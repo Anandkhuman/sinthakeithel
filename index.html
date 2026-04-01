@@ -31,11 +31,10 @@
             --info: #0984e3;
         }
 
-        /* Slightly decrease global scaling to make everything fit beautifully */
         html { font-size: 14px; }
         
         @media (max-width: 380px) {
-            html { font-size: 13px; } /* Shrink further for very small screens */
+            html { font-size: 13px; }
         }
 
         body {
@@ -61,6 +60,54 @@
                 height: 90vh;
                 max-height: 850px;
             }
+        }
+
+        /* =========================================================
+           TOAST NOTIFICATION SYSTEM CSS
+           ========================================================= */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: #333;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            font-size: 0.95em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDownToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toast i { font-size: 1.2em; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+        .toast.fade-out { animation: fadeOutToast 0.4s ease-out forwards; }
+
+        @keyframes slideDownToast {
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeOutToast {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
         }
 
         /* =========================================================
@@ -98,6 +145,7 @@
             background-color: var(--secondary-color);
             display: flex; flex-direction: column; z-index: 1;
             padding-bottom: 60px;
+            overflow-y: auto;
         }
         .page.active { opacity: 1; visibility: visible; z-index: 5; }
 
@@ -106,8 +154,10 @@
            ========================================================= */
         .auth-content {
             width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 15px;
+            display: flex; flex-direction: column; 
+            justify-content: flex-start;
+            align-items: center;
+            padding: 40px 15px; 
             box-sizing: border-box;
             background: #ecf0f1;
             overflow-y: auto;
@@ -121,6 +171,8 @@
             overflow: hidden;
             animation: fadeIn 0.5s ease-out;
             position: relative;
+            margin: auto; 
+            flex-shrink: 0; 
         }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -183,10 +235,9 @@
         #auth-error { 
             color: var(--danger); text-align: center; margin-bottom: 12px; 
             font-size: 0.85em; background: rgba(214, 48, 49, 0.1); padding: 8px; border-radius: 8px;
-            display: none; 
+            display: none; font-weight: 500;
         }
 
-        /* Toggle Switch CSS */
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
@@ -204,8 +255,22 @@
             padding: 15px 10px 10px 10px; color: var(--white);
             border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
             box-shadow: 0 4px 20px #00874370;
-            z-index: 100;
+            z-index: 100; flex-shrink: 0;
         }
+
+        /* STORE HOURS BANNER CSS */
+        .store-hours-banner {
+            display: none;  
+            color: #fff;
+            font-size: 0.85em;
+            text-align: center;
+            margin-top: 2px;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+        .banner-fade { animation: fadeText 0.5s ease-in-out; }
+        @keyframes fadeText { 0% { opacity: 0; } 100% { opacity: 1; } }
+
         .header-top { display: flex; justify-content: space-between; align-items: center; padding: 0 10px;}
         .header-top h1 { font-size: 1.3em; margin: 0; font-weight: 700; display:flex; align-items:center;}
         .user-greeting { font-size: 0.85em; font-weight: 500; opacity: 0.9; text-align: right; }
@@ -227,34 +292,63 @@
            UI COMPONENTS
            ========================================================= */
         .category-card {
-            flex-shrink: 0; width: 70px; text-align: center; cursor: pointer;
-            border: 2px solid transparent; border-radius: 15px; padding: 4px;
+            flex-shrink: 0;
+            width: 70px;
+            text-align: center;
+            cursor: pointer;
+            background-color: var(--white);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 4px;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
         }
-        .category-card.active { border-color: var(--primary-color); background-color: var(--border-color); }
-        .category-card img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
-        .category-card p { margin-top: 6px; font-size: 0.75em; font-weight: 500; color: var(--text-color); white-space: nowrap; }
 
+        .category-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: 15px;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255,255,255,0.6),
+                transparent
+            );
+            transform: translateX(-100%);
+            animation: shineMove 2.5s infinite;
+            z-index: 0;
+        }
+
+        .category-card > * { position: relative; z-index: 1; }
+        .category-card.active { border-color: var(--primary-color); background-color: var(--border-color); }
+        @keyframes shineMove { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+
+        .category-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .category-card p {
+            margin-top: 6px; font-size: 0.75em; font-weight: 500;
+            color: var(--text-color); white-space: nowrap;
+        }
+        
         .section-title { font-size: 1.1em; font-weight: 700; margin: 12px 0 8px 0; color: #2d3436; }
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 5px 0 12px 0; gap: 8px; scroll-behavior: smooth; }
         .horizontal-scroll::-webkit-scrollbar { display: none; }
-
-        .promo-banner {
-            width: 100%; height: 120px; 
-            background: linear-gradient(90deg, #2d3436, #636e72);
-            border-radius: 15px; margin-top: 12px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; box-sizing: border-box; color: white;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15); position: relative; overflow: hidden;
-        }
-        .promo-content h3 { margin: 0; font-size: 1.3em; font-weight: 700;}
-        .promo-content p { margin: 4px 0 0 0; font-size: 0.85em; opacity: 0.9; }
-        .promo-banner img { height: 130%; position: absolute; right: -15px; bottom: -15px; transform: rotate(-15deg); }
 
         .card {
             flex-shrink: 0; width: 135px; background-color: var(--white);
             border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.06);
             overflow: hidden; position: relative; transition: transform 0.2s ease; display:flex; flex-direction:column;
+            cursor: pointer;
         }
         .card:hover { transform: translateY(-2px); }
         .card img { width: 100%; height: 95px; object-fit: cover; }
@@ -311,7 +405,16 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid white;
         }
 
-        body.auth-screen .bottom-nav, body.auth-screen #cart-fab-container { display: none !important; }
+        /* NEW CHAT NOTIFICATION BADGE CSS */
+        .chat-badge {
+            position: absolute; top: -5px; right: -5px; background: var(--danger);
+            color: white; border-radius: 50%; width: 16px; height: 16px;
+            font-size: 0.7em; display: none; justify-content: center; align-items: center;
+            font-weight: bold; border: 2px solid var(--white); z-index: 10;
+        }
+
+        body.auth-screen .bottom-nav, body.auth-screen #cart-fab-container,
+        body.in-chat #customerBottomNav, body.in-chat #cart-fab-container, body.in-chat .bottom-nav { display: none !important; }
 
         .cart-item {
             display: flex; align-items: center; background: var(--white);
@@ -324,9 +427,9 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--primary-color); font-weight: bold;
         }
 
-        #map-container {
+        .map-container-common {
             height: 180px; width: 100%; border-radius: 12px; overflow: hidden; margin-top: 12px; margin-bottom: 12px;
-            border: 2px solid var(--primary-color); display: none;
+            border: 2px solid var(--primary-color); display: none; position: relative; z-index: 1;
         }
         .location-btn {
             background-color: #0984e3; color: var(--white); width: 100%; padding: 10px; border-radius: 10px; border: none;
@@ -334,7 +437,7 @@
             font-weight: 500; margin-bottom: 8px; transition: background 0.3s;
         }
         
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; width: 100%; text-align: left; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #2d3436; font-size: 0.85em; }
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 10px; box-sizing: border-box; font-family: inherit; background: #fff; }
         
@@ -363,6 +466,9 @@
         .notification-card {
             background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             display: flex; align-items: flex-start; position: relative;
+            flex-shrink: 0; 
+            width: 100%;
+            box-sizing: border-box;
         }
         .notif-icon-box {
             width: 35px; height: 35px; background: #e6f7ef; color: var(--primary-color); border-radius: 10px;
@@ -371,110 +477,205 @@
         .delete-notif-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #b2bec3; cursor: pointer; font-size: 1.05em; padding: 4px; }
         .delete-notif-btn:hover { color: var(--danger); }
 
-        /* =========================================================
-           ADMIN / DRIVER INTEGRATION CSS SECTION
-           ========================================================= */
-        #adminPage, #driverPage {
-            display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; background-color: var(--secondary-color);
-        }
-
-        .main-content { flex: 1; padding: 15px; padding-bottom: 90px; box-sizing: border-box; overflow-y: auto;}
-        .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.4s ease; }
-
-        .header-title { font-size: 1.3em; margin-bottom: 15px; font-weight: 700; color: #2d3436; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;}
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .stat-card {
-            background: var(--white); padding: 12px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.04);
-            display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;
-        }
-        .stat-info h3 { margin: 0; font-size: 1.2em; color: var(--text-color); }
-        .stat-info p { margin: 0; color: var(--light-text); font-size: 0.8em; font-weight: 600; text-transform: uppercase;}
-        .stat-icon {
-            width: 40px; height: 40px; background: #e6f7ef; color: var(--primary-color); border-radius: 10px;
-            display: flex; justify-content: center; align-items: center; font-size: 1.2em; margin-bottom: 4px;
-        }
-
-        .table-container { background: var(--white); border-radius: 15px; padding: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.04); overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 15px;}
-        table { width: 100%; border-collapse: collapse; min-width: 450px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
-        th { font-weight: 600; color: var(--light-text); text-transform: uppercase; font-size: 0.75em; letter-spacing: 0.5px; }
-        .status-select {
-            padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color);
-            background: #f8f9fa; font-family: inherit; font-size: 0.85em; font-weight: 600; outline: none;
-        }
-
-        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap:wrap; gap:8px; }
-        .btn-add {
-            background: var(--primary-gradient); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 135, 67, 0.3); font-size: 0.85em; cursor: pointer; display: flex; align-items: center; gap: 6px;
-        }
-        
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-        .admin-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.04); position: relative; }
-        .admin-card img { width: 100%; height: 100px; object-fit: cover; }
-        .admin-card-body { padding: 10px; }
-        .admin-card h4 { margin: 0; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .admin-card .price { color: var(--primary-color); font-weight: 700; margin-top: 4px; display: block; font-size: 0.85em;}
-        
-        .delete-btn {
-            position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.9); color: var(--danger);
-            width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; border: none; font-size: 0.85em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .edit-btn {
-            position: absolute; top: 6px; right: 40px; background: rgba(255,255,255,0.9); color: var(--info);
-            width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; border: none; font-size: 0.85em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .modal {
-            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; 
-            background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
-        }
-        .modal-content {
-            background-color: var(--white); padding: 20px; border-radius: 15px; width: 100%; max-width: 420px; position: relative; max-height: 90vh; overflow-y: auto;
-        }
-        .close-modal { position: absolute; right: 15px; top: 15px; font-size: 1.3em; cursor: pointer; color: var(--light-text); }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px; border: 2px solid #f1f2f6; border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 0.95em; background-color: #f8f9fa; outline: none; transition: border-color 0.3s;
-        }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary-color); }
-        
-        .code-input-modal { text-align: center; }
-        .code-input-modal h3 { margin-top: 0; color: var(--text-color); font-size: 1.3em;}
-        .code-input-modal p { color: var(--light-text); font-size: 0.9em; }
-        #deliveryCodeInput_admin, #deliveryCodeInput_driver { font-size: 1.8em; text-align: center; letter-spacing: 6px; padding: 12px; margin: 12px 0; font-weight: bold; color: var(--primary-color);}
-
-        .leaflet-marker-icon.driver-icon { background: none; border: none; }
-        
-        .settings-panel { background:var(--white); padding:15px; border-radius:15px; box-shadow:0 6px 15px rgba(0,0,0,0.04); margin-bottom:15px; }
-        .settings-panel input[type="number"] { padding:10px; border:2px solid #f1f2f6; border-radius:8px; width:90px; margin-right:10px; font-weight:bold; outline:none; text-align:center;}
-        .settings-panel input[type="number"]:focus { border-color: var(--primary-color); }
-        
-        /* Switch Panel in Profile Menu */
+        /* Profile Menu Specifics */
         .profile-menu-item {
             display: flex; align-items: center; padding: 12px; background: white; border-radius: 12px; 
             margin-bottom: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.03); cursor: pointer; transition: transform 0.2s;
             text-decoration: none; color: var(--text-color);
         }
         .profile-menu-item:hover { transform: translateY(-2px); }
-        .profile-menu-item i { font-size: 1.2em; width: 35px; color: var(--primary-color); }
+        .profile-menu-item i { font-size: 1.2em; width: 35px; color: var(--primary-color); text-align: center; }
         .profile-menu-item span { flex: 1; font-weight: 600; font-size: 1em; }
         .profile-menu-item .fa-chevron-right { width: auto; color: var(--light-text); font-size: 0.9em; }
 
+        /* =========================================================
+           ITEM DETAILS PAGE CSS
+           ========================================================= */
+        #itemDetailsPage { background: var(--secondary-color); padding-bottom: 70px; }
+        .item-details-hero { width: 100%; height: 250px; position: relative; }
+        .item-details-hero img { width: 100%; height: 100%; object-fit: cover; }
+        .item-details-hero .back-btn {
+            position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; color: var(--text-color); font-size: 1.2em; z-index: 10;
+        }
+        .item-details-card {
+            background: white; border-radius: 25px 25px 0 0; padding: 25px 20px;
+            margin-top: -30px; position: relative; z-index: 2; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+        }
+        .item-details-title { font-size: 1.5em; font-weight: 700; color: #2d3436; margin: 0 0 5px 0; }
+        .item-details-price { font-size: 1.3em; font-weight: 700; color: var(--primary-color); margin: 0 0 10px 0; }
+        .item-details-stars { color: #f1c40f; font-size: 1.1em; margin-bottom: 20px; display: flex; gap: 3px; }
+        .item-details-stars span { color: #b2bec3; font-size: 0.85em; margin-left: 8px; color: var(--light-text); }
+        
+        .item-qty-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 15px; border-top: 1px solid #f1f2f6; }
+        .item-qty-row span { font-weight: 600; color: #636e72; }
+        .detail-qty-controls { display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 5px 15px; border-radius: 20px; border: 1px solid #dfe6e9;}
+        .detail-qty-controls button {
+            background: none; border: none; font-size: 1.5em; cursor: pointer; color: var(--primary-color); font-weight: bold; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center;
+        }
+        .detail-qty-controls span { font-size: 1.2em; font-weight: 700; color: var(--text-color); }
+
+        /* =========================================================
+           ADMIN / DRIVER INTEGRATION CSS SECTION
+           ========================================================= */
+        #adminPage, #driverPage { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; background-color: var(--secondary-color); }
+        .main-content { flex: 1; padding: 15px; padding-bottom: 90px; box-sizing: border-box; overflow-y: auto;}
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.4s ease; }
+        .header-title { font-size: 1.3em; margin-bottom: 15px; font-weight: 700; color: #2d3436; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;}
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); padding: 12px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+        .stat-info h3 { margin: 0; font-size: 1.2em; color: var(--text-color); }
+        .stat-info p { margin: 0; color: var(--light-text); font-size: 0.8em; font-weight: 600; text-transform: uppercase;}
+        .stat-icon { width: 40px; height: 40px; background: #e6f7ef; color: var(--primary-color); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.2em; margin-bottom: 4px; }
+        .table-container { background: var(--white); border-radius: 15px; padding: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.04); overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 15px;}
+        table { width: 100%; border-collapse: collapse; min-width: 450px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
+        th { font-weight: 600; color: var(--light-text); text-transform: uppercase; font-size: 0.75em; letter-spacing: 0.5px; }
+        .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: #f8f9fa; font-family: inherit; font-size: 0.85em; font-weight: 600; outline: none; }
+        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap:wrap; gap:8px; }
+        .btn-add { background: var(--primary-gradient); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 135, 67, 0.3); font-size: 0.85em; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .admin-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.04); position: relative; }
+        .admin-card img { width: 100%; height: 100px; object-fit: cover; }
+        .admin-card-body { padding: 10px; }
+        .admin-card h4 { margin: 0; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-card .price { color: var(--primary-color); font-weight: 700; margin-top: 4px; display: block; font-size: 0.85em;}
+        .delete-btn { position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.9); color: var(--danger); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; font-size: 0.85em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .edit-btn { position: absolute; top: 6px; right: 40px; background: rgba(255,255,255,0.9); color: var(--info); width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; font-size: 0.85em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        .modal-content { background-color: var(--white); padding: 20px; border-radius: 15px; width: 100%; max-width: 420px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; right: 15px; top: 15px; font-size: 1.3em; cursor: pointer; color: var(--light-text); }
+        .modal .form-group input, .modal .form-group select { width: 100%; padding: 12px; border: 2px solid #f1f2f6; border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 0.95em; background-color: #f8f9fa; outline: none; transition: border-color 0.3s; }
+        .modal .form-group input:focus, .modal .form-group select:focus { border-color: var(--primary-color); }
+        .code-input-modal { text-align: center; }
+        .code-input-modal h3 { margin-top: 0; color: var(--text-color); font-size: 1.3em;}
+        .code-input-modal p { color: var(--light-text); font-size: 0.9em; }
+        #deliveryCodeInput_admin, #deliveryCodeInput_driver { font-size: 1.8em; text-align: center; letter-spacing: 6px; padding: 12px; margin: 12px 0; font-weight: bold; color: var(--primary-color);}
+        .leaflet-marker-icon.driver-icon { background: none; border: none; }
+        .settings-panel { background:var(--white); padding:15px; border-radius:15px; box-shadow:0 6px 15px rgba(0,0,0,0.04); margin-bottom:15px; }
+        .settings-panel input[type="number"], .settings-panel input[type="time"] { padding:10px; border:2px solid #f1f2f6; border-radius:8px; width:100%; font-weight:bold; outline:none; text-align:center;}
+        .settings-panel input[type="number"]:focus, .settings-panel input[type="time"]:focus { border-color: var(--primary-color); }
+
+        /* =========================================================
+           NEW FEATURES CSS (CHAT, REVIEWS, CONTACT, CLOSED)
+           ========================================================= */
+        /* Contact Us */
+        .contact-card { display:flex; align-items:center; background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+        .contact-card i.fa-whatsapp { color:#25D366; font-size:2em; margin-left:auto; cursor:pointer; }
+        .contact-info { flex:1; margin-left:15px; }
+        .contact-info h4 { margin:0; font-size:1.1em; color:#2d3436; }
+        .contact-info p { margin:4px 0 0 0; color:#636e72; font-size:0.9em; }
+
+        /* Chat Theme */
+        #chatRoomPage { padding-bottom: 0; display:flex; flex-direction:column; background:#ece5dd;}
+        #chatRoomPage .app-header { flex-shrink: 0; }
+        .chat-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; background:#ece5dd; }
+        .chat-messages { flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; }
+        .chat-bubble { max-width:75%; padding:10px 14px; border-radius:15px; position:relative; word-wrap:break-word; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
+        .chat-bubble.sent { align-self:flex-end; background:#dcf8c6; border-bottom-right-radius:2px; }
+        .chat-bubble.received { align-self:flex-start; background:#ffffff; border-bottom-left-radius:2px; }
+        .chat-sender { font-size:0.75em; font-weight:bold; color:var(--primary-color); margin-bottom:4px; display:block; }
+        .chat-time { font-size:0.65em; color:#999; text-align:right; margin-top:4px; display:block; }
+        .chat-input-area { background:#f0f0f0; padding:10px; display:flex; align-items:center; gap:10px; }
+        .chat-input-area input { flex:1; padding:12px 15px; border-radius:25px; border:none; outline:none; font-family:inherit; }
+        .chat-send-btn { background:var(--primary-color); color:white; width:45px; height:45px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:none; cursor:pointer; font-size:1.2em; }
+        .typing-indicator { font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
+
+        /* Store Closed Modified Background + Splash Layout */
+        #storeClosedPage { 
+            z-index:99999; 
+            padding: 0; 
+            overflow: hidden; 
+            position: relative; 
+            background: #000;
+            width: 100%;
+            height: 100vh; 
+        }
+        .store-closed-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0.6; z-index: 0;
+        }
+        .store-closed-content {
+            position: relative; 
+            z-index: 1; 
+            display:flex; 
+            flex-direction:column; 
+            align-items:center; 
+            justify-content:flex-end; 
+            text-align:center; 
+            padding:10px 10px 60px;
+            width: 100%; 
+            height: 100%; 
+            box-sizing: border-box;
+            background: rgba(0,0,0,0.1);
+        }
+        .store-closed-content h2 { color: #fff; font-size: 2em; margin-bottom: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .store-closed-content p.open-time { color: #55efc4; font-size: 1.2em; font-weight: 700; margin-bottom: 2px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .store-closed-content p.opening-in { color: #fff; font-size: 0.95em; margin-bottom: 2px; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); text-transform: uppercase; letter-spacing: 1px;}
+        
+        .timer-box { display:flex; gap:15px; justify-content:center; margin-bottom: 10px; }
+        .time-segment { background: rgba(0, 135, 67, 0.8); backdrop-filter: blur(5px); color:white; padding:15px; border-radius:12px; width:65px; font-size:1.8em; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);}
+        .time-label { font-size:0.5em; display:block; font-weight:bold; text-transform:uppercase; margin-top:8px; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); letter-spacing: 1px;}
+        
+        #storeClosedVisitBtn {
+            background: rgba(255, 255, 255, 0.95);
+            color: #008743;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: none;
+            width: 80%;
+            margin-top: 5px;
+        }
+
+        /* Review Section */
+        .review-card { background:#f8f9fa; padding:12px; border-radius:12px; margin-bottom:10px; border:1px solid #eee; }
+        .review-header { display:flex; justify-content:space-between; margin-bottom:5px; }
+        .review-stars { color:#f1c40f; font-size:0.9em; }
     </style>
 </head>
 <body class="auth-screen">
 
-    <!-- SPLASH SCREEN -->
+    <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- HIDDEN INVOICE CONTAINER -->
+    <div id="invoice-container" style="position: absolute; top: -9999px; left: -9999px; width: 700px; z-index: -1; background: #fff;"></div>
+
+    <!-- INITIAL SPLASH SCREEN (Default hidden if store is closed immediately) -->
     <div id="splashScreen">
         <img src="https://github.com/Anandkhuman/sinthalottery/raw/main/splash1.gif" alt="Loading...">
     </div>
 
-    <!-- HIDDEN INVOICE CONTAINER -->
-    <div id="invoice-container" style="position: absolute; top: -9999px; left: -9999px; width: 700px; z-index: -1; background: #fff;"></div>
+    <!-- REVIEW MODAL (Global) -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="reviewModal">&times;</span>
+            <h2 style="margin-top:0; font-size:1.2em; color:var(--text-color);">Review Items</h2>
+            <div class="form-group">
+                <label>Select Item to Review</label>
+                <select id="reviewItemSelect" class="form-control"></select>
+            </div>
+            <div class="form-group" style="text-align:center;">
+                <label>Rating</label>
+                <div id="reviewStarSelection" style="font-size:2em; color:#ccc; cursor:pointer;">
+                    <i class="fas fa-star" data-val="1"></i>
+                    <i class="fas fa-star" data-val="2"></i>
+                    <i class="fas fa-star" data-val="3"></i>
+                    <i class="fas fa-star" data-val="4"></i>
+                    <i class="fas fa-star" data-val="5"></i>
+                </div>
+                <input type="hidden" id="reviewRatingVal" value="0">
+            </div>
+            <div class="form-group">
+                <label>Comment</label>
+                <textarea id="reviewText" class="form-control" rows="3" placeholder="Tell us what you think..."></textarea>
+            </div>
+            <button class="btn-main" id="submitReviewBtn" style="margin-bottom:0;">Submit Review</button>
+        </div>
+    </div>
 
     <div class="mobile-container">
 
@@ -483,7 +684,7 @@
             <div class="auth-content">
                 <div class="auth-card">
                     <div class="auth-header">
-                        <div class="logo-circle"><i class="fas fa-mug-hot"></i></div>
+                        <div class="logo-circle"><i class="fas fa-shopping-cart"></i></div>
                         <h1>Welcome Back</h1>
                         <p>Sign in to continue to Sintha Keithel</p>
                     </div>
@@ -530,8 +731,6 @@
                         <p>Enter your email to receive a reset link</p>
                     </div>
                     <div class="auth-body">
-                        <p id="reset-error" style="color: var(--danger); text-align: center; display: none; margin-bottom: 12px; font-size: 0.85em; background: rgba(214, 48, 49, 0.1); padding: 8px; border-radius: 8px;"></p>
-                        <p id="reset-success" style="color: var(--success); text-align: center; display: none; margin-bottom: 12px; font-size: 0.85em; background: rgba(0, 184, 148, 0.1); padding: 8px; border-radius: 8px;"></p>
                         
                         <div class="input-group">
                             <label class="input-label">EMAIL ADDRESS</label>
@@ -568,14 +767,15 @@
         <!-- REGISTER PAGE -->
         <div id="registerPage" class="page">
              <div class="auth-content">
-                <div class="auth-card">
-                    <div class="auth-header">
+                <div class="auth-card" style="margin: 20px auto;">
+                    <div class="auth-header" style="padding-top:20px;">
                         <div class="logo-circle"><i class="fas fa-user-plus"></i></div>
                         <h1>Create Account</h1>
                         <p>Join the Sintha Keithel</p>
                     </div>
                     
                     <div class="auth-body">
+                        <!-- Basic Info -->
                         <div class="input-group">
                             <label class="input-label">FULL NAME</label>
                             <input type="text" id="regName" class="auth-input" placeholder="John Doe">
@@ -590,6 +790,28 @@
                             <label class="input-label">PASSWORD</label>
                             <input type="password" id="registerPassword" class="auth-input" placeholder="••••••••">
                             <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">MOBILE NUMBER</label>
+                            <input type="tel" id="regPhone" class="auth-input" placeholder="10-digit number" maxlength="10">
+                            <i class="fas fa-phone"></i>
+                        </div>
+
+                        <!-- Address Info for Automatic Checkout -->
+                        <div class="form-group" style="margin-bottom: 15px; margin-top: 15px;">
+                            <label style="font-size: 0.8em; color: #636e72; font-weight: 600; margin-left: 5px; margin-bottom: 5px;">DELIVERY LOCATION (Optional but Recommended)</label>
+                            <button class="location-btn" id="regGeoBtn" style="font-size:0.9em;"><i class="fas fa-location-arrow"></i> Use My Current Location</button>
+                            <div id="reg-map-container" class="map-container-common"><div id="reg-map" style="height:100%; width:100%;"></div></div>
+                            <input type="text" id="regAddressText" class="form-control" placeholder="House/Flat No., Landmark, City" style="margin-bottom: 8px; font-size: 0.9em;">
+                            <input type="hidden" id="regLat"><input type="hidden" id="regLng">
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 8px;">
+                            <div style="flex: 1;"><input type="text" id="regPin" class="form-control" placeholder="PIN Code" maxlength="6" style="font-size: 0.9em;"></div>
+                            <div style="flex: 1;"><input type="text" id="regVillage" class="form-control" placeholder="Village/Area" style="font-size: 0.9em;"></div>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 8px; margin-bottom:20px;">
+                            <div style="flex: 1;"><input type="text" id="regDistrict" class="form-control" placeholder="District" style="font-size: 0.9em;" readonly></div>
+                            <div style="flex: 1;"><input type="text" id="regState" class="form-control" placeholder="State" style="font-size: 0.9em;" readonly></div>
                         </div>
                         
                         <button class="btn-main" id="registerBtn">Sign Up</button>
@@ -606,26 +828,67 @@
         <div id="appContainer" class="page">
             <header class="app-header">
                 <div class="header-top">
-                    <h1><i class="fas fa-mug-hot" style="margin-right:8px;"></i> Sintha Keithel</h1>
+                    <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
                     <div class="user-greeting" id="userGreeting">Hello, Guest</div>
                 </div>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="What are you craving?">
                 </div>
+                <!-- Info Banner if working hours are ON -->
+                <div id="storeHoursBanner" class="store-hours-banner">
+                    <span id="bannerText"></span>
+                </div>
             </header>
 
             <main>
                 <h2 class="section-title">Categories</h2>
                 <div class="horizontal-scroll" id="category-section-dynamic"></div>
-                
+
                 <h2 class="section-title">Most Popular Dishes</h2>
                 <div class="horizontal-scroll" id="popularDishesContainer"></div>
-
 
                 <h2 class="section-title" id="dishesListTitle">Recommended Dishes</h2>
                 <div class="horizontal-scroll" id="dishesContainer" style="flex-wrap: wrap; justify-content: space-between;"></div>
             </main>
+        </div>
+        
+        <!-- ITEM DETAILS PAGE -->
+        <div id="itemDetailsPage" class="page">
+            <div class="item-details-hero">
+                <div class="back-btn" data-target="appContainer"><i class="fas fa-arrow-left"></i></div>
+                <img id="detailHeroImage" src="" alt="Dish">
+            </div>
+            <div class="item-details-card">
+                <h2 class="item-details-title" id="detailTitle">Dish Name</h2>
+                <h3 class="item-details-price" id="detailPrice">₹0.00</h3>
+                <div class="item-details-stars">
+                    <i class="fas fa-star"></i><strong style="color:#2d3436; margin-left:5px;">0.0</strong>
+                    <span>(0 Reviews)</span>
+                </div>
+                
+                <div class="item-qty-row">
+                    <span>Select Quantity</span>
+                    <div class="detail-qty-controls">
+                        <button id="detailQtyMinus">-</button>
+                        <span id="detailQtyValue">1</span>
+                        <button id="detailQtyPlus">+</button>
+                    </div>
+                </div>
+                
+                <button class="btn-main" id="detailAddToCartBtn" style="margin-top: 10px; font-size: 1.1em; padding: 15px;"><i class="fas fa-shopping-basket"></i> Add to Cart</button>
+            </div>
+
+            <!-- Customer Reviews Section -->
+            <div style="padding: 0 15px; margin-top: 20px;">
+                <h2 class="section-title">Customer Reviews</h2>
+                <div id="itemReviewsContainer"></div>
+            </div>
+            
+            <div style="padding: 0 15px; margin-top: 20px;">
+                <h2 class="section-title">Recommended For You</h2>
+                <div class="horizontal-scroll" id="detailsRecommendedContainer"></div>
+            </div>
         </div>
 
         <!-- CART -->
@@ -659,10 +922,10 @@
                 <div class="form-group"><label>Full Name</label><input type="text" id="checkoutName" class="form-control" placeholder="Your Name"></div>
                 <div class="form-group">
                     <label>Delivery Location</label>
-                    <button class="location-btn" id="geoBtn"><i class="fas fa-location-arrow"></i> Use My Current Location</button>
-                    <div id="map-container"><div id="map" style="height:100%; width:100%;"></div></div>
-                    <input type="text" id="addressText" class="form-control" placeholder="House/Flat No., Landmark, City" style="margin-bottom: 8px;">
-                    <input type="hidden" id="lat"><input type="hidden" id="lng">
+                    <button class="location-btn" id="chkGeoBtn"><i class="fas fa-location-arrow"></i> Use My Current Location</button>
+                    <div id="chk-map-container" class="map-container-common"><div id="chk-map" style="height:100%; width:100%;"></div></div>
+                    <input type="text" id="checkoutAddressText" class="form-control" placeholder="House/Flat No., Landmark, City" style="margin-bottom: 8px;">
+                    <input type="hidden" id="chkLat"><input type="hidden" id="chkLng">
                 </div>
                 <div class="form-group" style="display: flex; gap: 8px;">
                     <div style="flex: 1;"><label>PIN Code</label><input type="text" id="checkoutPin" class="form-control" placeholder="e.g. 795001" maxlength="6"></div>
@@ -672,7 +935,7 @@
                     <div style="flex: 1;"><label>District</label><input type="text" id="checkoutDistrict" class="form-control" placeholder="District"></div>
                     <div style="flex: 1;"><label>State</label><input type="text" id="checkoutState" class="form-control" placeholder="State"></div>
                 </div>
-                 <div class="form-group"><label>Contact Phone Number</label><input type="tel" id="contactPhone" class="form-control" placeholder="10-digit Mobile Number" maxlength="10"></div>
+                 <div class="form-group"><label>Contact Phone Number</label><input type="tel" id="checkoutPhone" class="form-control" placeholder="10-digit Mobile Number" maxlength="10"></div>
                 <div class="form-group">
                     <label>Payment Method</label>
                     <label class="payment-option">
@@ -713,12 +976,97 @@
                     <h2 style="margin: 0; font-size: 1.2em;">Notifications</h2>
                 </div>
             </header>
-            <div style="flex:1; padding:15px; overflow-y:auto;" id="notificationListContainer">
+            <div style="flex:1; padding:15px; overflow-y:auto; display: flex; flex-direction: column;" id="notificationListContainer">
                 <p style="text-align:center; color:#777; margin-top:40px;">Loading...</p>
             </div>
         </div>
 
-        <!-- MENU / PROFILE PAGE (REPLACES SIDE MENU) -->
+        <!-- CHAT SELECTION PAGE -->
+        <div id="chatSelectionPage" class="page">
+            <header class="app-header" style="border-radius: 0 0 20px 20px;">
+                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
+                    <i class="fas fa-arrow-left" data-target="appContainer" style="font-size: 1.1em; cursor: pointer;"></i>
+                    <h2 style="margin: 0; font-size: 1.2em;">Chat Board</h2>
+                </div>
+            </header>
+            <div style="padding:15px; display:flex; flex-direction:column; gap:15px;">
+                <div class="profile-menu-item" onclick="loadChat('public', null, 'Public Community')">
+                    <div style="position:relative; width:50px; height:50px; background:#e6f7ef; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px; font-size:1.5em; color:var(--primary-color);">
+                        <i class="fas fa-users"></i>
+                        <div id="custPublicChatBadge" class="chat-badge">0</div>
+                    </div>
+                    <div style="flex:1;">
+                        <span style="display:block; font-size:1.1em; margin-bottom:4px; font-weight:700;">Public Community</span>
+                        <span style="font-size:0.85em; color:var(--light-text); font-weight:normal;">Chat with everyone</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                
+                <div class="profile-menu-item" onclick="loadChat('private', currentUser.uid, 'Support Team')">
+                    <div style="position:relative; width:50px; height:50px; background:#e0f0ff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px; font-size:1.5em; color:var(--info);">
+                        <i class="fas fa-headset"></i>
+                        <div id="custPrivateChatBadge" class="chat-badge">0</div>
+                    </div>
+                    <div style="flex:1;">
+                        <span style="display:block; font-size:1.1em; margin-bottom:4px; font-weight:700;">Support Team</span>
+                        <span style="font-size:0.85em; color:var(--light-text); font-weight:normal;">Private chat with admins</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAT ROOM PAGE -->
+        <div id="chatRoomPage" class="page" style="z-index: 20;">
+            <header class="app-header" style="border-radius:0;">
+                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
+                    <i class="fas fa-arrow-left" id="chatBackBtn" style="font-size: 1.1em; cursor: pointer;"></i>
+                    <h2 id="chatRoomTitle" style="margin: 0; font-size: 1.2em;">Chat</h2>
+                </div>
+            </header>
+            <div class="chat-container">
+                <div id="chatMessagesContainer" class="chat-messages"></div>
+                <div id="typingIndicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Type a message...">
+                    <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT US PAGE -->
+        <div id="contactUsPage" class="page">
+            <header class="app-header" style="border-radius: 0 0 20px 20px;">
+                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
+                    <i class="fas fa-arrow-left" data-target="menuPage" style="font-size: 1.1em; cursor: pointer;"></i>
+                    <h2 style="margin: 0; font-size: 1.2em;">Contact Us</h2>
+                </div>
+            </header>
+            <div style="flex:1; padding:15px; overflow-y:auto;">
+                <p style="color:#636e72; font-size:0.9em; text-align:center; margin-bottom:20px;">Need help? Reach out to our support team directly via WhatsApp.</p>
+                <div id="contactUsList"></div>
+            </div>
+        </div>
+
+        <!-- STORE CLOSED PAGE -->
+        <div id="storeClosedPage" class="page">
+            <img src="https://github.com/Anandkhuman/sinthalottery/raw/main/splash2.gif" alt="Closed Splash" class="store-closed-bg">
+            <div class="store-closed-content">
+                <h2>Store is Closed</h2>
+                <p id="closedPageOpenTimeText" class="open-time">Opens at: --:--</p>
+                
+                <p class="opening-in">Opening In</p>
+                <div class="timer-box">
+                    <div><div class="time-segment" id="tc-h">00</div><span class="time-label">Hours</span></div>
+                    <div><div class="time-segment" id="tc-m">00</div><span class="time-label">Mins</span></div>
+                    <div><div class="time-segment" id="tc-s">00</div><span class="time-label">Secs</span></div>
+                </div>
+                
+                <button class="btn-main" id="storeClosedVisitBtn"><i class="fas fa-eye"></i> Visit Sintha Keithel</button>
+            </div>
+        </div>
+
+        <!-- MENU / PROFILE PAGE -->
         <div id="menuPage" class="page">
             <header class="app-header">
                 <div class="header-top">
@@ -728,8 +1076,16 @@
             <div style="flex:1; padding:15px; overflow-y:auto;">
                 <h3 style="margin-top:0; color:var(--text-color); font-size:1.1em;">My Account</h3>
                 
+                <div class="profile-menu-item" data-target="editProfilePage" id="openEditProfileBtn">
+                    <i class="fas fa-address-card"></i><span>Edit Profile & Address</span><i class="fas fa-chevron-right"></i>
+                </div>
+
                 <div class="profile-menu-item" data-target="ordersPage">
                     <i class="fas fa-receipt"></i><span>Order History</span><i class="fas fa-chevron-right"></i>
+                </div>
+
+                <div class="profile-menu-item" data-target="contactUsPage" onclick="loadContactUs()">
+                    <i class="fas fa-headset"></i><span>Contact Us</span><i class="fas fa-chevron-right"></i>
                 </div>
 
                 <div id="adminSwitchSection" style="display:none; margin-top: 20px;">
@@ -753,6 +1109,40 @@
                 <button class="btn-main" style="background: #ff7675; margin-top:25px;" id="menuLogoutBtn">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
+            </div>
+        </div>
+
+        <!-- EDIT PROFILE / ADDRESS PAGE -->
+        <div id="editProfilePage" class="page">
+            <header class="app-header" style="border-radius: 0 0 20px 20px;">
+                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
+                    <i class="fas fa-arrow-left" data-target="menuPage" style="font-size: 1.1em; cursor: pointer;"></i>
+                    <h2 style="margin: 0; font-size: 1.2em;">Edit Profile</h2>
+                </div>
+            </header>
+            <div style="flex:1; padding:15px; overflow-y:auto;">
+                <div class="form-group"><label>Full Name</label><input type="text" id="profName" class="form-control"></div>
+                <div class="form-group"><label>Mobile Number</label><input type="tel" id="profPhone" class="form-control" maxlength="10"></div>
+                
+                <h3 style="font-size:1.05em; color:var(--primary-color); border-bottom:1px solid #eee; padding-bottom:8px; margin-top:20px;">Saved Address</h3>
+                
+                <div class="form-group">
+                    <label>Location on Map</label>
+                    <button class="location-btn" id="profGeoBtn"><i class="fas fa-location-arrow"></i> Update Current Location</button>
+                    <div id="prof-map-container" class="map-container-common"><div id="prof-map" style="height:100%; width:100%;"></div></div>
+                    <input type="text" id="profAddressText" class="form-control" placeholder="House/Flat No., Landmark, City" style="margin-bottom: 8px;">
+                    <input type="hidden" id="profLat"><input type="hidden" id="profLng">
+                </div>
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;"><label>PIN Code</label><input type="text" id="profPin" class="form-control" maxlength="6"></div>
+                    <div style="flex: 1;"><label>Village/Area</label><input type="text" id="profVillage" class="form-control"></div>
+                </div>
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;"><label>District</label><input type="text" id="profDistrict" class="form-control" readonly></div>
+                    <div style="flex: 1;"><label>State</label><input type="text" id="profState" class="form-control" readonly></div>
+                </div>
+
+                <button class="btn-main" id="saveProfileBtn" style="margin-top:20px;">Save Changes</button>
             </div>
         </div>
 
@@ -783,6 +1173,13 @@
 
          <div class="bottom-nav" id="customerBottomNav">
             <div class="nav-item active" data-page="appContainer"><i class="fas fa-home"></i><span>Home</span></div>
+            
+            <div class="nav-item" data-page="chatSelectionPage" style="position:relative;">
+                <i class="fas fa-comments"></i>
+                <div id="customerChatBadge" class="chat-badge">0</div>
+                <span>Chat</span>
+            </div>
+
             <div class="nav-item" data-page="notificationsPage" id="notifNavBtn">
                 <div style="position:relative; display:flex; justify-content:center; align-items:center;">
                     <i class="fas fa-bell"></i>
@@ -804,7 +1201,6 @@
                     <div class="user-greeting" id="adminGreetingName">Hello, Admin</div>
                 </div>
             </header>
-
             <div class="main-content">
                 <div id="dashboard_admin" class="section active">
                     <div class="header-title">Overview</div>
@@ -813,35 +1209,41 @@
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-shopping-bag"></i></div><div class="stat-info"><h3 id="stat-orders_admin">0</h3><p>Orders</p></div></div>
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-hamburger"></i></div><div class="stat-info"><h3 id="stat-dishes_admin">0</h3><p>Dishes</p></div></div>
                     </div>
-
                     <div class="settings-panel">
                         <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:8px; font-size:1.05em;">System Settings</h3>
                         
-                        <!-- Toggle Switch for Role Selection -->
-                        <div style="display:flex; align-items:center; margin-bottom:5px; margin-top:12px;">
+                        <!-- NEW: Working Hours Settings -->
+                        <div style="background:#f8f9fa; padding:10px; border-radius:10px; margin-bottom:15px; border: 1px solid var(--border-color);">
+                            <h4 style="margin:0 0 10px 0; color:var(--text-color); font-size:0.95em;"><i class="fas fa-clock"></i> Working Hours</h4>
+                            <div style="display:flex; align-items:center; margin-bottom:10px;">
+                                <label style="flex:1; font-weight:600; font-size:0.9em; color:var(--light-text);">Enable Store Hours:</label>
+                                <label class="switch"><input type="checkbox" id="adminEnableHours"><span class="slider round"></span></label>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <div style="flex:1;"><label style="font-size:0.8em; font-weight:600;">Open Time</label><input type="time" id="adminStartTime"></div>
+                                <div style="flex:1;"><label style="font-size:0.8em; font-weight:600;">Close Time</label><input type="time" id="adminStopTime"></div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; margin-bottom:5px;">
                             <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Enable Role Selection:</label>
-                            <label class="switch">
-                                <input type="checkbox" id="adminEnableRoleSelect">
-                                <span class="slider round"></span>
-                            </label>
+                            <label class="switch"><input type="checkbox" id="adminEnableRoleSelect"><span class="slider round"></span></label>
                         </div>
                         <p style="color:var(--danger); font-size:0.75em; margin-top:0; margin-bottom:12px; display:flex; gap:5px; align-items:flex-start;">
                             <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
                             <span>Warning: Enabling this allows new registrations to select Admin or Driver roles automatically. Ask before turning on.</span>
                         </p>
-
                         <div style="display:flex; align-items:center; margin-bottom:12px; margin-top:12px;">
                             <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Delivery Charge (₹):</label>
-                            <input type="number" id="adminDeliveryCharge" value="50">
+                            <input type="number" id="adminDeliveryCharge" value="50" style="width: 100px;">
                         </div>
                         <div style="display:flex; align-items:center; margin-bottom:15px;">
                             <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Driver Commission (₹):</label>
-                            <input type="number" id="adminDriverCommission" value="20">
+                            <input type="number" id="adminDriverCommission" value="20" style="width: 100px;">
                         </div>
                         <button class="btn-main" style="margin:0;" id="saveSettingsBtn_admin">Save Settings</button>
                     </div>
                 </div>
-
                 <div id="orders_admin" class="section">
                     <div class="header-title">Live Orders</div>
                     <div class="table-container">
@@ -851,7 +1253,6 @@
                         </table>
                     </div>
                 </div>
-
                 <div id="menu_admin" class="section">
                     <div class="action-bar">
                         <div class="header-title" style="margin:0; border:none; padding:0;">Dishes Catalog</div>
@@ -866,6 +1267,12 @@
                     </div>
                     <div class="menu-grid" id="dishesGrid_admin"></div>
                 </div>
+                
+                <!-- NEW ADMIN CHAT SECTION -->
+                <div id="chat_admin" class="section">
+                    <div class="header-title">Chat & Support</div>
+                    <div id="adminChatListContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
 
                 <div id="categories_admin" class="section">
                     <div class="action-bar">
@@ -874,7 +1281,6 @@
                     </div>
                     <div class="menu-grid" id="categoriesGrid_admin"></div>
                 </div>
-
                 <div id="users_admin" class="section">
                     <div class="header-title">User Management</div>
                     <h3 style="margin-top:15px; color:var(--primary-dark); font-size:1.05em;"><i class="fas fa-motorcycle"></i> Drivers</h3>
@@ -884,26 +1290,27 @@
                             <tbody id="driversTableBody_admin"></tbody>
                         </table>
                     </div>
-
                     <h3 style="margin-top:15px; color:var(--info); font-size:1.05em;"><i class="fas fa-users"></i> Customers</h3>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Customer Info</th><th>Email</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Customer Info</th><th>Contact & Address</th><th>Actions</th></tr></thead>
                             <tbody id="customersTableBody_admin"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
             <div class="bottom-nav">
                 <div class="nav-item active" data-admin-target="dashboard_admin"><i class="fas fa-chart-pie"></i><span>Home</span></div>
                 <div class="nav-item" data-admin-target="orders_admin"><i class="fas fa-receipt"></i><span>Orders</span></div>
-                <div class="nav-item" data-admin-target="menu_admin"><i class="fas fa-utensils"></i><span>Dishes</span></div>
-                <div class="nav-item" data-admin-target="categories_admin"><i class="fas fa-tags"></i><span>Categories</span></div>
+                <div class="nav-item" data-admin-target="menu_admin"><i class="fas fa-utensils"></i><span>Menu</span></div>
+                <div class="nav-item" data-admin-target="chat_admin" style="position:relative;">
+                    <i class="fas fa-comments"></i>
+                    <div id="adminChatBadge" class="chat-badge">0</div>
+                    <span>Chat</span>
+                </div>
                 <div class="nav-item" data-admin-target="users_admin"><i class="fas fa-users"></i><span>Users</span></div>
                 <div class="nav-item logout-btn" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i><span>App</span></div>
             </div>
-
             <!-- MODALS ADMIN -->
             <div id="dishModal_admin" class="modal">
                 <div class="modal-content">
@@ -929,7 +1336,6 @@
                     <button class="btn-main" style="margin-bottom:0;" id="saveDishBtn_admin">Save to Menu</button>
                 </div>
             </div>
-
             <div id="categoryModal_admin" class="modal">
                 <div class="modal-content">
                     <span class="close-modal" data-modal="categoryModal_admin">&times;</span>
@@ -939,7 +1345,6 @@
                     <button class="btn-main" style="margin-bottom:0;" id="saveCategoryBtn_admin">Save Category</button>
                 </div>
             </div>
-
             <div id="deliveryCodeModal_admin" class="modal">
                 <div class="modal-content code-input-modal">
                     <span class="close-modal" data-modal="deliveryCodeModal_admin">&times;</span>
@@ -964,7 +1369,6 @@
                     Total Earnings: <span style="color:#ffd32a;">₹<span id="driverHeaderEarnings">0</span></span>
                 </div>
             </header>
-
             <div class="main-content">
                 <div id="dashboard_driver" class="section active">
                     <div class="header-title">Driver Dashboard</div>
@@ -974,38 +1378,27 @@
                         <div class="stat-card"><div class="stat-icon" style="background:#e6f7ef; color:var(--success);"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="stat-completed_driver">0</h3><p>Completed</p></div></div>
                     </div>
                 </div>
-
                 <div id="requests_driver" class="section">
                     <div class="header-title">New Order Requests</div>
                     <div id="driverRequestsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
                 </div>
-
                 <div id="active_driver" class="section">
                     <div class="header-title">My Active Deliveries</div>
                     <div id="driverActiveContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
                 </div>
-                
                 <div id="history_driver" class="section">
                     <div class="header-title">Delivery History</div>
                     <div id="driverHistoryContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
                 </div>
-
                 <div id="profile_driver" class="section">
                     <div class="header-title">Driver Profile</div>
                     <div class="settings-panel">
-                        <div class="form-group">
-                            <label>Dear Name (Display Name)</label>
-                            <input type="text" id="driverProfileName" class="form-control" placeholder="e.g. John (Driver)" style="width:100%; text-align:left;">
-                        </div>
-                        <div class="form-group">
-                            <label>Mobile Number</label>
-                            <input type="tel" id="driverProfilePhone" class="form-control" placeholder="10-digit Number" style="width:100%; text-align:left;" maxlength="10">
-                        </div>
+                        <div class="form-group"><label>Dear Name (Display Name)</label><input type="text" id="driverProfileName" class="form-control" placeholder="e.g. John (Driver)" style="width:100%; text-align:left;"></div>
+                        <div class="form-group"><label>Mobile Number</label><input type="tel" id="driverProfilePhone" class="form-control" placeholder="10-digit Number" style="width:100%; text-align:left;" maxlength="10"></div>
                         <button class="btn-main" id="saveDriverProfileBtn" style="margin-bottom:0;">Save Profile</button>
                     </div>
                 </div>
             </div>
-
             <div class="bottom-nav">
                 <div class="nav-item active" data-driver-target="dashboard_driver"><i class="fas fa-chart-pie"></i><span>Home</span></div>
                 <div class="nav-item" data-driver-target="requests_driver"><i class="fas fa-list"></i><span>Requests</span></div>
@@ -1014,7 +1407,6 @@
                 <div class="nav-item" data-driver-target="profile_driver"><i class="fas fa-user-cog"></i><span>Profile</span></div>
                 <div class="nav-item" onclick="showPage('menuPage')"><i class="fas fa-arrow-left"></i><span>App</span></div>
             </div>
-
             <!-- MODALS DRIVER -->
             <div id="deliveryCodeModal_driver" class="modal">
                 <div class="modal-content code-input-modal">
@@ -1025,7 +1417,6 @@
                     <button class="btn-main" style="margin-bottom:0;" id="verifyCodeBtn_driver">Verify Code</button>
                 </div>
             </div>
-
             <!-- DRIVER PAYMENT MODAL -->
             <div id="driverPaymentModal" class="modal">
                 <div class="modal-content code-input-modal">
@@ -1086,8 +1477,36 @@
         let globalDeliveryCharge = 50;
         let globalDriverCommission = 20;
         let globalEnableRoleSelection = false;
+        let globalWorkingHours = { enabled: false, start: '09:00', end: '22:00' };
+        window.isStoreClosedViewOnly = false;
+        window.hasClickedVisit = false; 
 
-        let pendingRegName = ''; // Global var for capturing name across auth states
+        let pendingRegName = '';
+
+        // Item Details Tracking
+        let currentDetailDish = null;
+        let currentDetailQty = 1;
+
+        // =========================================================
+        // TOAST NOTIFICATION FUNCTION 
+        // =========================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'fa-info-circle';
+            if (type === 'success') icon = 'fa-check-circle';
+            if (type === 'error') icon = 'fa-exclamation-circle';
+            
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
 
         // Fetch Global Settings
         db.ref('settings').on('value', snap => {
@@ -1096,29 +1515,94 @@
                 globalDeliveryCharge = parseFloat(s.deliveryCharge) || 50;
                 globalDriverCommission = parseFloat(s.driverCommission) || 20;
                 globalEnableRoleSelection = s.enableRoleSelection !== undefined ? s.enableRoleSelection : false;
+                if(s.workingHours) globalWorkingHours = s.workingHours;
                 
                 const adminChg = document.getElementById('adminDeliveryCharge');
                 const adminCom = document.getElementById('adminDriverCommission');
                 const adminRoleToggle = document.getElementById('adminEnableRoleSelect');
+                const adminWH = document.getElementById('adminEnableHours');
+                const adminStart = document.getElementById('adminStartTime');
+                const adminEnd = document.getElementById('adminStopTime');
 
                 if(adminChg) adminChg.value = globalDeliveryCharge;
                 if(adminCom) adminCom.value = globalDriverCommission;
                 if(adminRoleToggle) adminRoleToggle.checked = globalEnableRoleSelection;
+                if(adminWH) adminWH.checked = globalWorkingHours.enabled;
+                if(adminStart) adminStart.value = globalWorkingHours.start;
+                if(adminEnd) adminEnd.value = globalWorkingHours.end;
 
                 updateCartUI();
+                checkAndEnforceStoreHours();
             }
         });
 
-        // Tracking Map Variables 
         const allMaps = {};
         const allMarkers = {};
+
+        function initPickerMap(btnId, mapContainerId, mapId, latId, lngId, addressId) {
+            document.getElementById(btnId).addEventListener('click', () => {
+                const btn = document.getElementById(btnId);
+                document.getElementById(mapContainerId).style.display = 'block';
+                
+                let pMap = allMaps[mapId];
+                if(!pMap) {
+                    pMap = L.map(mapId).setView([24.8170, 93.9368], 13); 
+                    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' }).addTo(pMap);
+                    
+                    pMap.on('click', (e) => {
+                        let m = allMarkers[mapId];
+                        if(m) pMap.removeLayer(m);
+                        allMarkers[mapId] = L.marker([e.latlng.lat, e.latlng.lng]).addTo(pMap);
+                        document.getElementById(latId).value = e.latlng.lat;
+                        document.getElementById(lngId).value = e.latlng.lng;
+                        fetchAddress(e.latlng.lat, e.latlng.lng, addressId);
+                    });
+                    allMaps[mapId] = pMap;
+                }
+                
+                setTimeout(() => pMap.invalidateSize(), 300);
+                
+                if (navigator.geolocation) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+                    navigator.geolocation.getCurrentPosition(
+                        (p) => {
+                            let m = allMarkers[mapId];
+                            if(m) pMap.removeLayer(m);
+                            allMarkers[mapId] = L.marker([p.coords.latitude, p.coords.longitude]).addTo(pMap);
+                            document.getElementById(latId).value = p.coords.latitude;
+                            document.getElementById(lngId).value = p.coords.longitude;
+                            pMap.setView([p.coords.latitude, p.coords.longitude], 16);
+                            fetchAddress(p.coords.latitude, p.coords.longitude, addressId);
+                            btn.innerHTML = '<i class="fas fa-check"></i> Location Set';
+                        },
+                        (e) => { 
+                            showToast("Geolocation permission denied. Please click on the map or enter manually.", "error"); 
+                            btn.innerHTML = '<i class="fas fa-location-arrow"></i> Use My Current Location'; 
+                        }
+                    );
+                }
+            });
+        }
+
+        initPickerMap('regGeoBtn', 'reg-map-container', 'reg-map', 'regLat', 'regLng', 'regAddressText');
+        initPickerMap('chkGeoBtn', 'chk-map-container', 'chk-map', 'chkLat', 'chkLng', 'checkoutAddressText');
+        initPickerMap('profGeoBtn', 'prof-map-container', 'prof-map', 'profLat', 'profLng', 'profAddressText');
+
+        function fetchAddress(lat, lng, addressInputId) {
+            const addr = document.getElementById(addressInputId);
+            addr.value = "Fetching address...";
+            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
+                .then(r => r.json())
+                .then(d => {
+                     addr.value = `${d.locality || ''}, ${d.principalSubdivision || ''}, ${d.countryName || ''}`;
+                     if(addressInputId === 'checkoutAddressText') checkOrderValidity();
+                }).catch(() => addr.value = "Could not fetch address. Please enter manually.");
+        }
 
         function initOrUpdateMap(mapContainerId, destLat, destLng, driverLat, driverLng) {
             const mapEl = document.getElementById(mapContainerId);
             if (!mapEl) return;
-            
             mapEl.style.display = 'block';
-            
             let mapObj = allMaps[mapContainerId];
             if (!mapObj) {
                 mapObj = L.map(mapContainerId);
@@ -1126,47 +1610,55 @@
                 allMaps[mapContainerId] = mapObj;
                 allMarkers[mapContainerId] = { dest: null, driver: null };
             }
-
             setTimeout(() => mapObj.invalidateSize(), 300);
-
             const markers = allMarkers[mapContainerId];
 
             if (destLat && destLng) {
                 const destLatLng = [destLat, destLng];
-                if (!markers.dest) {
-                    markers.dest = L.marker(destLatLng).addTo(mapObj).bindPopup("Delivery Address");
-                } else {
-                    markers.dest.setLatLng(destLatLng);
-                }
+                if (!markers.dest) markers.dest = L.marker(destLatLng).addTo(mapObj).bindPopup("Delivery Address");
+                else markers.dest.setLatLng(destLatLng);
             }
-
             if (driverLat && driverLng) {
                 const driverLatLng =[driverLat, driverLng];
                 if (!markers.driver) {
                     const icon = L.divIcon({html: '<i class="fas fa-motorcycle" style="color:#d63031; font-size:24px; text-shadow:1px 1px 2px #000;"></i>', className: 'driver-icon', iconSize:[24,24]});
                     markers.driver = L.marker(driverLatLng, {icon: icon}).addTo(mapObj).bindPopup("Driver");
-                } else {
-                    markers.driver.setLatLng(driverLatLng);
-                }
+                } else markers.driver.setLatLng(driverLatLng);
             }
 
             if (markers.dest && markers.driver) {
                 mapObj.fitBounds(L.latLngBounds(markers.dest.getLatLng(), markers.driver.getLatLng()), {padding:[30,30]});
-            } else if (markers.dest) {
-                mapObj.setView(markers.dest.getLatLng(), 15);
-            } else if (markers.driver) {
-                mapObj.setView(markers.driver.getLatLng(), 15);
-            }
+            } else if (markers.dest) mapObj.setView(markers.dest.getLatLng(), 15);
+            else if (markers.driver) mapObj.setView(markers.driver.getLatLng(), 15);
         }
 
+        function setupPinAutoFill(pinId, distId, stateId, callback) {
+            document.getElementById(pinId).addEventListener('input', function() {
+                const pin = this.value.trim();
+                const distEl = document.getElementById(distId);
+                const stateEl = document.getElementById(stateId);
+                if (pin.length === 6) {
+                    fetch(`https://api.postalpincode.in/pincode/${pin}`).then(res => res.json()).then(data => {
+                            if (data && data[0] && data[0].Status === 'Success') {
+                                const po = data[0].PostOffice[0];
+                                distEl.value = po.District; stateEl.value = po.State;
+                            } else { distEl.value = ''; stateEl.value = ''; }
+                            if(callback) callback();
+                        }).catch(err => { if(callback) callback(); });
+                } else { distEl.value = ''; stateEl.value = ''; if(callback) callback(); }
+            });
+        }
+        setupPinAutoFill('regPin', 'regDistrict', 'regState');
+        setupPinAutoFill('checkoutPin', 'checkoutDistrict', 'checkoutState', () => checkOrderValidity());
+        setupPinAutoFill('profPin', 'profDistrict', 'profState');
+
+
         // =========================================================
-        // INVOICE GENERATION LOGIC (Optimized Alignment & Margins)
+        // INVOICE GENERATION LOGIC 
         // =========================================================
         window.downloadInvoice = (orderStr) => {
             const order = JSON.parse(decodeURIComponent(orderStr));
             const invoiceEl = document.createElement('div');
-            
-            // Fixed width to 700px to perfectly fit A4 sizing and prevent right side cutoff
             invoiceEl.style.padding = '30px'; 
             invoiceEl.style.fontFamily = "'Poppins', sans-serif";
             invoiceEl.style.color = '#2d3436';
@@ -1198,10 +1690,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #008743; padding-bottom: 20px; margin-bottom: 30px;">
                     <div style="flex: 1;">
                         <h1 style="color: #008743; margin: 0; font-size: 2.2em; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-mug-hot"></i> Sintha Keithel
+                            <i class="fas fa-shopping-cart"></i> Sintha Keithel
                         </h1>
-                        <p style="margin: 5px 0 0 0; color: #636e72; font-size: 0.9em;">www.sinthakeithel.com</p>
-                        <p style="margin: 2px 0 0 0; color: #636e72; font-size: 0.9em;">support@sinthakeithel.com</p>
+                        <p style="margin: 5px 0 0 0; color: #636e72; font-size: 0.9em;">www.sinthakeithel.in</p>
+                        <p style="margin: 2px 0 0 0; color: #636e72; font-size: 0.9em;">support@sinthakeithel.in</p>
                     </div>
                     <div style="text-align: right; flex: 1;">
                         <h2 style="margin: 0; color: #2d3436; font-size: 1.8em; text-transform: uppercase; letter-spacing: 2px;">Invoice</h2>
@@ -1209,7 +1701,6 @@
                         <p style="margin: 2px 0 0 0; color: #636e72; font-size: 0.9em;">Date: ${new Date(order.timestamp).toLocaleString()}</p>
                     </div>
                 </div>
-
                 <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
                     <div style="flex: 1; padding-right: 15px;">
                         <h3 style="color: #008743; margin-top: 0; margin-bottom: 8px; font-size: 1.05em; text-transform: uppercase;">Billed To:</h3>
@@ -1224,7 +1715,6 @@
                         ${order.paymentId ? `<p style="margin: 2px 0 0 0; color: #636e72; font-size: 0.85em;">Txn: ${order.paymentId}</p>` : ''}
                     </div>
                 </div>
-
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed;">
                     <thead>
                         <tr style="background-color: #f4f6f8; border-bottom: 2px solid #dfe6e9;">
@@ -1234,28 +1724,15 @@
                             <th style="padding: 10px; text-align: right; color: #2d3436; width: 25%; font-size: 0.9em;">Total</th>
                         </tr>
                     </thead>
-                    <tbody style="font-size: 0.95em;">
-                        ${itemsHtml}
-                    </tbody>
+                    <tbody style="font-size: 0.95em;">${itemsHtml}</tbody>
                 </table>
-
                 <div style="display: flex; justify-content: flex-end;">
                     <div style="width: 280px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #636e72; font-size: 0.95em;">
-                            <span>Subtotal:</span>
-                            <span>₹${subtotal.toFixed(2)}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;">
-                            <span>Delivery Fee:</span>
-                            <span>₹${deliveryFee.toFixed(2)}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; border-top: 2px solid #dfe6e9; padding-top: 12px; font-weight: 700; font-size: 1.2em; color: #008743;">
-                            <span>Total Amount:</span>
-                            <span>₹${parseFloat(order.total).toFixed(2)}</span>
-                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #636e72; font-size: 0.95em;"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;"><span>Delivery Fee:</span><span>₹${deliveryFee.toFixed(2)}</span></div>
+                        <div style="display: flex; justify-content: space-between; border-top: 2px solid #dfe6e9; padding-top: 12px; font-weight: 700; font-size: 1.2em; color: #008743;"><span>Total Amount:</span><span>₹${parseFloat(order.total).toFixed(2)}</span></div>
                     </div>
                 </div>
-
                 <div style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
                     <h3 style="color: #008743; margin: 0 0 4px 0; font-size: 1.1em;">Thank you for your order!</h3>
                     <p style="color: #636e72; margin: 0; font-size: 0.85em;">If you have any questions about this invoice, please contact our support.</p>
@@ -1267,16 +1744,13 @@
             container.appendChild(invoiceEl);
 
             const opt = {
-                margin:       10, // Margin in mm (ensures safety zones)
+                margin:       10, 
                 filename:     `Invoice_${order.id.substring(1,8)}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, windowWidth: 720 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-
-            html2pdf().set(opt).from(invoiceEl).save().then(() => {
-                container.innerHTML = '';
-            });
+            html2pdf().set(opt).from(invoiceEl).save().then(() => { container.innerHTML = ''; });
         };
 
         // =========================================================
@@ -1290,12 +1764,11 @@
             activePageId = id;
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             
-            // Handle bottom nav active states for customer
-            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage') {
+            // Handle bottom nav active states
+            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'chatSelectionPage' || id === 'contactUsPage') {
                 document.querySelectorAll('#customerBottomNav .nav-item').forEach(nav => {
                     let navPage = nav.dataset.page;
-                    // Orders map to menu nav visual
-                    if(id === 'ordersPage' && navPage === 'menuPage') { nav.classList.add('active'); }
+                    if((id === 'ordersPage' || id === 'editProfilePage' || id === 'contactUsPage') && navPage === 'menuPage') { nav.classList.add('active'); }
                     else if((id === 'cartPage' || id === 'checkoutPage') && navPage === 'appContainer') { nav.classList.add('active'); }
                     else { nav.classList.toggle('active', navPage === id); }
                 });
@@ -1303,15 +1776,17 @@
             
             const custNav = document.getElementById('customerBottomNav');
             const cartFab = document.getElementById('cart-fab-container');
-            // Show bottom nav strictly for these screens (fixes hidden navigation)
-            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage') {
+            
+            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'itemDetailsPage' || id === 'chatSelectionPage' || id === 'contactUsPage') {
                 custNav.style.display = 'flex';
-                // Only hide floating cart FAB on cart and checkout page, but keep nav
-                cartFab.style.display = (id === 'cartPage' || id === 'checkoutPage') ? 'none' : 'block';
+                cartFab.style.display = (id === 'cartPage' || id === 'checkoutPage' || id === 'itemDetailsPage') ? 'none' : 'block';
             } else {
                 custNav.style.display = 'none';
                 cartFab.style.display = 'none';
             }
+
+            if(id === 'chatRoomPage') document.body.classList.add('in-chat');
+            else document.body.classList.remove('in-chat');
 
             if(id === 'loginPage' || id === 'registerPage' || id === 'forgotPasswordPage' || id === 'roleSelectPage') {
                 document.body.classList.add('auth-screen');
@@ -1320,14 +1795,17 @@
             }
 
             if(id === 'checkoutPage') {
-                setTimeout(() => { if(map) map.invalidateSize(); }, 300);
+                setTimeout(() => { if(allMaps['chk-map']) allMaps['chk-map'].invalidateSize(); }, 300);
+                autoFillCheckoutFromProfile();
                 checkOrderValidity();
             }
-            if(id === 'ordersPage') loadOrders();
-            if(id === 'notificationsPage') {
-                loadNotifications();
-                markNotificationsAsRead();
+            if(id === 'editProfilePage') {
+                setTimeout(() => { if(allMaps['prof-map']) allMaps['prof-map'].invalidateSize(); }, 300);
+                loadProfileDataIntoForm();
             }
+
+            if(id === 'ordersPage') loadOrders();
+            if(id === 'notificationsPage') { loadNotifications(); markNotificationsAsRead(); }
         };
 
         document.querySelectorAll('[data-target]:not(.close-modal), [data-page]').forEach(b => 
@@ -1339,37 +1817,47 @@
         );
         document.getElementById('gotoRegister').onclick = () => showPage('registerPage');
         document.getElementById('gotoLogin').onclick = () => showPage('loginPage');
-        
         document.getElementById('gotoForgot').onclick = () => showPage('forgotPasswordPage');
         document.getElementById('backToLoginFromReset').onclick = () => showPage('loginPage');
+        
         document.getElementById('sendResetBtn').onclick = () => {
             const email = document.getElementById('resetEmail').value;
             if(!email) {
-                document.getElementById('reset-error').textContent = "Please enter an email address.";
-                document.getElementById('reset-error').style.display = 'block';
+                showToast("Please enter an email address.", "error");
                 return;
             }
             auth.sendPasswordResetEmail(email)
                 .then(() => {
-                    document.getElementById('reset-success').textContent = "Reset link sent to your email.";
-                    document.getElementById('reset-success').style.display = 'block';
-                    document.getElementById('reset-error').style.display = 'none';
+                    showToast("Password reset link sent to your email.", "success");
+                    showPage('loginPage');
                 }).catch(e => {
-                    document.getElementById('reset-error').textContent = e.message;
-                    document.getElementById('reset-error').style.display = 'block';
-                    document.getElementById('reset-success').style.display = 'none';
+                    if(e.code === 'auth/user-not-found') {
+                        showToast("No account found with this email address.", "error");
+                    } else if(e.code === 'auth/invalid-email') {
+                        showToast("Please enter a valid email address.", "error");
+                    } else {
+                        showToast("Failed to send reset link. Please try again.", "error");
+                    }
                 });
         };
 
-        document.getElementById('menuLogoutBtn').onclick = () => { auth.signOut(); cart=[]; updateCartUI(); };
+        document.getElementById('menuLogoutBtn').onclick = () => { 
+            auth.signOut().then(() => {
+                cart=[]; 
+                window.hasClickedVisit = false;
+                updateCartUI(); 
+                showToast("Logged out successfully.", "success");
+            });
+        };
         
         document.getElementById('goToCheckoutBtn').onclick = () => {
-            if(cart.length === 0) {
-                alert("Please add items to your cart before proceeding to checkout.");
+            if(window.isStoreClosedViewOnly) {
+                showToast("Store is closed. Checkout is currently disabled.", "error");
                 return;
             }
-            if(currentUserData) {
-                document.getElementById('checkoutName').value = currentUserData.name || currentUser.displayName || '';
+            if(cart.length === 0) { 
+                showToast("Please add items to your cart before proceeding to checkout.", "info"); 
+                return; 
             }
             showPage('checkoutPage');
         };
@@ -1377,16 +1865,11 @@
         document.getElementById('trackOrderBtn').onclick = () => showPage('ordersPage');
         document.getElementById('backToHomeBtn').onclick = () => showPage('appContainer');
 
-        // Centralized and Race-Condition Safe Auth Observer (Fixed Role Check)
+        // Centralized and Race-Condition Safe Auth Observer 
         auth.onAuthStateChanged(u => {
-            
-            // Hide Splash screen once auth check is complete
-            // Using a slight timeout so it doesn't just flash on fast connections
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
-                if (splash && !splash.classList.contains('hidden')) {
-                    splash.classList.add('hidden');
-                }
+                if (splash && !splash.classList.contains('hidden')) splash.classList.add('hidden');
             }, 6000);
 
             if(u) {
@@ -1396,13 +1879,9 @@
                         userData = {
                             email: u.email,
                             name: u.displayName || pendingRegName || 'Guest',
-                            role: '',
-                            banned: false,
-                            createdAt: Date.now()
+                            role: '', banned: false, createdAt: Date.now()
                         };
-                        db.ref('users/' + u.uid).set(userData).then(() => {
-                            checkRoleAndProceed(u, userData);
-                        });
+                        db.ref('users/' + u.uid).set(userData).then(() => { checkRoleAndProceed(u, userData); });
                     } else {
                         if ((!userData.name || userData.name === 'Guest') && (u.displayName || pendingRegName)) {
                             userData.name = u.displayName || pendingRegName;
@@ -1412,57 +1891,44 @@
                     }
                 });
             } else {
-                currentUser = null;
-                currentUserData = null;
+                currentUser = null; currentUserData = null;
+                window.hasClickedVisit = false;
                 showPage('loginPage');
                 if (ordersRef) ordersRef.off();
                 if (notificationsListener) notificationsListener.off();
             }
         });
 
-        // Safe Function to fetch DB state and show proper role selection page
         function checkRoleAndProceed(u, userData) {
-            if(userData.banned) {
-                auth.signOut();
-                alert("Your account has been banned by the Admin.");
-                return;
+            if(userData.banned) { 
+                auth.signOut(); 
+                showToast("Your account has been banned by the Administrator.", "error"); 
+                return; 
             }
             currentUser = u;
             currentUserData = userData;
 
             if(!userData.role || userData.role === '') {
-                // Ensure we get the fresh setting straight from Firebase to avoid skipping
                 db.ref('settings').once('value').then(setSnap => {
                     let canSelect = false;
-                    if(setSnap.exists() && setSnap.val().enableRoleSelection !== undefined) {
-                        canSelect = setSnap.val().enableRoleSelection;
-                    }
-                    
-                    if(canSelect === true || canSelect === "true") {
-                        showPage('roleSelectPage');
-                    } else {
+                    if(setSnap.exists() && setSnap.val().enableRoleSelection !== undefined) canSelect = setSnap.val().enableRoleSelection;
+                    if(canSelect === true || canSelect === "true") showPage('roleSelectPage');
+                    else {
                         db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
-                            userData.role = 'customer';
-                            finalizeLogin('customer', u, userData);
+                            userData.role = 'customer'; finalizeLogin('customer', u, userData);
                         });
                     }
                 }).catch(err => {
-                    console.error("Error fetching settings", err);
-                    // Fallback to customer if db fails
                     db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
-                        userData.role = 'customer';
-                        finalizeLogin('customer', u, userData);
+                        userData.role = 'customer'; finalizeLogin('customer', u, userData);
                     });
                 });
-            } else {
-                finalizeLogin(userData.role, u, userData);
-            }
+            } else finalizeLogin(userData.role, u, userData);
         }
 
         window.selectRole = (role) => {
             db.ref('users/' + currentUser.uid).update({ role: role }).then(() => {
-                currentUserData.role = role;
-                finalizeLogin(role, currentUser, currentUserData);
+                currentUserData.role = role; finalizeLogin(role, currentUser, currentUserData);
             });
         };
 
@@ -1476,57 +1942,181 @@
             fetchAndRenderCategories();
             listenForStatusUpdates(); 
             listenForUnreadNotifications();
+            listenForChatUnreadCount(); // <-- Call Chat Notification Listener
+            checkAndEnforceStoreHours(); 
             
             const name = userData.name || u.displayName || 'Guest';
             const shortName = name.split(' ')[0];
             document.getElementById('userGreeting').innerHTML = `Hello, ${shortName}`;
 
-            if(role === 'admin') {
-                document.getElementById('adminGreetingName').innerText = `Hello, ${shortName}`;
-                initAdminContext();
-            }
-            if(role === 'driver') {
-                document.getElementById('driverGreetingName').innerText = `Hello, ${shortName}`;
-                initDriverContext();
-            }
+            if(role === 'admin') { document.getElementById('adminGreetingName').innerText = `Hello, ${shortName}`; initAdminContext(); }
+            if(role === 'driver') { document.getElementById('driverGreetingName').innerText = `Hello, ${shortName}`; initDriverContext(); }
+            
+            showToast(`Welcome back, ${shortName}!`, 'success');
         }
 
         const showError = (msg) => {
             const err = document.getElementById('auth-error');
-            err.textContent = msg;
+            err.textContent = msg; 
             err.style.display = 'block';
+            showToast(msg, 'error');
         }
 
-        document.getElementById('loginBtn').onclick = () => auth.signInWithEmailAndPassword(
-            document.getElementById('loginEmail').value, document.getElementById('loginPassword').value
-        ).catch(e => showError(e.message));
+        document.getElementById('loginBtn').onclick = () => {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
 
-        document.getElementById('googleBtn').onclick = () => {
-            auth.signInWithPopup(googleProvider).catch(e => showError(e.message));
+            if(!email || !pass) {
+                showError("Please enter both email and password.");
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, pass).catch(e => {
+                if (e.code === 'auth/user-not-found') {
+                    showError("User does not exist. Please register first.");
+                } else if (e.code === 'auth/wrong-password') {
+                    showError("Wrong password. Please try again.");
+                } else if (e.code === 'auth/invalid-credential') {
+                    showError("Invalid email or password. Please try again.");
+                } else if (e.code === 'auth/invalid-email') {
+                    showError("Please enter a valid email address.");
+                } else if (e.code === 'auth/user-disabled') {
+                    showError("This account has been disabled by the admin.");
+                } else if (e.code === 'auth/too-many-requests') {
+                    showError("Too many failed attempts. Please try again later.");
+                } else {
+                    showError("Login failed. Please check your credentials.");
+                }
+            });
         };
 
+        document.getElementById('googleBtn').onclick = () => { 
+            auth.signInWithPopup(googleProvider).catch(e => showToast("Google Sign-In failed or was cancelled.", "error")); 
+        };
+
+        // REGISTER LOGIC
         document.getElementById('registerBtn').onclick = () => {
             const email = document.getElementById('registerEmail').value;
             const pass = document.getElementById('registerPassword').value;
             const name = document.getElementById('regName').value;
-            if(!name) { showError("Please enter your full name"); return; }
+            const phone = document.getElementById('regPhone').value;
             
-            pendingRegName = name; // Ensures checkRoleAndProceed will pick it up properly
+            if(!name) { showError("Please enter your full name."); return; }
+            if(phone && phone.length < 10) { showError("Please enter a valid 10-digit mobile number."); return; }
+            
+            const addrInfo = {
+                phone: phone,
+                address: document.getElementById('regAddressText').value,
+                lat: document.getElementById('regLat').value,
+                lng: document.getElementById('regLng').value,
+                pin: document.getElementById('regPin').value,
+                village: document.getElementById('regVillage').value,
+                district: document.getElementById('regDistrict').value,
+                state: document.getElementById('regState').value
+            };
+
+            pendingRegName = name;
             auth.createUserWithEmailAndPassword(email, pass)
                 .then((userCred) => {
                     userCred.user.updateProfile({ displayName: name });
+                    db.ref('users/' + userCred.user.uid).update(addrInfo);
+                    showToast("Account created successfully!", "success");
                 })
-                .catch(e => showError(e.message));
+                .catch(e => {
+                    if(e.code === 'auth/email-already-in-use') {
+                        showError("Email is already registered. Please try logging in.");
+                    } else if(e.code === 'auth/weak-password') {
+                        showError("Password is too weak. Please use at least 6 characters.");
+                    } else if(e.code === 'auth/invalid-email') {
+                        showError("Please enter a valid email address.");
+                    } else {
+                        showError("Registration failed. Please check your details.");
+                    }
+                });
+        };
+
+        function loadProfileDataIntoForm() {
+            if(!currentUser) return;
+            db.ref('users/' + currentUser.uid).once('value', snap => {
+                const u = snap.val();
+                if(!u) return;
+                document.getElementById('profName').value = u.name || '';
+                document.getElementById('profPhone').value = u.phone || '';
+                document.getElementById('profAddressText').value = u.address || '';
+                document.getElementById('profPin').value = u.pin || '';
+                document.getElementById('profVillage').value = u.village || '';
+                document.getElementById('profDistrict').value = u.district || '';
+                document.getElementById('profState').value = u.state || '';
+                document.getElementById('profLat').value = u.lat || '';
+                document.getElementById('profLng').value = u.lng || '';
+
+                if(u.lat && u.lng) {
+                    document.getElementById('prof-map-container').style.display = 'block';
+                    let pMap = allMaps['prof-map'];
+                    if(pMap) {
+                        setTimeout(() => pMap.invalidateSize(), 300);
+                        let m = allMarkers['prof-map'];
+                        if(m) pMap.removeLayer(m);
+                        allMarkers['prof-map'] = L.marker([u.lat, u.lng]).addTo(pMap);
+                        pMap.setView([u.lat, u.lng], 15);
+                    }
+                }
+            });
+        }
+
+        document.getElementById('saveProfileBtn').onclick = () => {
+            if(!currentUser) return;
+            const profileData = {
+                name: document.getElementById('profName').value,
+                phone: document.getElementById('profPhone').value,
+                address: document.getElementById('profAddressText').value,
+                pin: document.getElementById('profPin').value,
+                village: document.getElementById('profVillage').value,
+                district: document.getElementById('profDistrict').value,
+                state: document.getElementById('profState').value,
+                lat: document.getElementById('profLat').value,
+                lng: document.getElementById('profLng').value
+            };
+            db.ref('users/' + currentUser.uid).update(profileData).then(() => {
+                currentUserData = {...currentUserData, ...profileData}; 
+                showToast("Profile and Address updated successfully!", "success");
+                showPage('menuPage');
+            }).catch(e => showToast("Error saving profile. Please try again.", "error"));
         };
 
         const nameInput = document.getElementById('checkoutName');
-        const phoneInput = document.getElementById('contactPhone');
-        const addressInput = document.getElementById('addressText');
+        const phoneInput = document.getElementById('checkoutPhone');
+        const addressInput = document.getElementById('checkoutAddressText');
         const pinInput = document.getElementById('checkoutPin');
         const villageInput = document.getElementById('checkoutVillage');
         const districtInput = document.getElementById('checkoutDistrict');
         const stateInput = document.getElementById('checkoutState');
         const orderBtn = document.getElementById('placeOrderBtn');
+
+        function autoFillCheckoutFromProfile() {
+            if(!currentUserData) return;
+            nameInput.value = currentUserData.name || currentUser.displayName || '';
+            if(!phoneInput.value) phoneInput.value = currentUserData.phone || '';
+            if(!addressInput.value) addressInput.value = currentUserData.address || '';
+            if(!pinInput.value) pinInput.value = currentUserData.pin || '';
+            if(!villageInput.value) villageInput.value = currentUserData.village || '';
+            if(!districtInput.value) districtInput.value = currentUserData.district || '';
+            if(!stateInput.value) stateInput.value = currentUserData.state || '';
+            
+            if(currentUserData.lat && currentUserData.lng && !document.getElementById('chkLat').value) {
+                document.getElementById('chkLat').value = currentUserData.lat;
+                document.getElementById('chkLng').value = currentUserData.lng;
+                document.getElementById('chk-map-container').style.display = 'block';
+                let cMap = allMaps['chk-map'];
+                if(cMap) {
+                    setTimeout(() => cMap.invalidateSize(), 300);
+                    let m = allMarkers['chk-map'];
+                    if(m) cMap.removeLayer(m);
+                    allMarkers['chk-map'] = L.marker([currentUserData.lat, currentUserData.lng]).addTo(cMap);
+                    cMap.setView([currentUserData.lat, currentUserData.lng], 15);
+                }
+            }
+        }
         
         document.querySelectorAll('input[name="paymentMethod"]').forEach(elem => {
             elem.addEventListener("change", function(event) {
@@ -1535,39 +2125,7 @@
             });
         });
 
-        nameInput.addEventListener('input', checkOrderValidity);
-        phoneInput.addEventListener('input', checkOrderValidity);
-        addressInput.addEventListener('input', checkOrderValidity);
-        villageInput.addEventListener('input', checkOrderValidity);
-        districtInput.addEventListener('input', checkOrderValidity);
-        stateInput.addEventListener('input', checkOrderValidity);
-
-        pinInput.addEventListener('input', function() {
-            const pin = this.value.trim();
-            if (pin.length === 6) {
-                fetch(`https://api.postalpincode.in/pincode/${pin}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data[0] && data[0].Status === 'Success') {
-                            const postOffice = data[0].PostOffice[0];
-                            districtInput.value = postOffice.District;
-                            stateInput.value = postOffice.State;
-                        } else {
-                            districtInput.value = '';
-                            stateInput.value = '';
-                        }
-                        checkOrderValidity();
-                    })
-                    .catch(err => {
-                        console.error('Error fetching PIN details:', err);
-                        checkOrderValidity();
-                    });
-            } else {
-                districtInput.value = '';
-                stateInput.value = '';
-                checkOrderValidity();
-            }
-        });
+        [nameInput, phoneInput, addressInput, villageInput, districtInput, stateInput].forEach(inp => inp.addEventListener('input', checkOrderValidity));
 
         function checkOrderValidity() {
             const nameVal = nameInput.value.trim();
@@ -1578,60 +2136,18 @@
             const districtVal = districtInput.value.trim();
             const stateVal = stateInput.value.trim();
             
-            if (nameVal.length > 0 && phoneVal.length >= 10 && addressVal.length > 5 && pinVal.length === 6 && villageVal.length > 0 && districtVal.length > 0 && stateVal.length > 0 && selectedPaymentMethod && cart.length > 0) {
+            if (nameVal.length > 0 && phoneVal.length >= 10 && addressVal.length > 5 && pinVal.length === 6 && villageVal.length > 0 && districtVal.length > 0 && stateVal.length > 0 && selectedPaymentMethod && cart.length > 0 && !window.isStoreClosedViewOnly) {
                 orderBtn.disabled = false;
                 orderBtn.style.opacity = '1';
-                if(selectedPaymentMethod === 'razorpay') {
-                    orderBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Pay';
-                } else if (selectedPaymentMethod === 'cod') {
-                    orderBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                }
+                if(selectedPaymentMethod === 'razorpay') orderBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Pay';
+                else if (selectedPaymentMethod === 'cod') orderBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
             } else {
                 orderBtn.disabled = true;
                 orderBtn.style.opacity = '0.6';
-                if (cart.length === 0) {
-                    orderBtn.textContent = "Cart is Empty";
-                } else {
-                    orderBtn.textContent = "Complete Your Details";
-                }
+                if (window.isStoreClosedViewOnly) orderBtn.textContent = "Store is Closed";
+                else if (cart.length === 0) orderBtn.textContent = "Cart is Empty";
+                else orderBtn.textContent = "Complete Your Details";
             }
-        }
-
-        document.getElementById('geoBtn').addEventListener('click', () => {
-            const btn = document.getElementById('geoBtn');
-            document.getElementById('map-container').style.display = 'block';
-            if(!map) {
-                map = L.map('map').setView([24.8170, 93.9368], 13); 
-                L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' }).addTo(map);
-                map.on('click', (e) => handleLocationUpdate(e.latlng.lat, e.latlng.lng));
-            }
-            map.invalidateSize();
-            if (navigator.geolocation) {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
-                navigator.geolocation.getCurrentPosition(
-                    (p) => {
-                        handleLocationUpdate(p.coords.latitude, p.coords.longitude);
-                        map.setView([p.coords.latitude, p.coords.longitude], 16);
-                        btn.innerHTML = '<i class="fas fa-check"></i> Location Set';
-                    },
-                    (e) => { alert("Geolocation permission denied. Please click on the map or enter your address manually."); btn.innerHTML = '<i class="fas fa-location-arrow"></i> Use My Current Location'; }
-                );
-            }
-        });
-
-        function handleLocationUpdate(lat, lng) {
-            if(marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map);
-            document.getElementById('lat').value = lat;
-            document.getElementById('lng').value = lng;
-            const addr = document.getElementById('addressText');
-            addr.value = "Fetching address...";
-            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
-                .then(r => r.json())
-                .then(d => {
-                     addr.value = `${d.locality || ''}, ${d.principalSubdivision || ''}, ${d.countryName || ''}`;
-                     checkOrderValidity();
-                }).catch(() => addr.value = "Could not fetch address. Please enter manually.");
         }
 
         function fetchData() {
@@ -1658,18 +2174,63 @@
             `;
         }
 
-        function renderPopularDishes(dishesList) {
-            const c = document.getElementById('popularDishesContainer');
-            c.innerHTML = '';
-            let popular =[...dishesList].sort(() => 0.5 - Math.random()).slice(0, 5);
-            if(popular.length === 0) { 
-                c.innerHTML = '<p style="padding:10px; color:#666; width:100%; text-align:center;">No popular dishes right now.</p>'; 
-                return; 
-            }
-            popular.forEach(d => {
+        window.openItemDetails = (dishId) => {
+            currentDetailDish = allDishesData.find(d => d.key === dishId);
+            if(!currentDetailDish) return;
+            currentDetailQty = 1;
+
+            document.getElementById('detailHeroImage').src = currentDetailDish.imageUrl;
+            document.getElementById('detailTitle').textContent = currentDetailDish.name;
+            document.getElementById('detailPrice').textContent = `₹${parseFloat(currentDetailDish.price).toFixed(2)}`;
+            document.getElementById('detailQtyValue').textContent = currentDetailQty;
+
+            const avgRating = currentDetailDish.rating ? parseFloat(currentDetailDish.rating).toFixed(1) : '0.0';
+            const rCount = currentDetailDish.reviewCount || 0;
+            document.querySelector('.item-details-stars').innerHTML = `
+                <i class="fas fa-star"></i><strong style="color:#2d3436; margin-left:5px;">${avgRating}</strong>
+                <span>(${rCount} Review${rCount!==1?'s':''})</span>
+            `;
+            
+            document.getElementById('itemReviewsContainer').innerHTML = '<p style="color:#666;">Loading reviews...</p>';
+            db.ref(`dishes/${dishId}/reviews`).once('value', snap => {
+                const cont = document.getElementById('itemReviewsContainer');
+                cont.innerHTML = '';
+                if(!snap.exists()) {
+                    cont.innerHTML = '<p style="color:#666; font-size:0.9em;">No reviews yet. Be the first to review after purchasing!</p>';
+                } else {
+                    const revs = [];
+                    snap.forEach(c => revs.push(c.val()));
+                    revs.reverse(); 
+                    
+                    revs.forEach(r => {
+                        let starsHtml = '';
+                        for(let i=1; i<=5; i++) {
+                            starsHtml += `<i class="fas fa-star" style="color:${i<=r.rating ? '#f1c40f' : '#ccc'}"></i>`;
+                        }
+                        const date = new Date(r.timestamp).toLocaleDateString();
+                        cont.innerHTML += `
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <strong style="font-size:0.9em; color:#2d3436;">${r.name}</strong>
+                                    <span style="font-size:0.75em; color:#b2bec3;">${date}</span>
+                                </div>
+                                <div class="review-stars">${starsHtml}</div>
+                                <p style="margin:5px 0 0 0; font-size:0.85em; color:#636e72;">${r.text}</p>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            const recCont = document.getElementById('detailsRecommendedContainer');
+            recCont.innerHTML = '';
+            let recommendations = allDishesData.filter(d => d.key !== dishId).sort(() => 0.5 - Math.random()).slice(0, 4);
+            
+            recommendations.forEach(d => {
                 const stock = parseInt(d.stock) || 0;
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.onclick = () => openItemDetails(d.key); 
                 card.innerHTML = createDishCardHTML(d);
                 
                 const addBtn = document.createElement('button');
@@ -1677,7 +2238,79 @@
                     addBtn.className = 'add-btn'; addBtn.style.background = '#ccc'; addBtn.disabled = true; addBtn.innerHTML = '<i class="fas fa-ban"></i>';
                 } else {
                     addBtn.className = 'add-btn'; addBtn.innerHTML = '<i class="fas fa-plus"></i>';
-                    addBtn.onclick = () => addToCart(d.key, d.name, d.price, d.imageUrl, stock);
+                    addBtn.onclick = (e) => { e.stopPropagation(); addToCart(d.key, d.name, d.price, d.imageUrl, stock); };
+                }
+                card.appendChild(addBtn);
+                recCont.appendChild(card);
+            });
+
+            showPage('itemDetailsPage');
+        };
+
+        document.getElementById('detailQtyPlus').onclick = () => {
+            const max = parseInt(currentDetailDish.stock) || 0;
+            if(currentDetailQty < max) {
+                currentDetailQty++;
+                document.getElementById('detailQtyValue').textContent = currentDetailQty;
+            } else { showToast("Maximum stock limit reached.", "error"); }
+        };
+
+        document.getElementById('detailQtyMinus').onclick = () => {
+            if(currentDetailQty > 1) {
+                currentDetailQty--;
+                document.getElementById('detailQtyValue').textContent = currentDetailQty;
+            }
+        };
+
+        document.getElementById('detailAddToCartBtn').onclick = () => {
+            if(!currentDetailDish || parseInt(currentDetailDish.stock) <= 0) return;
+            addToCartMulti(currentDetailDish.key, currentDetailDish.name, currentDetailDish.price, currentDetailDish.imageUrl, parseInt(currentDetailDish.stock), currentDetailQty);
+            if(!window.isStoreClosedViewOnly) showPage('appContainer');
+        };
+
+        function renderPopularDishes(dishesList) {
+            const c = document.getElementById('popularDishesContainer');
+            c.innerHTML = '';
+            let popular =[...dishesList].sort(() => 0.5 - Math.random()).slice(0, 5);
+            if(popular.length === 0) { c.innerHTML = '<p style="padding:10px; color:#666; width:100%; text-align:center;">No popular dishes right now.</p>'; return; }
+            popular.forEach(d => {
+                const stock = parseInt(d.stock) || 0;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openItemDetails(d.key);
+                card.innerHTML = createDishCardHTML(d);
+                
+                const addBtn = document.createElement('button');
+                if(stock <= 0) {
+                    addBtn.className = 'add-btn'; addBtn.style.background = '#ccc'; addBtn.disabled = true; addBtn.innerHTML = '<i class="fas fa-ban"></i>';
+                } else {
+                    addBtn.className = 'add-btn'; addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                    addBtn.onclick = (e) => { e.stopPropagation(); addToCart(d.key, d.name, d.price, d.imageUrl, stock); };
+                }
+                card.appendChild(addBtn);
+                c.appendChild(card);
+            });
+        }
+
+        function renderDishes(dishesList) {
+            const c = document.getElementById('dishesContainer');
+            c.innerHTML = '';
+            if(dishesList.length === 0) { c.innerHTML = '<p style="padding:10px; color:#666; width:100%; text-align:center;">No dishes found.</p>'; return; }
+            dishesList.forEach(d => {
+                const stock = parseInt(d.stock) || 0;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.width = '48%'; 
+                card.style.marginBottom = '12px';
+                card.onclick = () => openItemDetails(d.key);
+                card.innerHTML = createDishCardHTML(d);
+                
+                const addBtn = document.createElement('button');
+                if(stock <= 0) {
+                    addBtn.className = 'add-btn'; addBtn.style.background = '#ccc'; addBtn.disabled = true; addBtn.innerHTML = '<i class="fas fa-ban"></i>';
+                } else {
+                    addBtn.className = 'add-btn'; addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                    addBtn.onclick = (e) => { e.stopPropagation(); addToCart(d.key, d.name, d.price, d.imageUrl, stock); };
                 }
                 card.appendChild(addBtn);
                 c.appendChild(card);
@@ -1716,10 +2349,7 @@
                         }
                     });
                 }
-                
-                document.querySelectorAll('.category-card').forEach(card => {
-                    card.addEventListener('click', handleCategoryClick);
-                });
+                document.querySelectorAll('.category-card').forEach(card => card.addEventListener('click', handleCategoryClick));
             });
         }
         
@@ -1742,33 +2372,6 @@
             }
         }
 
-        function renderDishes(dishesList) {
-            const c = document.getElementById('dishesContainer');
-            c.innerHTML = '';
-            if(dishesList.length === 0) { 
-                c.innerHTML = '<p style="padding:10px; color:#666; width:100%; text-align:center;">No dishes found.</p>'; 
-                return; 
-            }
-            dishesList.forEach(d => {
-                const stock = parseInt(d.stock) || 0;
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.width = '48%'; // Optimized for perfect flex wrap spacing
-                card.style.marginBottom = '12px';
-                card.innerHTML = createDishCardHTML(d);
-                
-                const addBtn = document.createElement('button');
-                if(stock <= 0) {
-                    addBtn.className = 'add-btn'; addBtn.style.background = '#ccc'; addBtn.disabled = true; addBtn.innerHTML = '<i class="fas fa-ban"></i>';
-                } else {
-                    addBtn.className = 'add-btn'; addBtn.innerHTML = '<i class="fas fa-plus"></i>';
-                    addBtn.onclick = () => addToCart(d.key, d.name, d.price, d.imageUrl, stock);
-                }
-                card.appendChild(addBtn);
-                c.appendChild(card);
-            });
-        }
-
         document.querySelector('.search-bar input').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             const filteredDishes = allDishesData.filter(dish => dish.name.toLowerCase().includes(searchTerm));
@@ -1778,15 +2381,28 @@
             document.getElementById('dishesListTitle').textContent = 'Search Results';
         });
 
-        window.addToCart = (id,name,price,img,stockMax) => {
+        // CART LOGIC
+        window.addToCart = (id,name,price,img,stockMax) => addToCartMulti(id, name, price, img, stockMax, 1);
+
+        window.addToCartMulti = (id,name,price,img,stockMax, qty) => {
+            if(window.isStoreClosedViewOnly) {
+                showToast("Store is currently closed. You can only view items.", "error");
+                return;
+            }
             price = parseFloat(price); 
             const ex = cart.find(i=>i.id===id);
             if(ex) {
-                if(ex.quantity >= stockMax) { alert("Maximum stock limit reached for this item."); return; }
-                ex.quantity++;
+                if(ex.quantity + qty > stockMax) { 
+                    showToast("Maximum stock limit reached for this item.", "error"); 
+                    ex.quantity = stockMax; 
+                } else { 
+                    ex.quantity += qty; 
+                    showToast(`Added ${qty}x ${name} to Cart`, "success");
+                }
             } else {
                 if(stockMax <= 0) return;
-                cart.push({id,name,price,img,quantity:1, stockMax: stockMax});
+                cart.push({id,name,price,img,quantity:qty, stockMax: stockMax});
+                showToast(`Added ${qty}x ${name} to Cart`, "success");
             }
             updateCartUI();
         };
@@ -1798,8 +2414,7 @@
             if(cart.length===0) { 
                 c.innerHTML='<p style="text-align:center; padding: 25px 0; color: #777;">Your cart is empty.</p>'; 
                 document.getElementById('cart-summary').style.display='none'; 
-                checkOrderValidity(); 
-                return; 
+                checkOrderValidity(); return; 
             }
             
             document.getElementById('cart-summary').style.display='block';
@@ -1835,13 +2450,14 @@
         window.modQty = (id,n) => {
             const i = cart.find(x=>x.id===id);
             if(i) { 
-                if(n > 0 && i.quantity >= i.stockMax) { alert("Maximum stock limit reached."); return; }
+                if(n > 0 && i.quantity >= i.stockMax) { showToast("Maximum stock limit reached.", "error"); return; }
                 i.quantity+=n; 
                 if(i.quantity<=0) cart=cart.filter(x=>x.id!==id); 
                 updateCartUI(); 
             }
         };
 
+        // NOTIFICATIONS LOGIC
         function pushNotification(title, body) {
             if(!currentUser) return;
             db.ref(`notifications/${currentUser.uid}`).push({
@@ -1855,10 +2471,10 @@
             notificationOrdersRef.on('child_changed', (snapshot) => {
                 const order = snapshot.val();
                 const orderId = snapshot.key;
-                
                 const lastNotified = order.lastNotifiedStatus || 'Placed';
                 if (lastNotified !== order.status && order.status) {
                     pushNotification(`Order #${orderId.substring(1,6)} Update`, `Your order is now: ${order.status}`);
+                    showToast(`Order Update: ${order.status}`, "info");
                     db.ref(`orders/${orderId}/lastNotifiedStatus`).set(order.status);
                 }
             });
@@ -1869,17 +2485,13 @@
             db.ref(`notifications/${currentUser.uid}`).on('value', snap => {
                 let unreadCount = 0;
                 if(snap.exists()) {
-                    snap.forEach(c => {
-                        if(!c.val().read) unreadCount++;
-                    });
+                    snap.forEach(c => { if(!c.val().read) unreadCount++; });
                 }
                 const badge = document.getElementById('notif-badge');
                 if(unreadCount > 0) {
                     badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
                     badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
+                } else { badge.style.display = 'none'; }
             });
         }
 
@@ -1888,12 +2500,8 @@
             db.ref(`notifications/${currentUser.uid}`).once('value', snap => {
                 if(snap.exists()) {
                     const updates = {};
-                    snap.forEach(child => {
-                        if(!child.val().read) updates[`${child.key}/read`] = true;
-                    });
-                    if(Object.keys(updates).length > 0) {
-                        db.ref(`notifications/${currentUser.uid}`).update(updates);
-                    }
+                    snap.forEach(child => { if(!child.val().read) updates[`${child.key}/read`] = true; });
+                    if(Object.keys(updates).length > 0) db.ref(`notifications/${currentUser.uid}`).update(updates);
                 }
             });
         }
@@ -1901,6 +2509,7 @@
         window.deleteNotification = (key) => {
             if (!currentUser || !key) return;
             db.ref(`notifications/${currentUser.uid}/${key}`).remove();
+            showToast("Notification deleted.", "success");
         };
 
         function loadNotifications() {
@@ -1931,9 +2540,7 @@
                         
                         html += `
                             <div class="notification-card" style="${n.read ? 'opacity:0.7;' : 'border-left: 4px solid var(--primary-color);'}">
-                                <button class="delete-notif-btn" onclick="deleteNotification('${n.key}')" title="Delete notification">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                                <button class="delete-notif-btn" onclick="deleteNotification('${n.key}')" title="Delete notification"><i class="fas fa-times"></i></button>
                                 <div class="notif-icon-box"><i class="fas ${icon}"></i></div>
                                 <div class="notif-content" style="flex:1;">
                                     <h4 style="margin:0 0 4px 0; color:#2d3436; font-size:1em;">${titleText}</h4>
@@ -1944,9 +2551,7 @@
                     } catch(e) { console.error("Skipped a corrupted notification:", e); }
                 });
                 container.innerHTML = html;
-                if(document.getElementById('notificationsPage').classList.contains('active')) {
-                    markNotificationsAsRead();
-                }
+                if(document.getElementById('notificationsPage').classList.contains('active')) markNotificationsAsRead();
             });
         }
         
@@ -1972,7 +2577,7 @@
                 phone: phoneInput.value.trim(), address: addressInput.value.trim(),
                 village: villageInput.value.trim(), pin: pinInput.value.trim(),
                 district: districtInput.value.trim(), state: stateInput.value.trim(),
-                location: { lat: document.getElementById('lat').value, lng: document.getElementById('lng').value },
+                location: { lat: document.getElementById('chkLat').value, lng: document.getElementById('chkLng').value },
                 items: cart, total: totalAmount.toFixed(2), status: 'Placed', lastNotifiedStatus: 'Placed',
                 method: paymentMethod, paymentId: paymentId, paymentStatus: paymentId ? 'Paid' : 'Pending', deliveryCode: dCode, timestamp: new Date().toISOString(),
                 driverId: null
@@ -1980,12 +2585,13 @@
             db.ref('orders').push(order).then((snap) => {
                 deductStock();
                 pushNotification("Order Placed", `Order #${snap.key.substring(1,6)} has been placed successfully.`);
+                showToast("Order Placed Successfully!", "success");
                 cart =[]; updateCartUI();
                 const codeElement = document.getElementById('thankYouDeliveryCode');
                 if (codeElement) { codeElement.textContent = dCode; }
                 showPage('thankYouPage');
             }).catch(err => {
-                alert('Failed to save order. Please try again or contact support.');
+                showToast('Failed to save order. Please try again.', "error");
                 console.error("Firebase write error: ", err);
             });
         }
@@ -2008,9 +2614,9 @@
                 };
                 try {
                     const rzp1 = new Razorpay(options);
-                    rzp1.on('payment.failed', (response) => alert("Payment Failed: " + response.error.description));
+                    rzp1.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
                     rzp1.open();
-                } catch (err) { alert("Payment interface failed to load."); }
+                } catch (err) { showToast("Payment interface failed to load.", "error"); }
             }
         };
 
@@ -2025,9 +2631,10 @@
                 "handler": (response) => {
                     db.ref('orders/' + orderId).update({
                         paymentStatus: 'Paid',
-                        method: 'Paid Online'
+                        method: 'Paid Online',
+                        paymentId: response.razorpay_payment_id
                     }).then(() => {
-                        alert("Payment successful! Your driver will hand over the food shortly.");
+                        showToast("Payment successful! Your driver will hand over the food shortly.", "success");
                     });
                 },
                 "prefill": { "name": name, "email": currentUser ? currentUser.email : "guest@example.com", "contact": phone },
@@ -2035,9 +2642,9 @@
             };
             try {
                 const rzp1 = new Razorpay(options);
-                rzp1.on('payment.failed', (response) => alert("Payment Failed: " + response.error.description));
+                rzp1.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
                 rzp1.open();
-            } catch (err) { alert("Payment interface failed to load."); }
+            } catch (err) { showToast("Payment interface failed to load.", "error"); }
         };
 
         function createOrderCardHTML(orderKey, orderData) {
@@ -2059,6 +2666,12 @@
             const downloadBtn = st === 'Delivered' ? `
                 <button class="btn-main" style="margin-top:15px; background: #fff; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 10px; font-size: 0.9em; box-shadow: none;" onclick="downloadInvoice('${orderStr}')">
                     <i class="fas fa-file-invoice"></i> Download Invoice
+                </button>
+            ` : '';
+
+            const reviewBtn = st === 'Delivered' ? `
+                <button class="btn-main" style="margin-top:8px; background: #e6f7ef; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 10px; font-size: 0.9em; box-shadow: none;" onclick="openReviewModal('${orderStr}')">
+                    <i class="fas fa-star"></i> Review Items
                 </button>
             ` : '';
 
@@ -2097,7 +2710,8 @@
                     <div class="track-step ${s4}"><div class="dot"></div><p>Done</p></div>
                 </div>
                 ${downloadBtn}
-                <div id="track-map-${orderKey}" style="height:180px; width:100%; margin-top:12px; border-radius:10px; display:none; border:2px solid var(--primary-color);"></div>
+                ${reviewBtn}
+                <div id="track-map-${orderKey}" class="map-container-common" style="border:2px solid var(--primary-color);"></div>
             `;
         }
         
@@ -2209,12 +2823,21 @@
                 const dc = parseFloat(document.getElementById('adminDeliveryCharge').value);
                 const cc = parseFloat(document.getElementById('adminDriverCommission').value);
                 const enableRole = document.getElementById('adminEnableRoleSelect').checked;
+                
+                const whEnabled = document.getElementById('adminEnableHours').checked;
+                const whStart = document.getElementById('adminStartTime').value || '09:00';
+                const whEnd = document.getElementById('adminStopTime').value || '22:00';
 
                 db.ref('settings').update({
                     deliveryCharge: dc,
                     driverCommission: cc,
-                    enableRoleSelection: enableRole
-                }).then(()=>alert("Settings Saved successfully!"));
+                    enableRoleSelection: enableRole,
+                    workingHours: {
+                        enabled: whEnabled,
+                        start: whStart,
+                        end: whEnd
+                    }
+                }).then(()=>showToast("Settings Saved successfully!", "success"));
             };
 
             document.getElementById('csvFileInput_admin').addEventListener('change', function(e) {
@@ -2223,7 +2846,7 @@
                 const categorySelect = document.getElementById('csvCategorySelect_admin');
                 const catId = categorySelect.value;
                 const catName = categorySelect.options[categorySelect.selectedIndex]?.text || '';
-                if(!catId) { alert('Please select a Category from the dropdown first!'); return; }
+                if(!catId) { showToast('Please select a Category from the dropdown first!', 'info'); return; }
 
                 const reader = new FileReader();
                 reader.onload = function(event) {
@@ -2249,12 +2872,13 @@
                             }
                         }
                     });
-                    alert(count + ' items uploaded successfully!');
+                    showToast(`${count} items uploaded successfully!`, "success");
                 };
                 reader.readAsText(file);
                 e.target.value = '';
             });
 
+            // UPDATED FETCH USERS WITH FULL DETAILS
             function fetchUsers_admin() {
                 db.ref('users').on('value', snap => {
                     const cBody = document.getElementById('customersTableBody_admin');
@@ -2268,13 +2892,21 @@
                         const tr = document.createElement('tr');
                         const displayName = u.name || uid;
 
-                        if(u.role === 'customer') {
+                        if(u.role === 'customer' || !u.role) { // Show all standard users
+                            const phone = u.phone || 'N/A';
+                            // Format Full Address
+                            const addressStr = [u.address, u.village, u.district, u.state, u.pin].filter(Boolean).join(', ');
+
                             tr.innerHTML = `
-                                <td><strong>${displayName}</strong></td>
-                                <td>${u.email || ''}</td>
+                                <td><strong>${displayName}</strong><br><span style="font-size:0.75em; color:var(--light-text);">${u.email || 'N/A'}</span></td>
                                 <td>
-                                    <button onclick="toggleBan_admin('${uid}', ${u.banned})" style="background:${u.banned?'#00b894':'#d63031'}; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; margin-bottom:4px;">${u.banned?'Unban':'Ban'}</button>
-                                    <button onclick="deleteUserRecord_admin('${uid}')" style="background:#2d3436; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em;">Delete</button>
+                                    <div style="font-size:0.85em; color:var(--primary-color); margin-bottom:4px;"><i class="fas fa-phone"></i> ${phone}</div>
+                                    <div style="font-size:0.8em; color:var(--light-text); line-height:1.3;"><i class="fas fa-map-marker-alt"></i> ${addressStr || 'No Address Provided'}</div>
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <button onclick="openAdminPrivateChat('${uid}', '${displayName}')" style="background:#0984e3; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; margin-bottom:4px; width:100%;"><i class="fas fa-comments"></i> Chat</button>
+                                    <button onclick="toggleBan_admin('${uid}', ${u.banned})" style="background:${u.banned?'#00b894':'#d63031'}; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; margin-bottom:4px; width:100%;">${u.banned?'Unban':'Ban'}</button>
+                                    <button onclick="deleteUserRecord_admin('${uid}')" style="background:#2d3436; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; width:100%;">Delete</button>
                                 </td>
                             `;
                             cBody.appendChild(tr);
@@ -2298,21 +2930,31 @@
                 });
             }
 
+            window.openAdminPrivateChat = (uid, name) => {
+                loadChat('private', uid, name);
+            };
+
             window.toggleBan_admin = (uid, currentStatus) => {
                 if(confirm(`Are you sure you want to ${currentStatus ? 'unban' : 'ban'} this user?`)) {
-                    db.ref('users/' + uid).update({ banned: !currentStatus });
+                    db.ref('users/' + uid).update({ banned: !currentStatus }).then(() => {
+                        showToast(`User ${currentStatus ? 'unbanned' : 'banned'} successfully.`, "success");
+                    });
                 }
             };
 
             window.deleteUserRecord_admin = (uid) => {
                 if(confirm("Delete this user record? (Note: This does not delete their Auth profile, only DB record)")) {
-                    db.ref('users/' + uid).remove();
+                    db.ref('users/' + uid).remove().then(() => {
+                        showToast("User record deleted.", "success");
+                    });
                 }
             };
 
             window.receiveDriverCash_admin = (uid) => {
                 if(confirm("Confirm that you have received the collected cash from this driver? This will reset their cash collected balance to 0.")) {
-                    db.ref('users/' + uid).update({ collectedCash: 0 });
+                    db.ref('users/' + uid).update({ collectedCash: 0 }).then(() => {
+                        showToast("Cash received and balance reset.", "success");
+                    });
                 }
             };
 
@@ -2371,28 +3013,30 @@
                     document.getElementById('deliveryCodeModal_admin').style.display = 'flex';
                     document.getElementById('deliveryCodeInput_admin').focus();
                 } else {
-                    db.ref('orders/' + id).update({ status });
+                    db.ref('orders/' + id).update({ status }).then(() => {
+                        showToast("Order status updated to " + status, "success");
+                    });
                 }
             };
 
             document.getElementById('verifyCodeBtn_admin').onclick = () => {
                 const userInput = document.getElementById('deliveryCodeInput_admin').value;
                 if(!userInput || !orderIdToVerify_admin) {
-                    alert("Please enter the delivery code.");
+                    showToast("Please enter the delivery code.", "info");
                     return;
                 }
                 db.ref('orders/' + orderIdToVerify_admin + '/deliveryCode').once('value', snap => {
                     const realCode = snap.val();
                     if(userInput == realCode) {
                         db.ref('orders/' + orderIdToVerify_admin).update({ status: 'Delivered' });
-                        alert("Code Verified! Status updated.");
+                        showToast("Code Verified! Status updated to Delivered.", "success");
                         document.getElementById('deliveryCodeModal_admin').style.display = 'none';
                         document.getElementById('deliveryCodeInput_admin').value = '';
                         orderIdToVerify_admin = null;
                         orderSelectElementToRevert_admin = null;
                         orderPreviousStatus_admin = null;
                     } else {
-                        alert("Incorrect Code! Please try again.");
+                        showToast("Incorrect Code! Please try again.", "error");
                         document.getElementById('deliveryCodeInput_admin').value = '';
                     }
                 });
@@ -2478,13 +3122,15 @@
                     if (editingDishId_admin) {
                         db.ref('dishes/' + editingDishId_admin).update(dishData).then(() => {
                             document.getElementById('dishModal_admin').style.display = 'none';
+                            showToast("Dish updated successfully.", "success");
                         });
                     } else {
                         db.ref('dishes').push(dishData).then(() => {
                             document.getElementById('dishModal_admin').style.display = 'none';
+                            showToast("Dish added successfully.", "success");
                         });
                     }
-                } else { alert("Please fill all fields, including category"); }
+                } else { showToast("Please fill all fields, including category", "error"); }
             };
 
             function fetchCategories_admin() {
@@ -2547,17 +3193,21 @@
                     if (editingCategoryId_admin) {
                         db.ref('categories/' + editingCategoryId_admin).update(catData).then(() => {
                             document.getElementById('categoryModal_admin').style.display = 'none';
+                            showToast("Category updated successfully.", "success");
                         });
                     } else {
                         db.ref('categories').push(catData).then(() => {
                             document.getElementById('categoryModal_admin').style.display = 'none';
+                            showToast("Category created successfully.", "success");
                         });
                     }
-                } else { alert("Please provide both a category name and an image URL."); }
+                } else { showToast("Please provide both a category name and an image URL.", "error"); }
             };
 
             window.deleteItem_admin = (coll, id) => { 
-                if(confirm('Delete this item permanently?')) { db.ref(coll + '/' + id).remove(); }
+                if(confirm('Delete this item permanently?')) { 
+                    db.ref(coll + '/' + id).remove().then(() => showToast("Item deleted.", "success")); 
+                }
             };
 
             document.querySelectorAll('#adminPage .close-modal').forEach(btn => {
@@ -2574,10 +3224,68 @@
                 };
             });
 
+            // NEW: FETCH ADMIN CHAT LIST
+            function fetchAdminChatList() {
+                db.ref('chats').on('value', snap => {
+                    const container = document.getElementById('adminChatListContainer');
+                    if(!container) return;
+                    container.innerHTML = '';
+                    
+                    let publicUnread = 0;
+                    const pubData = snap.child('public/messages').val();
+                    if(pubData) {
+                        Object.values(pubData).forEach(m => { if(m.read === false && m.senderId !== currentUser.uid) publicUnread++; });
+                    }
+                    container.innerHTML += `
+                        <div class="profile-menu-item" onclick="loadChat('public', null, 'Public Community')">
+                            <div style="position:relative; width:50px; height:50px; background:#e6f7ef; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px; font-size:1.5em; color:var(--primary-color);">
+                                <i class="fas fa-users"></i>
+                                ${publicUnread > 0 ? `<div class="chat-badge" style="display:flex;">${publicUnread}</div>` : ''}
+                            </div>
+                            <div style="flex:1;">
+                                <span style="display:block; font-size:1.1em; font-weight:700;">Public Community</span>
+                                <span style="font-size:0.85em; color:var(--light-text);">Chat with everyone</span>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    `;
+
+                    db.ref('users').once('value', usersSnap => {
+                        const users = usersSnap.val() || {};
+                        snap.forEach(chatNode => {
+                            if(chatNode.key.startsWith('private_')) {
+                                const uid = chatNode.key.replace('private_', '');
+                                const userData = users[uid] || { name: 'Unknown User' };
+                                let unread = 0;
+                                const msgs = chatNode.child('messages').val();
+                                if(msgs) {
+                                    Object.values(msgs).forEach(m => { if(m.read === false && m.senderId !== currentUser.uid) unread++; });
+                                    
+                                    container.innerHTML += `
+                                        <div class="profile-menu-item" onclick="loadChat('private', '${uid}', '${userData.name}')">
+                                            <div style="position:relative; width:50px; height:50px; background:#e0f0ff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px; font-size:1.5em; color:var(--info);">
+                                                <i class="fas fa-user"></i>
+                                                ${unread > 0 ? `<div class="chat-badge" style="display:flex;">${unread}</div>` : ''}
+                                            </div>
+                                            <div style="flex:1;">
+                                                <span style="display:block; font-size:1.1em; font-weight:700;">${userData.name}</span>
+                                                <span style="font-size:0.85em; color:var(--light-text);">Private Chat</span>
+                                            </div>
+                                            <i class="fas fa-chevron-right"></i>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        });
+                    });
+                });
+            }
+
             fetchOrders_admin();
             fetchDishes_admin();
             fetchCategories_admin();
             fetchUsers_admin();
+            fetchAdminChatList(); // Initialize chat list
         }
 
         // =========================================================
@@ -2593,7 +3301,6 @@
             window.driverPaymentListener = null;
             let driverWatchIds = {};
 
-            // Fetch Driver Balances and Profile
             db.ref('users/' + currentUser.uid).on('value', snap => {
                 const u = snap.val();
                 if(u) {
@@ -2622,10 +3329,13 @@
             document.getElementById('saveDriverProfileBtn').onclick = () => {
                 const pName = document.getElementById('driverProfileName').value.trim();
                 const pPhone = document.getElementById('driverProfilePhone').value.trim();
-                if(!pName || !pPhone) { alert("Please fill both name and phone."); return; }
+                if(!pName || !pPhone) { showToast("Please fill both name and phone.", "error"); return; }
                 db.ref('users/' + currentUser.uid).update({
                     name: pName, driverPhone: pPhone
-                }).then(()=> { alert("Profile Saved!"); document.getElementById('driverGreetingName').innerText = `Hello, ${pName.split(' ')[0]}`; });
+                }).then(()=> { 
+                    showToast("Profile Saved!", "success"); 
+                    document.getElementById('driverGreetingName').innerText = `Hello, ${pName.split(' ')[0]}`; 
+                });
             };
 
             function createDriverOrderCard(order, type) {
@@ -2643,7 +3353,7 @@
                     `;
                 }
 
-                let trackMap = type === 'active' ? `<div id="driver-track-map-${order.id}" style="height:180px; width:100%; border-radius:10px; margin-top:12px; display:none; border:2px solid var(--info);"></div>` : '';
+                let trackMap = type === 'active' ? `<div id="driver-track-map-${order.id}" class="map-container-common" style="border:2px solid var(--info);"></div>` : '';
 
                 return `
                     <div class="order-card" style="margin:0 0 15px 0; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
@@ -2675,9 +3385,10 @@
                         status: 'Out for Delivery',
                         driverName: dName,
                         driverPhone: dPhone
+                    }).then(() => {
+                        showToast("Order Accepted! Tracking started.", "success");
                     });
 
-                    // Start GPS Tracking
                     if (navigator.geolocation) {
                         driverWatchIds[id] = navigator.geolocation.watchPosition(pos => {
                             db.ref('orders/' + id + '/driverLocation').set({
@@ -2709,12 +3420,10 @@
                     snapshot.forEach(child => {
                         const order = { id: child.key, ...child.val() };
                         
-                        // Requests: Placed or Preparing, NO driver assigned
                         if((order.status === 'Placed' || order.status === 'Preparing') && !order.driverId) {
                             reqCount++;
                             reqCont.innerHTML += createDriverOrderCard(order, 'request');
                         }
-                        // Active: Out for Delivery, assigned to THIS driver
                         else if(order.status === 'Out for Delivery' && order.driverId === currentUser.uid) {
                             actCount++;
                             actCont.innerHTML += createDriverOrderCard(order, 'active');
@@ -2728,7 +3437,6 @@
                                 }, 100);
                             }
                         }
-                        // History: Delivered, assigned to THIS driver
                         else if(order.status === 'Delivered' && order.driverId === currentUser.uid) {
                             histCount++;
                             histCont.insertAdjacentHTML('afterbegin', createDriverOrderCard(order, 'history'));
@@ -2753,7 +3461,6 @@
                     delete driverWatchIds[orderId];
                 }
                 
-                // Add commission
                 db.ref('users/' + currentUser.uid + '/earnings').once('value', s => {
                     db.ref('users/' + currentUser.uid).update({ earnings: (s.val() || 0) + globalDriverCommission });
                 });
@@ -2768,7 +3475,7 @@
             document.getElementById('verifyCodeBtn_driver').onclick = () => {
                 const userInput = document.getElementById('deliveryCodeInput_driver').value;
                 if(!userInput || !orderIdToVerify_driver) {
-                    alert("Please enter the delivery code.");
+                    showToast("Please enter the delivery code.", "info");
                     return;
                 }
                 db.ref('orders/' + orderIdToVerify_driver).once('value', snap => {
@@ -2778,23 +3485,20 @@
                         document.getElementById('deliveryCodeInput_driver').value = '';
 
                         if (orderObj.method.toLowerCase().includes('cash') || orderObj.method === 'cod') {
-                            // Check if they already paid online from tracking page beforehand
                             if(orderObj.paymentStatus === 'Paid') {
                                 finalizeDriverDelivery(orderIdToVerify_driver, orderObj.total, false);
-                                alert("Customer already paid online! Delivered successfully! Commission added.");
+                                showToast("Customer already paid online! Delivered successfully! Commission added.", "success");
                                 orderIdToVerify_driver = null;
                             } else {
                                 window.currentDeliveryOrderId = orderIdToVerify_driver;
                                 window.currentDeliveryOrderTotal = orderObj.total;
                                 document.getElementById('paymentModalAmount').textContent = orderObj.total;
                                 
-                                // Auto generate URL for Razorpay QR Payment
                                 const payUrl = window.location.origin + window.location.pathname + '?payOrder=' + orderIdToVerify_driver;
                                 document.getElementById('paymentModalQR').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(payUrl)}`;
                                 
                                 document.getElementById('driverPaymentModal').style.display = 'flex';
 
-                                // Listener for auto-detecting Razorpay payment success
                                 if(window.driverPaymentListener) {
                                     db.ref('orders/' + window.currentDeliveryOrderId).off('value', window.driverPaymentListener);
                                 }
@@ -2803,18 +3507,18 @@
                                     if(updatedOrder && updatedOrder.paymentStatus === 'Paid' && updatedOrder.status !== 'Delivered') {
                                         finalizeDriverDelivery(window.currentDeliveryOrderId, window.currentDeliveryOrderTotal, false);
                                         document.getElementById('driverPaymentModal').style.display = 'none';
-                                        alert("Customer Payment Received Automatically via Razorpay! Order Delivered.");
+                                        showToast("Customer Payment Received Automatically via Razorpay! Order Delivered.", "success");
                                         resetDriverVerification();
                                     }
                                 });
                             }
                         } else {
                             finalizeDriverDelivery(orderIdToVerify_driver, orderObj.total, false);
-                            alert("Delivered successfully! Commission added.");
+                            showToast("Delivered successfully! Commission added.", "success");
                             orderIdToVerify_driver = null;
                         }
                     } else {
-                        alert("Incorrect Code! Please try again.");
+                        showToast("Incorrect Code! Please try again.", "error");
                         document.getElementById('deliveryCodeInput_driver').value = '';
                     }
                 });
@@ -2823,7 +3527,7 @@
             document.getElementById('driverCashSuccessBtn').onclick = () => {
                 finalizeDriverDelivery(window.currentDeliveryOrderId, window.currentDeliveryOrderTotal, true);
                 document.getElementById('driverPaymentModal').style.display = 'none';
-                alert("Cash Collected! Delivered successfully! Commission added.");
+                showToast("Cash Collected! Delivered successfully! Commission added.", "success");
                 resetDriverVerification();
             };
 
@@ -2850,9 +3554,443 @@
 
             fetchOrders_driver();
         }
-        
+
         // =========================================================
-        // RAZORPAY QR PAYMENT AUTO-DETECTION (Standalone)
+        // ADDED FEATURE: REVIEWS SYSTEM LOGIC
+        // =========================================================
+        let selectedRating = 0;
+        document.querySelectorAll('#reviewStarSelection .fa-star').forEach(star => {
+            star.addEventListener('click', (e) => {
+                selectedRating = parseInt(e.target.dataset.val);
+                document.getElementById('reviewRatingVal').value = selectedRating;
+                document.querySelectorAll('#reviewStarSelection .fa-star').forEach(s => {
+                    if(parseInt(s.dataset.val) <= selectedRating) s.style.color = '#f1c40f';
+                    else s.style.color = '#ccc';
+                });
+            });
+        });
+
+        window.openReviewModal = (orderStr) => {
+            const order = JSON.parse(decodeURIComponent(orderStr));
+            const select = document.getElementById('reviewItemSelect');
+            select.innerHTML = '';
+            order.items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+            
+            selectedRating = 0;
+            document.getElementById('reviewRatingVal').value = 0;
+            document.querySelectorAll('#reviewStarSelection .fa-star').forEach(s => s.style.color = '#ccc');
+            document.getElementById('reviewText').value = '';
+            
+            document.getElementById('reviewModal').style.display = 'flex';
+        };
+
+        document.getElementById('submitReviewBtn').onclick = () => {
+            const itemId = document.getElementById('reviewItemSelect').value;
+            const rating = parseInt(document.getElementById('reviewRatingVal').value);
+           
+            const text = document.getElementById('reviewText').value.trim();
+            
+            if (rating === 0) {
+                showToast("Please select a star rating.", "error");
+                return;
+            }
+
+            db.ref(`dishes/${itemId}/reviews`).push({
+                userId: currentUser.uid,
+                name: currentUserData.name || currentUser.displayName || "Customer",
+                rating: rating,
+                text: text,
+                timestamp: Date.now()
+            }).then(() => {
+                db.ref(`dishes/${itemId}`).once('value', snap => {
+                    const dish = snap.val();
+                    let currentCount = dish.reviewCount || 0;
+                    let currentTotal = (dish.rating || 0) * currentCount;
+                    
+                    let newCount = currentCount + 1;
+                    let newAvg = (currentTotal + rating) / newCount;
+
+                    db.ref(`dishes/${itemId}`).update({
+                        rating: newAvg,
+                        reviewCount: newCount
+                    });
+                });
+
+                document.getElementById('reviewModal').style.display = 'none';
+                showToast("Thank you! Review submitted successfully.", "success");
+            });
+        };
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modalId = e.target.getAttribute('data-modal');
+                if(modalId) document.getElementById(modalId).style.display = 'none';
+            });
+        });
+
+        // =========================================================
+        // ADDED FEATURE: CONTACT US PAGE LOGIC
+        // =========================================================
+        window.loadContactUs = () => {
+            const container = document.getElementById('contactUsList');
+            container.innerHTML = '<p style="text-align:center; color:#999; margin-top:30px;"><i class="fas fa-spinner fa-spin"></i> Loading support contacts...</p>';
+            
+            db.ref('users').orderByChild('role').equalTo('admin').once('value', snap => {
+                container.innerHTML = '';
+                if(!snap.exists()) {
+                    container.innerHTML = '<p style="text-align:center; color:#999; margin-top:30px;">No support admins found.</p>';
+                    return;
+                }
+
+                snap.forEach(child => {
+                    const admin = child.val();
+                    const phone = admin.phone || admin.driverPhone || '';
+                    if(!phone) return;
+
+                    let waPhone = phone.replace(/\D/g, '');
+                    if(waPhone.length === 10) waPhone = '91' + waPhone; 
+
+                    const card = document.createElement('div');
+                    card.className = 'contact-card';
+                    card.innerHTML = `
+                        <div style="width:50px; height:50px; background:#e0f0ff; color:var(--info); border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:1.5em;"><i class="fas fa-user-shield"></i></div>
+                        <div class="contact-info">
+                            <h4>${admin.name || 'Admin Support'}</h4>
+                            <p>${phone}</p>
+                        </div>
+                        <i class="fab fa-whatsapp" onclick="window.open('https://wa.me/${waPhone}?text=Hello%20Sintha%20Keithel%20Support,', '_blank')" title="Chat on WhatsApp"></i>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                if(container.innerHTML === '') {
+                    container.innerHTML = '<p style="text-align:center; color:#999; margin-top:30px;">Admins have not added their contact numbers yet.</p>';
+                }
+            });
+        };
+
+        // =========================================================
+        // ADDED FEATURE: CHAT BOARD LOGIC & NOTIFICATIONS
+        // =========================================================
+        let currentChatRef = null;
+        let currentChatListener = null;
+        let typingTimeout = null;
+        let isTyping = false;
+        let activeChatPath = '';
+
+        window.loadChat = (type, targetId, title) => {
+            document.getElementById('chatRoomTitle').innerText = title;
+            activeChatPath = type === 'public' ? 'chats/public' : `chats/private_${targetId}`;
+            
+            showPage('chatRoomPage');
+
+            const msgContainer = document.getElementById('chatMessagesContainer');
+            msgContainer.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading messages...</p>';
+            
+            if (currentChatRef && currentChatListener) {
+                currentChatRef.off('value', currentChatListener);
+            }
+
+            currentChatRef = db.ref(activeChatPath + '/messages');
+            currentChatListener = currentChatRef.on('value', snap => {
+                msgContainer.innerHTML = '';
+                if (snap.exists()) {
+                    let html = '';
+                    snap.forEach(child => {
+                        const msg = child.val();
+                        const isMe = msg.senderId === currentUser.uid;
+                        const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        
+                        html += `
+                            <div class="chat-bubble ${isMe ? 'sent' : 'received'}">
+                                ${!isMe ? `<span class="chat-sender">${msg.senderName} ${msg.senderRole==='admin'?'<i class="fas fa-check-circle"></i>':''}</span>` : ''}
+                                <span style="font-size:0.95em; color:#333; line-height:1.4;">${msg.text}</span>
+                                <span class="chat-time">${time}</span>
+                            </div>
+                        `;
+
+                        // Mark unread messages as read automatically when chat is open
+                        if (!isMe && msg.read === false) {
+                            child.ref.update({ read: true });
+                        }
+                    });
+                    msgContainer.innerHTML = html;
+                    msgContainer.scrollTop = msgContainer.scrollHeight;
+                } else {
+                    msgContainer.innerHTML = '<p style="text-align:center; color:#999; margin-top:30px;">No messages yet. Start the conversation!</p>';
+                }
+            });
+
+            db.ref(activeChatPath + '/typing').on('value', snap => {
+                const typingUsers = snap.val() || {};
+                const isSomeoneElseTyping = Object.keys(typingUsers).some(uid => uid !== currentUser.uid && typingUsers[uid] === true);
+                
+                document.getElementById('typingIndicator').style.display = isSomeoneElseTyping ? 'block' : 'none';
+                if(isSomeoneElseTyping) {
+                    msgContainer.scrollTop = msgContainer.scrollHeight;
+                }
+            });
+        };
+
+        document.getElementById('chatSendBtn').onclick = () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text || !activeChatPath || !currentUser) return;
+
+            db.ref(activeChatPath + '/messages').push({
+                senderId: currentUser.uid,
+                senderName: currentUserData.name || currentUser.displayName || 'User',
+                senderRole: currentUserData.role || 'customer',
+                text: text,
+                timestamp: Date.now(),
+                read: false // Flag for Notification badge
+            });
+
+            input.value = '';
+            input.focus();
+            db.ref(activeChatPath + `/typing/${currentUser.uid}`).set(false);
+        };
+
+        document.getElementById('chatInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { document.getElementById('chatSendBtn').click(); }
+        });
+
+        document.getElementById('chatInput').addEventListener('input', () => {
+            if(!activeChatPath) return;
+            
+            if(!isTyping) {
+                isTyping = true;
+                db.ref(activeChatPath + `/typing/${currentUser.uid}`).set(true);
+            }
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                isTyping = false;
+                db.ref(activeChatPath + `/typing/${currentUser.uid}`).set(false);
+            }, 1500);
+        });
+
+        document.getElementById('chatBackBtn').onclick = () => {
+            if(activeChatPath && currentUser) {
+                db.ref(activeChatPath + `/typing/${currentUser.uid}`).set(false);
+            }
+            
+            if(currentUserData && currentUserData.role === 'admin') {
+                showPage('adminPage'); 
+            } else {
+                showPage('chatSelectionPage'); 
+            }
+            activeChatPath = '';
+        };
+
+        // GLOBAL CHAT NOTIFICATION LISTENER
+        function listenForChatUnreadCount() {
+            if(!currentUser || !currentUserData) return;
+            const role = currentUserData.role;
+            const cBadge = document.getElementById('customerChatBadge');
+            const aBadge = document.getElementById('adminChatBadge');
+            const pubBadge = document.getElementById('custPublicChatBadge');
+            const privBadge = document.getElementById('custPrivateChatBadge');
+
+            db.ref('chats').on('value', snap => {
+                let unreadCount = 0;
+                let pubUnread = 0;
+                let privUnread = 0;
+
+                snap.forEach(chatNode => {
+                    const isPublic = chatNode.key === 'public';
+                    const isMyPrivate = chatNode.key === `private_${currentUser.uid}`;
+                    
+                    if(role === 'customer' && !isPublic && !isMyPrivate) return;
+
+                    const msgs = chatNode.child('messages').val();
+                    if(msgs) {
+                        Object.values(msgs).forEach(m => {
+                            if(m.read === false && m.senderId !== currentUser.uid) {
+                                unreadCount++;
+                                if (isPublic) pubUnread++;
+                                if (isMyPrivate) privUnread++;
+                            }
+                        });
+                    }
+                });
+
+                if(role === 'customer') {
+                    if(cBadge) {
+                        cBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                        cBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+                    }
+                    if(pubBadge) {
+                        pubBadge.textContent = pubUnread > 9 ? '9+' : pubUnread;
+                        pubBadge.style.display = pubUnread > 0 ? 'flex' : 'none';
+                    }
+                    if(privBadge) {
+                        privBadge.textContent = privUnread > 9 ? '9+' : privUnread;
+                        privBadge.style.display = privUnread > 0 ? 'flex' : 'none';
+                    }
+                }
+
+                if(role === 'admin' && aBadge) {
+                    aBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                    aBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // =========================================================
+        // ADDED FEATURE: STORE CLOSED / WORKING HOURS LOGIC
+        // =========================================================
+        let timerInterval = null;
+        let wasClosedLastSecond = null;
+        let bannerFlipToggle = true;
+        
+        function checkAndEnforceStoreHours() {
+            const banner = document.getElementById('storeHoursBanner');
+
+            if(!globalWorkingHours.enabled) {
+                if(activePageId === 'storeClosedPage') showPage('appContainer');
+                else document.getElementById('storeClosedPage').classList.remove('active');
+                
+                window.isStoreClosedViewOnly = false;
+                window.hasClickedVisit = false;
+                if(timerInterval) clearInterval(timerInterval);
+                if(banner) banner.style.display = 'none';
+                updateCartUI(); 
+                return;
+            }
+
+            if(banner) banner.style.display = 'block';
+
+            if(timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const currentHours = now.getHours();
+                const currentMinutes = now.getMinutes();
+                const currentSeconds = now.getSeconds();
+                const currentTimeInSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
+
+                const [startH, startM] = globalWorkingHours.start.split(':').map(Number);
+                const [endH, endM] = globalWorkingHours.end.split(':').map(Number);
+                const startTimeInSeconds = startH * 3600 + startM * 60;
+                const endTimeInSeconds = endH * 3600 + endM * 60;
+
+                let isClosed = false;
+                let targetTimeInSeconds = 0;
+                let isNextDay = false;
+
+                if (startTimeInSeconds < endTimeInSeconds) {
+                    if (currentTimeInSeconds < startTimeInSeconds) {
+                        isClosed = true;
+                        targetTimeInSeconds = startTimeInSeconds;
+                    } else if (currentTimeInSeconds >= endTimeInSeconds) {
+                        isClosed = true;
+                        targetTimeInSeconds = startTimeInSeconds;
+                        isNextDay = true;
+                    } else {
+                        isClosed = false;
+                        targetTimeInSeconds = endTimeInSeconds;
+                    }
+                } else { 
+                    if (currentTimeInSeconds >= endTimeInSeconds && currentTimeInSeconds < startTimeInSeconds) {
+                        isClosed = true;
+                        targetTimeInSeconds = startTimeInSeconds;
+                    } else {
+                        isClosed = false;
+                        if (currentTimeInSeconds >= startTimeInSeconds) {
+                            targetTimeInSeconds = endTimeInSeconds;
+                            isNextDay = true;
+                        } else {
+                            targetTimeInSeconds = endTimeInSeconds;
+                        }
+                    }
+                }
+
+                let diffInSeconds = 0;
+                if (isNextDay) {
+                    diffInSeconds = (24 * 3600 - currentTimeInSeconds) + targetTimeInSeconds;
+                } else {
+                    diffInSeconds = targetTimeInSeconds - currentTimeInSeconds;
+                }
+
+                const h = Math.floor(diffInSeconds / 3600);
+                const m = Math.floor((diffInSeconds % 3600) / 60);
+                const s = diffInSeconds % 60;
+                const timeString = `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+
+                function formatAMPM(hours, minutes) {
+                    let ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; 
+                    let strTime = hours + ':' + (minutes < 10 ? '0'+minutes : minutes) + ' ' + ampm;
+                    return strTime;
+                }
+                const openTimeFormatted = formatAMPM(startH, startM);
+                const closeTimeFormatted = formatAMPM(endH, endM);
+
+                if (now.getSeconds() % 4 === 0) {
+                    bannerFlipToggle = !bannerFlipToggle;
+                    document.getElementById('bannerText').classList.remove('banner-fade');
+                    void document.getElementById('bannerText').offsetWidth; 
+                    document.getElementById('bannerText').classList.add('banner-fade');
+                }
+
+                if(isClosed) {
+                    document.getElementById('tc-h').textContent = h.toString().padStart(2, '0');
+                    document.getElementById('tc-m').textContent = m.toString().padStart(2, '0');
+                    document.getElementById('tc-s').textContent = s.toString().padStart(2, '0');
+                    document.getElementById('closedPageOpenTimeText').textContent = `Opens at: ${openTimeFormatted}`;
+
+                    if(bannerFlipToggle) {
+                        document.getElementById('bannerText').innerHTML = `<i class="fas fa-lock" style="color:#ff7675;"></i> Store Closed (Opens ${openTimeFormatted})`;
+                    } else {
+                        document.getElementById('bannerText').innerHTML = `<i class="fas fa-clock" style="color:#ffeaa7;"></i> Opening in: ${timeString}`;
+                    }
+
+                    if (wasClosedLastSecond !== true) {
+                        window.isStoreClosedViewOnly = true;
+                        updateCartUI();
+                        if (!window.hasClickedVisit && currentUser) {
+                            const splash = document.getElementById('splashScreen');
+                            if (splash) splash.classList.add('hidden');
+                            showPage('storeClosedPage');
+                        }
+                        wasClosedLastSecond = true;
+                    }
+                } else {
+                    if(bannerFlipToggle) {
+                        document.getElementById('bannerText').innerHTML = `<i class="fas fa-door-open" style="color:#55efc4;"></i> Store Open (${openTimeFormatted} - ${closeTimeFormatted})`;
+                    } else {
+                        document.getElementById('bannerText').innerHTML = `<i class="fas fa-clock" style="color:#ffeaa7;"></i> Closing in: ${timeString}`;
+                    }
+
+                    if (wasClosedLastSecond !== false) {
+                        window.isStoreClosedViewOnly = false;
+                        window.hasClickedVisit = false;
+                        updateCartUI();
+                        if(activePageId === 'storeClosedPage') {
+                            showPage('appContainer');
+                        }
+                        wasClosedLastSecond = false;
+                    }
+                }
+            }, 1000);
+        }
+
+        document.getElementById('storeClosedVisitBtn').onclick = () => {
+            window.hasClickedVisit = true;
+            window.isStoreClosedViewOnly = true;
+            showPage('appContainer'); 
+            showToast("Store is closed. Browsing only.", "info");
+        };
+
+        // =========================================================
+        // RAZORPAY QR PAYMENT AUTO-DETECTION 
         // =========================================================
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -2876,7 +4014,7 @@
                                         method: 'Paid Online',
                                         paymentId: response.razorpay_payment_id
                                     }).then(() => {
-                                        alert("Payment successful! The driver has been notified automatically.");
+                                        showToast("Payment successful! The driver has been notified automatically.", "success");
                                         window.location.href = window.location.origin + window.location.pathname;
                                     });
                                 },
@@ -2885,18 +4023,18 @@
                             };
                             try {
                                 const rzp1 = new Razorpay(options);
-                                rzp1.on('payment.failed', (response) => alert("Payment Failed: " + response.error.description));
+                                rzp1.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
                                 rzp1.open();
-                            } catch(e) { alert("Payment gateway failed to load."); }
+                            } catch(e) { showToast("Payment gateway failed to load.", "error"); }
                         } else if (order && order.paymentStatus === 'Paid') {
-                            alert("This order is already paid.");
+                            showToast("This order is already paid.", "info");
                             window.location.href = window.location.origin + window.location.pathname;
                         } else {
-                            alert("Order not found.");
+                            showToast("Order not found.", "error");
                             window.location.href = window.location.origin + window.location.pathname;
                         }
                     });
-                }, 1500); // Give Firebase a moment to connect
+                }, 1500); 
             }
         });
     </script>
