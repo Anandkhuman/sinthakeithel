@@ -29,6 +29,7 @@
             --danger: #d63031;
             --success: #00b894;
             --info: #0984e3;
+            --gold: #FFD700;
         }
 
         html { font-size: 14px; }
@@ -275,6 +276,21 @@
         .header-top h1 { font-size: 1.3em; margin: 0; font-weight: 700; display:flex; align-items:center;}
         .user-greeting { font-size: 0.85em; font-weight: 500; opacity: 0.9; text-align: right; }
         
+        /* NEW FEATURE: WALLET DISPLAY IN HEADER */
+        .header-wallet {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: none;
+            cursor: pointer;
+        }
+        .header-wallet i {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+        
         .search-bar { margin-top: 12px; position: relative; padding: 0 10px; }
         .search-bar input {
             width: 100%; padding: 12px 15px 12px 40px; border: none;
@@ -415,7 +431,7 @@
 
         body.auth-screen .bottom-nav, body.auth-screen #cart-fab-container,
         body.in-chat #customerBottomNav, body.in-chat #cart-fab-container, body.in-chat .bottom-nav { display: none !important; }
-
+        
         .cart-item {
             display: flex; align-items: center; background: var(--white);
             padding: 10px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -559,8 +575,47 @@
         .settings-panel input[type="number"]:focus, .settings-panel input[type="time"]:focus { border-color: var(--primary-color); }
 
         /* =========================================================
-           NEW FEATURES CSS (CHAT, REVIEWS, CONTACT, CLOSED)
+           NEW FEATURES CSS (CHAT, REVIEWS, CONTACT, CLOSED, PREMIUM)
            ========================================================= */
+        /* Premium Membership Page */
+        .plan-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .plan-card {
+            flex: 1; text-align: center; padding: 20px 15px; border-radius: 15px;
+            border: 2px solid var(--border-color); cursor: pointer; transition: all 0.3s ease;
+            position: relative;
+        }
+        .plan-card.selected {
+            border-color: var(--gold); background: #fffbeb;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+        .plan-card h3 { margin: 0 0 5px 0; font-size: 1.1em; color: #2d3436; }
+        .plan-card p { margin: 0; font-size: 1.4em; font-weight: 700; color: var(--primary-dark); }
+        .plan-card span { font-size: 0.8em; color: var(--light-text); }
+        .plan-card .best-value {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--gold); color: #2d3436; font-size: 0.7em; font-weight: 700;
+            padding: 4px 10px; border-radius: 10px;
+        }
+        .info-card {
+            background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;
+        }
+        .info-card h4 { margin: 0 0 8px 0; font-size: 1.1em; color: var(--primary-color); }
+        .info-card p { margin: 0; font-size: 0.9em; color: #636e72; }
+        .referral-code-box {
+            font-size: 1.5em; font-weight: bold; letter-spacing: 2px;
+            background: #e6f7ef; color: #008743; padding: 10px; border-radius: 10px;
+            border: 2px dashed #008743; margin: 10px 0;
+        }
+        /* Wallet & Withdrawal CSS */
+        .wallet-card {
+            background: var(--primary-gradient); color: white; padding: 20px;
+            border-radius: 15px; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 135, 67, 0.3);
+        }
+        .wallet-card .balance-label { font-size: 0.9em; opacity: 0.8; }
+        .wallet-card .balance-amount { font-size: 2.2em; font-weight: 700; margin: 5px 0; }
+        
         /* Contact Us */
         .contact-card { display:flex; align-items:center; background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
         .contact-card i.fa-whatsapp { color:#25D366; font-size:2em; margin-left:auto; cursor:pointer; }
@@ -568,20 +623,39 @@
         .contact-info h4 { margin:0; font-size:1.1em; color:#2d3436; }
         .contact-info p { margin:4px 0 0 0; color:#636e72; font-size:0.9em; }
 
-        /* Chat Theme */
-        #chatRoomPage { padding-bottom: 0; display:flex; flex-direction:column; background:#ece5dd;}
+        /* Chat Theme - IMPLEMENTATION: Robust Layout Fix */
+        #chatRoomPage {
+            height: 93%;
+            padding-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background: #ece5dd;
+        }
         #chatRoomPage .app-header { flex-shrink: 0; }
-        .chat-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; background:#ece5dd; }
-        .chat-messages { flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .chat-bubble { max-width:75%; padding:10px 14px; border-radius:15px; position:relative; word-wrap:break-word; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
         .chat-bubble.sent { align-self:flex-end; background:#dcf8c6; border-bottom-right-radius:2px; }
         .chat-bubble.received { align-self:flex-start; background:#ffffff; border-bottom-left-radius:2px; }
         .chat-sender { font-size:0.75em; font-weight:bold; color:var(--primary-color); margin-bottom:4px; display:block; }
         .chat-time { font-size:0.65em; color:#999; text-align:right; margin-top:4px; display:block; }
-        .chat-input-area { background:#f0f0f0; padding:10px; display:flex; align-items:center; gap:10px; }
+        .chat-input-area {
+            background: #f0f0f0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
         .chat-input-area input { flex:1; padding:12px 15px; border-radius:25px; border:none; outline:none; font-family:inherit; }
         .chat-send-btn { background:var(--primary-color); color:white; width:45px; height:45px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:none; cursor:pointer; font-size:1.2em; }
-        .typing-indicator { font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
+        .typing-indicator { flex-shrink: 0; font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
 
         /* Store Closed Modified Background + Splash Layout */
         #storeClosedPage { 
@@ -829,8 +903,16 @@
         <div id="appContainer" class="page active">
             <header class="app-header">
                 <div class="header-top">
-                    <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
-                    <div class="user-greeting" id="userGreeting">Hello, Guest</div>
+                    <div style="flex: 1;">
+                        <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
+                    </div>
+                    <!-- NEW FEATURE: USER GREETING & WALLET CONTAINER -->
+                    <div style="flex: 1; text-align: right;">
+                        <div class="user-greeting" id="userGreeting">Hello, Guest</div>
+                        <div class="header-wallet" id="headerWalletDisplay" data-target="premiumMembershipPage">
+                            <i class="fas fa-wallet"></i> ₹<span id="headerWalletBalance">0.00</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
@@ -939,6 +1021,13 @@
                  <div class="form-group"><label>Contact Phone Number</label><input type="tel" id="checkoutPhone" class="form-control" placeholder="10-digit Mobile Number" maxlength="10"></div>
                 <div class="form-group">
                     <label>Payment Method</label>
+                    <!-- NEW FEATURE: SINTHA WALLET PAYMENT OPTION -->
+                    <label class="payment-option" id="walletPaymentOption" style="display:none;">
+                        <input type="radio" name="paymentMethod" value="wallet">
+                        <span class="radio-check"></span>
+                        <i class="fas fa-wallet" style="color:var(--primary-color); margin-right:12px; font-size:1.3em; margin-left: 8px;"></i>
+                        <span style="font-weight:600; color: #2d3436;">Sintha Wallet (<span id="checkoutWalletBalance">₹0.00</span>)</span>
+                    </label>
                     <label class="payment-option">
                         <input type="radio" name="paymentMethod" value="razorpay">
                         <span class="radio-check"></span>
@@ -1018,6 +1107,7 @@
         </div>
 
         <!-- CHAT ROOM PAGE -->
+        <!-- IMPLEMENTATION: Simplified chat layout for robust keyboard handling -->
         <div id="chatRoomPage" class="page" style="z-index: 20;">
             <header class="app-header" style="border-radius:0;">
                 <div class="header-top" style="justify-content: flex-start; gap: 12px;">
@@ -1025,13 +1115,11 @@
                     <h2 id="chatRoomTitle" style="margin: 0; font-size: 1.2em;">Chat</h2>
                 </div>
             </header>
-            <div class="chat-container">
-                <div id="chatMessagesContainer" class="chat-messages"></div>
-                <div id="typingIndicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type a message...">
-                    <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
+            <div id="chatMessagesContainer" class="chat-messages"></div>
+            <div id="typingIndicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
@@ -1084,6 +1172,13 @@
                 <div class="profile-menu-item" data-target="ordersPage">
                     <i class="fas fa-receipt"></i><span>Order History</span><i class="fas fa-chevron-right"></i>
                 </div>
+                
+                <!-- NEW FEATURE: PREMIUM MEMBERSHIP MENU ITEM -->
+                <div class="profile-menu-item" data-target="premiumMembershipPage">
+                    <i class="fas fa-crown" style="color: var(--gold);"></i>
+                    <span id="premiumMenuItemText">Premium Membership</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
 
                 <div class="profile-menu-item" data-target="contactUsPage" onclick="loadContactUs()">
                     <i class="fas fa-headset"></i><span>Contact Us</span><i class="fas fa-chevron-right"></i>
@@ -1110,6 +1205,20 @@
                 <button class="btn-main" style="background: #ff7675; margin-top:25px;" id="menuLogoutBtn">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
+            </div>
+        </div>
+        
+        <!-- NEW FEATURE: PREMIUM MEMBERSHIP PAGE -->
+        <div id="premiumMembershipPage" class="page">
+            <header class="app-header" style="border-radius: 0 0 20px 20px;">
+                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
+                    <i class="fas fa-arrow-left" data-target="menuPage" style="font-size: 1.1em; cursor: pointer;"></i>
+                    <h2 style="margin: 0; font-size: 1.2em;"><i class="fas fa-crown" style="color:var(--gold)"></i> Premium</h2>
+                </div>
+            </header>
+            <div style="flex:1; padding:15px; overflow-y:auto;" id="premiumPageContent">
+                <!-- This content will be dynamically generated by renderPremiumPage() -->
+                <p style="text-align:center; color:#777; padding:15px;">Loading membership details...</p>
             </div>
         </div>
 
@@ -1242,6 +1351,30 @@
                             <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Driver Commission (₹):</label>
                             <input type="number" id="adminDriverCommission" value="20" style="width: 100px;">
                         </div>
+
+                        <!-- NEW FEATURE: PREMIUM/WALLET SETTINGS -->
+                         <div style="background:#fffbeb; padding:10px; border-radius:10px; margin-bottom:15px; border: 1px solid var(--gold);">
+                             <h4 style="margin:0 0 10px 0; color:var(--primary-dark); font-size:0.95em;"><i class="fas fa-crown"></i> Premium & Wallet</h4>
+                              <div style="display:flex; gap:10px; margin-bottom: 12px;">
+                                <div style="flex:1;">
+                                    <label style="font-size:0.8em; font-weight:600;">Monthly Plan (₹)</label>
+                                    <input type="number" id="adminMonthlyPlanPrice">
+                                </div>
+                                <div style="flex:1;">
+                                    <label style="font-size:0.8em; font-weight:600;">Yearly Plan (₹)</label>
+                                    <input type="number" id="adminYearlyPlanPrice">
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; margin-bottom:12px;">
+                                <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Referral Bonus (₹):</label>
+                                <input type="number" id="adminReferralBonus" style="width: 100px;">
+                            </div>
+                             <div style="display:flex; align-items:center;">
+                                <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Withdrawal Charge (%):</label>
+                                <input type="number" id="adminWithdrawalCharge" style="width: 100px;">
+                            </div>
+                         </div>
+
                         <button class="btn-main" style="margin:0;" id="saveSettingsBtn_admin">Save Settings</button>
                     </div>
                 </div>
@@ -1275,6 +1408,25 @@
                     <div id="adminChatListContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
 
+                <!-- NEW FEATURE: WITHDRAWAL REQUESTS SECTION -->
+                <div id="withdrawals_admin" class="section">
+                    <div class="header-title">Withdrawal Requests</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>UPI ID</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawalRequestsTableBody_admin"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="categories_admin" class="section">
                     <div class="action-bar">
                         <div class="header-title" style="margin:0; border:none; padding:0;">Categories</div>
@@ -1304,6 +1456,8 @@
                 <div class="nav-item active" data-admin-target="dashboard_admin"><i class="fas fa-chart-pie"></i><span>Home</span></div>
                 <div class="nav-item" data-admin-target="orders_admin"><i class="fas fa-receipt"></i><span>Orders</span></div>
                 <div class="nav-item" data-admin-target="menu_admin"><i class="fas fa-utensils"></i><span>Menu</span></div>
+                <!-- NEW FEATURE: WITHDRAWALS NAV ITEM -->
+                <div class="nav-item" data-admin-target="withdrawals_admin"><i class="fas fa-hand-holding-usd"></i><span>Withdraw</span></div>
                 <div class="nav-item" data-admin-target="chat_admin" style="position:relative;">
                     <i class="fas fa-comments"></i>
                     <div id="adminChatBadge" class="chat-badge">0</div>
@@ -1398,6 +1552,24 @@
                         <div class="form-group"><label>Mobile Number</label><input type="tel" id="driverProfilePhone" class="form-control" placeholder="10-digit Number" style="width:100%; text-align:left;" maxlength="10"></div>
                         <button class="btn-main" id="saveDriverProfileBtn" style="margin-bottom:0;">Save Profile</button>
                     </div>
+                    <!-- IMPLEMENTATION: Driver Withdrawal UI -->
+                    <div class="header-title" style="margin-top: 25px;">Earnings & Withdrawal</div>
+                    <div class="settings-panel">
+                        <div class="wallet-card" style="background: linear-gradient(135deg, #0984e3, #2d3436); margin-bottom: 20px;">
+                            <div class="balance-label">Total Withdrawable Earnings</div>
+                            <div class="balance-amount" style="font-size: 2em;">₹<span id="driverPanelEarnings">0</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount to Withdraw (₹)</label>
+                            <input type="number" id="driverWithdrawalAmount" class="form-control" placeholder="Min ₹100" style="width:100%; text-align:left;">
+                        </div>
+                        <div class="form-group">
+                            <label>Your UPI ID</label>
+                            <input type="text" id="driverWithdrawalUpiId" class="form-control" placeholder="e.g., yourname@oksbi" style="width:100%; text-align:left;">
+                        </div>
+                        <button class="btn-main" onclick="requestDriverWithdrawal()" style="margin-bottom:0; background: var(--info);">Request Withdrawal</button>
+                        <p style="font-size: 0.75em; text-align: center; color: var(--light-text); margin-top: 5px;">A withdrawal fee may be applied by the admin.</p>
+                    </div>
                 </div>
             </div>
             <div class="bottom-nav">
@@ -1478,10 +1650,18 @@
         // IMPLEMENTATION: Variable to store the action user wanted to perform before login
         let postLoginAction = null;
 
-        let globalDeliveryCharge = 50;
-        let globalDriverCommission = 20;
-        let globalEnableRoleSelection = false;
-        let globalWorkingHours = { enabled: false, start: '09:00', end: '22:00' };
+        // NEW FEATURE: Global Settings for Premium/Wallet
+        let globalSettings = {
+            deliveryCharge: 50,
+            driverCommission: 20,
+            enableRoleSelection: false,
+            workingHours: { enabled: false, start: '09:00', end: '22:00' },
+            premiumMonthlyPrice: 99,
+            premiumYearlyPrice: 999,
+            referralBonus: 50,
+            withdrawalCharge: 2
+        };
+
         window.isStoreClosedViewOnly = false;
         window.hasClickedVisit = false; 
 
@@ -1516,24 +1696,29 @@
         db.ref('settings').on('value', snap => {
             if(snap.exists()) {
                 const s = snap.val();
-                globalDeliveryCharge = parseFloat(s.deliveryCharge) || 50;
-                globalDriverCommission = parseFloat(s.driverCommission) || 20;
-                globalEnableRoleSelection = s.enableRoleSelection !== undefined ? s.enableRoleSelection : false;
-                if(s.workingHours) globalWorkingHours = s.workingHours;
-                
-                const adminChg = document.getElementById('adminDeliveryCharge');
-                const adminCom = document.getElementById('adminDriverCommission');
-                const adminRoleToggle = document.getElementById('adminEnableRoleSelect');
-                const adminWH = document.getElementById('adminEnableHours');
-                const adminStart = document.getElementById('adminStartTime');
-                const adminEnd = document.getElementById('adminStopTime');
+                globalSettings = { ...globalSettings, ...s };
 
-                if(adminChg) adminChg.value = globalDeliveryCharge;
-                if(adminCom) adminCom.value = globalDriverCommission;
-                if(adminRoleToggle) adminRoleToggle.checked = globalEnableRoleSelection;
-                if(adminWH) adminWH.checked = globalWorkingHours.enabled;
-                if(adminStart) adminStart.value = globalWorkingHours.start;
-                if(adminEnd) adminEnd.value = globalWorkingHours.end;
+                // Update Admin Panel fields if they exist
+                const adminFields = {
+                    adminDeliveryCharge: globalSettings.deliveryCharge,
+                    adminDriverCommission: globalSettings.driverCommission,
+                    adminEnableRoleSelect: globalSettings.enableRoleSelection,
+                    adminEnableHours: globalSettings.workingHours.enabled,
+                    adminStartTime: globalSettings.workingHours.start,
+                    adminStopTime: globalSettings.workingHours.end,
+                    adminMonthlyPlanPrice: globalSettings.premiumMonthlyPrice,
+                    adminYearlyPlanPrice: globalSettings.premiumYearlyPrice,
+                    adminReferralBonus: globalSettings.referralBonus,
+                    adminWithdrawalCharge: globalSettings.withdrawalCharge,
+                };
+                
+                for (const [id, value] of Object.entries(adminFields)) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = value;
+                        else el.value = value;
+                    }
+                }
 
                 updateCartUI();
                 checkAndEnforceStoreHours();
@@ -1686,9 +1871,15 @@
                     `;
                 });
             }
+            
+            // IMPLEMENTATION: Check for premium free delivery benefit in invoice
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            let deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            // Fallback for older orders before this change
+            if (order.total - subtotal >= 0) {
+                 deliveryFee = order.total - subtotal;
+            }
 
-            let deliveryFee = parseFloat(order.total) - subtotal;
-            if(deliveryFee < 0) deliveryFee = 0; 
 
             invoiceEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #008743; padding-bottom: 20px; margin-bottom: 30px;">
@@ -1733,7 +1924,7 @@
                 <div style="display: flex; justify-content: flex-end;">
                     <div style="width: 280px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #636e72; font-size: 0.95em;"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;"><span>Delivery Fee:</span><span>₹${deliveryFee.toFixed(2)}</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;"><span>Delivery Fee:</span><span>${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toFixed(2)}`}</span></div>
                         <div style="display: flex; justify-content: space-between; border-top: 2px solid #dfe6e9; padding-top: 12px; font-weight: 700; font-size: 1.2em; color: #008743;"><span>Total Amount:</span><span>₹${parseFloat(order.total).toFixed(2)}</span></div>
                     </div>
                 </div>
@@ -1769,10 +1960,10 @@
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             
             // Handle bottom nav active states
-            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'chatSelectionPage' || id === 'contactUsPage') {
+            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumMembershipPage') {
                 document.querySelectorAll('#customerBottomNav .nav-item').forEach(nav => {
                     let navPage = nav.dataset.page;
-                    if((id === 'ordersPage' || id === 'editProfilePage' || id === 'contactUsPage') && navPage === 'menuPage') { nav.classList.add('active'); }
+                    if((id === 'ordersPage' || id === 'editProfilePage' || id === 'contactUsPage' || id === 'premiumMembershipPage') && navPage === 'menuPage') { nav.classList.add('active'); }
                     else if((id === 'cartPage' || id === 'checkoutPage') && navPage === 'appContainer') { nav.classList.add('active'); }
                     else { nav.classList.toggle('active', navPage === id); }
                 });
@@ -1781,7 +1972,7 @@
             const custNav = document.getElementById('customerBottomNav');
             const cartFab = document.getElementById('cart-fab-container');
             
-            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'itemDetailsPage' || id === 'chatSelectionPage' || id === 'contactUsPage') {
+            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'itemDetailsPage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumMembershipPage') {
                 custNav.style.display = 'flex';
                 cartFab.style.display = (id === 'cartPage' || id === 'checkoutPage' || id === 'itemDetailsPage') ? 'none' : 'block';
             } else {
@@ -1807,6 +1998,10 @@
                 setTimeout(() => { if(allMaps['prof-map']) allMaps['prof-map'].invalidateSize(); }, 300);
                 loadProfileDataIntoForm();
             }
+            // NEW FEATURE: Render premium page on show
+            if(id === 'premiumMembershipPage') {
+                renderPremiumPage();
+            }
 
             if(id === 'ordersPage') loadOrders();
             if(id === 'notificationsPage' && currentUser) { loadNotifications(); markNotificationsAsRead(); }
@@ -1831,7 +2026,7 @@
                 const target = e.currentTarget.dataset.target || e.currentTarget.dataset.page;
                 
                 // Define which pages require a user to be logged in
-                const protectedPages = ['chatSelectionPage', 'notificationsPage', 'menuPage', 'ordersPage', 'editProfilePage', 'contactUsPage'];
+                const protectedPages = ['chatSelectionPage', 'notificationsPage', 'menuPage', 'ordersPage', 'editProfilePage', 'contactUsPage', 'premiumMembershipPage'];
 
                 if (protectedPages.includes(target)) {
                     if (requireLogin(target)) { // If requireLogin is true, proceed
@@ -1905,13 +2100,13 @@
             }, 6000);
 
             if(u) { // User is logged in
-                db.ref('users/' + u.uid).once('value', snap => {
+                db.ref('users/' + u.uid).on('value', snap => { // Use .on() to listen for wallet/premium changes
                     let userData = snap.val();
                     if (!userData) {
                         userData = {
                             email: u.email,
                             name: u.displayName || pendingRegName || 'Guest',
-                            role: '', banned: false, createdAt: Date.now()
+                            role: '', banned: false, createdAt: Date.now(), walletBalance: 0 // NEW FEATURE
                         };
                         db.ref('users/' + u.uid).set(userData).then(() => { checkRoleAndProceed(u, userData); });
                     } else {
@@ -1919,7 +2114,21 @@
                             userData.name = u.displayName || pendingRegName;
                             db.ref('users/' + u.uid).update({ name: userData.name });
                         }
-                        checkRoleAndProceed(u, userData);
+                        // NEW FEATURE: Ensure wallet balance exists
+                        if(typeof userData.walletBalance === 'undefined') {
+                            userData.walletBalance = 0;
+                            db.ref('users/' + u.uid).update({ walletBalance: 0 });
+                        }
+
+                        // if currentUser isn't set, it's the first login. Otherwise, it's a data update.
+                        if(!currentUser) {
+                           checkRoleAndProceed(u, userData);
+                        } else {
+                           // Data has been updated (e.g., wallet change), so just update UI
+                           currentUserData = userData;
+                           updateWalletDisplay();
+                           renderPremiumPage(); // Re-render in case status changed
+                        }
                     }
                 });
             } else { // User is NOT logged in (Guest Mode)
@@ -1941,6 +2150,7 @@
                 
                 // Update UI for guest
                 document.getElementById('userGreeting').innerHTML = `Hello, Guest`;
+                document.getElementById('headerWalletDisplay').style.display = 'none';
                 document.getElementById('adminSwitchSection').style.display = 'none';
                 document.getElementById('driverSwitchSection').style.display = 'none';
             }
@@ -1956,20 +2166,13 @@
             currentUserData = userData;
 
             if(!userData.role || userData.role === '') {
-                db.ref('settings').once('value').then(setSnap => {
-                    let canSelect = false;
-                    if(setSnap.exists() && setSnap.val().enableRoleSelection !== undefined) canSelect = setSnap.val().enableRoleSelection;
-                    if(canSelect === true || canSelect === "true") showPage('roleSelectPage');
-                    else {
-                        db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
-                            userData.role = 'customer'; finalizeLogin('customer', u, userData);
-                        });
-                    }
-                }).catch(err => {
+                if(globalSettings.enableRoleSelection === true || globalSettings.enableRoleSelection === "true") {
+                     showPage('roleSelectPage');
+                } else {
                     db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
                         userData.role = 'customer'; finalizeLogin('customer', u, userData);
                     });
-                });
+                }
             } else finalizeLogin(userData.role, u, userData);
         }
 
@@ -1995,6 +2198,8 @@
             const name = userData.name || u.displayName || 'Guest';
             const shortName = name.split(' ')[0];
             document.getElementById('userGreeting').innerHTML = `Hello, ${shortName}`;
+            
+            updateWalletDisplay();
 
             if(role === 'admin') { document.getElementById('adminGreetingName').innerText = `Hello, ${shortName}`; initAdminContext(); }
             if(role === 'driver') { document.getElementById('driverGreetingName').innerText = `Hello, ${shortName}`; initDriverContext(); }
@@ -2172,6 +2377,16 @@
                     cMap.setView([currentUserData.lat, currentUserData.lng], 15);
                 }
             }
+
+            // NEW FEATURE: Update wallet display on checkout page
+            const walletOption = document.getElementById('walletPaymentOption');
+            const walletBalanceDisplay = document.getElementById('checkoutWalletBalance');
+            if(currentUserData.walletBalance > 0) {
+                walletOption.style.display = 'flex';
+                walletBalanceDisplay.textContent = `₹${currentUserData.walletBalance.toFixed(2)}`;
+            } else {
+                walletOption.style.display = 'none';
+            }
         }
         
         document.querySelectorAll('input[name="paymentMethod"]').forEach(elem => {
@@ -2197,6 +2412,7 @@
                 orderBtn.style.opacity = '1';
                 if(selectedPaymentMethod === 'razorpay') orderBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Pay';
                 else if (selectedPaymentMethod === 'cod') orderBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                else if (selectedPaymentMethod === 'wallet') orderBtn.innerHTML = '<i class="fas fa-wallet"></i> Pay with Wallet';
             } else {
                 orderBtn.disabled = true;
                 orderBtn.style.opacity = '0.6';
@@ -2474,7 +2690,19 @@
             }
             
             document.getElementById('cart-summary').style.display='block';
-            document.getElementById('delivery-fee-display').textContent = `₹${globalDeliveryCharge.toFixed(2)}`;
+
+            // IMPLEMENTATION: Check for premium free delivery benefit
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            const deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            const deliveryFeeDisplay = document.getElementById('delivery-fee-display');
+            deliveryFeeDisplay.textContent = isPremium ? 'FREE' : `₹${deliveryFee.toFixed(2)}`;
+            if (isPremium) {
+                deliveryFeeDisplay.style.color = 'var(--success)';
+                deliveryFeeDisplay.style.fontWeight = '700';
+            } else {
+                deliveryFeeDisplay.style.color = 'inherit';
+                deliveryFeeDisplay.style.fontWeight = '500';
+            }
 
             c.innerHTML='';
             let sub=0;
@@ -2499,7 +2727,7 @@
             });
             
             document.getElementById('subtotal-price').textContent = `₹${sub.toFixed(2)}`;
-            document.getElementById('total-price').textContent = `₹${(sub+globalDeliveryCharge).toFixed(2)}`;
+            document.getElementById('total-price').textContent = `₹${(sub + deliveryFee).toFixed(2)}`;
             checkOrderValidity(); 
         }
 
@@ -2622,10 +2850,8 @@
             });
         }
 
-        function saveOrderToFirebase(paymentMethod, paymentId = null) {
-            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalDeliveryCharge);
+        function saveOrderToFirebase(paymentMethod, paymentId = null, totalAmount) {
             const dCode = Math.floor(100000 + Math.random() * 900000);
-            
             const uName = nameInput.value.trim() || currentUserData.name || currentUser.displayName || 'Unknown';
 
             const order = {
@@ -2652,25 +2878,35 @@
             });
         }
         
-        // IMPLEMENTATION: Added login check to the final order placement button
+        // IMPLEMENTATION: Added login check and wallet payment logic
         orderBtn.onclick = (e) => {
             e.preventDefault();
             if(orderBtn.disabled || cart.length === 0) return;
 
-            // This is the gate. If user is not logged in, stop here and show login page.
-            if (!requireLogin('checkoutPage')) {
-                return; 
-            }
+            if (!requireLogin('checkoutPage')) return; 
 
-            if (selectedPaymentMethod === 'cod') {
-                saveOrderToFirebase('Cash on Delivery');
+            // IMPLEMENTATION: Recalculate total with premium benefit
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            const deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + deliveryFee);
+
+            if (selectedPaymentMethod === 'wallet') {
+                if(currentUserData.walletBalance >= totalAmount) {
+                    const newBalance = currentUserData.walletBalance - totalAmount;
+                    db.ref('users/' + currentUser.uid).update({ walletBalance: newBalance }).then(() => {
+                        saveOrderToFirebase('Sintha Wallet', `wallet_${Date.now()}`, totalAmount);
+                    });
+                } else {
+                    showToast("Insufficient wallet balance.", "error");
+                }
+            } else if (selectedPaymentMethod === 'cod') {
+                saveOrderToFirebase('Cash on Delivery', null, totalAmount);
             } else if (selectedPaymentMethod === 'razorpay') {
-                const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalDeliveryCharge);
                 const options = {
                     "key": "rzp_live_SUarhYm5IfBTar", "amount": Math.round(totalAmount * 100), "currency": "INR",
                     "name": "Sintha Keithel", "description": "Food Order Payment",
                     "image": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-                    "handler": (response) => saveOrderToFirebase('Razorpay', response.razorpay_payment_id),
+                    "handler": (response) => saveOrderToFirebase('Razorpay', response.razorpay_payment_id, totalAmount),
                     "prefill": { "name": nameInput.value.trim(), "email": currentUser.email, "contact": phoneInput.value.trim() },
                     "theme": { "color": "#008743" }
                 };
@@ -2882,24 +3118,23 @@
             }
 
             document.getElementById('saveSettingsBtn_admin').onclick = () => {
-                const dc = parseFloat(document.getElementById('adminDeliveryCharge').value);
-                const cc = parseFloat(document.getElementById('adminDriverCommission').value);
-                const enableRole = document.getElementById('adminEnableRoleSelect').checked;
-                
-                const whEnabled = document.getElementById('adminEnableHours').checked;
-                const whStart = document.getElementById('adminStartTime').value || '09:00';
-                const whEnd = document.getElementById('adminStopTime').value || '22:00';
-
-                db.ref('settings').update({
-                    deliveryCharge: dc,
-                    driverCommission: cc,
-                    enableRoleSelection: enableRole,
+                const settingsData = {
+                    deliveryCharge: parseFloat(document.getElementById('adminDeliveryCharge').value) || 50,
+                    driverCommission: parseFloat(document.getElementById('adminDriverCommission').value) || 20,
+                    enableRoleSelection: document.getElementById('adminEnableRoleSelect').checked,
                     workingHours: {
-                        enabled: whEnabled,
-                        start: whStart,
-                        end: whEnd
-                    }
-                }).then(()=>showToast("Settings Saved successfully!", "success"));
+                        enabled: document.getElementById('adminEnableHours').checked,
+                        start: document.getElementById('adminStartTime').value || '09:00',
+                        end: document.getElementById('adminStopTime').value || '22:00'
+                    },
+                    // NEW FEATURE: Save premium/wallet settings
+                    premiumMonthlyPrice: parseFloat(document.getElementById('adminMonthlyPlanPrice').value) || 99,
+                    premiumYearlyPrice: parseFloat(document.getElementById('adminYearlyPlanPrice').value) || 999,
+                    referralBonus: parseFloat(document.getElementById('adminReferralBonus').value) || 50,
+                    withdrawalCharge: parseFloat(document.getElementById('adminWithdrawalCharge').value) || 2,
+                };
+
+                db.ref('settings').update(settingsData).then(()=>showToast("Settings Saved successfully!", "success"));
             };
 
             document.getElementById('csvFileInput_admin').addEventListener('change', function(e) {
@@ -3342,12 +3577,83 @@
                     });
                 });
             }
+            
+            // NEW FEATURE: WITHDRAWAL REQUESTS
+            function fetchWithdrawalRequests_admin() {
+                db.ref('withdrawalRequests').orderByChild('status').equalTo('pending').on('value', snap => {
+                    const tbody = document.getElementById('withdrawalRequestsTableBody_admin');
+                    tbody.innerHTML = '';
+                    if (!snap.exists()) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#777;">No pending requests.</td></tr>';
+                        return;
+                    }
+                    snap.forEach(child => {
+                        const req = child.val();
+                        const reqId = child.key;
+                        db.ref('users/' + req.userId).once('value', userSnap => {
+                            const user = userSnap.val();
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${user ? user.name : 'Unknown'} (${req.type || 'customer'})</td>
+                                <td style="font-weight:700;">₹${req.amount}</td>
+                                <td>${req.upiId}</td>
+                                <td>${new Date(req.timestamp).toLocaleString()}</td>
+                                <td>
+                                    <button onclick="handleWithdrawal('${reqId}', 'approved')" style="background:var(--success); color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; margin-right:5px;">Approve</button>
+                                    <button onclick="handleWithdrawal('${reqId}', 'rejected')" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em;">Reject</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    });
+                });
+            }
+
+            window.handleWithdrawal = (reqId, newStatus) => {
+                db.ref('withdrawalRequests/' + reqId).once('value', reqSnap => {
+                    const req = reqSnap.val();
+                    if (!req) {
+                        showToast("Request not found.", "error");
+                        return;
+                    }
+
+                    if (newStatus === 'approved') {
+                        if(!confirm("Approve this withdrawal? The amount will be deducted from the user's balance.")) return;
+                        
+                        db.ref('users/' + req.userId).once('value', userSnap => {
+                            const user = userSnap.val();
+                            const isDriver = req.type === 'driver';
+                            const balanceField = isDriver ? 'earnings' : 'walletBalance';
+                            const currentBalance = user[balanceField] || 0;
+                            const totalDeduction = parseFloat(req.totalDeduction);
+
+                            if (currentBalance >= totalDeduction) {
+                                const newBalance = currentBalance - totalDeduction;
+                                const updates = {};
+                                updates[balanceField] = newBalance;
+                                db.ref('users/' + req.userId).update(updates);
+                                db.ref('withdrawalRequests/' + reqId).update({ status: 'approved', processedAt: Date.now() });
+                                showToast("Withdrawal approved and amount deducted.", "success");
+                            } else {
+                                showToast(`User has insufficient ${balanceField}.`, "error");
+                                db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', reason: 'Insufficient funds' });
+                            }
+                        });
+                    } else { // Rejected
+                        if(!confirm("Are you sure you want to reject this withdrawal?")) return;
+                        db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', processedAt: Date.now() });
+                        showToast("Withdrawal request rejected.", "info");
+                    }
+                });
+            };
+
 
             fetchOrders_admin();
             fetchDishes_admin();
             fetchCategories_admin();
             fetchUsers_admin();
-            fetchAdminChatList(); // Initialize chat list
+            fetchAdminChatList();
+            fetchWithdrawalRequests_admin();
         }
 
         // =========================================================
@@ -3366,7 +3672,9 @@
             db.ref('users/' + currentUser.uid).on('value', snap => {
                 const u = snap.val();
                 if(u) {
-                    document.getElementById('driverHeaderEarnings').textContent = u.earnings || 0;
+                    const earnings = u.earnings || 0;
+                    document.getElementById('driverHeaderEarnings').textContent = earnings.toFixed(2);
+                    document.getElementById('driverPanelEarnings').textContent = earnings.toFixed(2);
                     document.getElementById('driverProfileName').value = u.name || currentUser.displayName || '';
                     document.getElementById('driverProfilePhone').value = u.driverPhone || '';
                 }
@@ -3524,12 +3832,12 @@
                 }
                 
                 db.ref('users/' + currentUser.uid + '/earnings').once('value', s => {
-                    db.ref('users/' + currentUser.uid).update({ earnings: (s.val() || 0) + globalDriverCommission });
+                    db.ref('users/' + currentUser.uid).update({ earnings: (s.val() || 0) + globalSettings.driverCommission });
                 });
 
                 if(isCashCollected) {
                     db.ref('users/' + currentUser.uid + '/collectedCash').once('value', s => {
-                        db.ref('users/' + currentUser.uid).update({ collectedCash: (s.val() || 0) + parseFloat(orderTotal) });
+                           db.ref('users/' + currentUser.uid).update({ collectedCash: (s.val() || 0) + parseFloat(orderTotal) });
                     });
                 }
             }
@@ -3914,7 +4222,7 @@
         function checkAndEnforceStoreHours() {
             const banner = document.getElementById('storeHoursBanner');
 
-            if(!globalWorkingHours.enabled) {
+            if(!globalSettings.workingHours.enabled) {
                 if(activePageId === 'storeClosedPage') showPage('appContainer');
                 else document.getElementById('storeClosedPage').classList.remove('active');
                 
@@ -3937,8 +4245,8 @@
                 const currentSeconds = now.getSeconds();
                 const currentTimeInSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
 
-                const [startH, startM] = globalWorkingHours.start.split(':').map(Number);
-                const [endH, endM] = globalWorkingHours.end.split(':').map(Number);
+                const [startH, startM] = globalSettings.workingHours.start.split(':').map(Number);
+                const [endH, endM] = globalSettings.workingHours.end.split(':').map(Number);
                 const startTimeInSeconds = startH * 3600 + startM * 60;
                 const endTimeInSeconds = endH * 3600 + endM * 60;
 
@@ -4052,12 +4360,14 @@
         };
 
         // =========================================================
-        // RAZORPAY QR PAYMENT AUTO-DETECTION 
-        // =========================================================
+        // RAZORPAY QR & NEW FEATURE: REFERRAL LINK DETECTION
+        // ========================================================== */
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
             const payOrderId = urlParams.get('payOrder');
-            
+            const referralCode = urlParams.get('ref'); // NEW FEATURE
+
+            // Existing Razorpay QR logic
             if (payOrderId) {
                 setTimeout(() => {
                     db.ref('orders/' + payOrderId).once('value', snap => {
@@ -4077,7 +4387,7 @@
                                         paymentId: response.razorpay_payment_id
                                     }).then(() => {
                                         showToast("Payment successful! The driver has been notified automatically.", "success");
-                                        window.location.href = window.location.origin + window.location.pathname;
+                                        window.history.replaceState({}, document.title, window.location.pathname);
                                     });
                                 },
                                 "prefill": { "name": order.userName, "email": order.email || "guest@example.com", "contact": order.phone },
@@ -4090,15 +4400,334 @@
                             } catch(e) { showToast("Payment gateway failed to load.", "error"); }
                         } else if (order && order.paymentStatus === 'Paid') {
                             showToast("This order is already paid.", "info");
-                            window.location.href = window.location.origin + window.location.pathname;
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         } else {
                             showToast("Order not found.", "error");
-                            window.location.href = window.location.origin + window.location.pathname;
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         }
                     });
                 }, 1500); 
             }
+
+            // NEW FEATURE: Referral Code Detection
+            if (referralCode) {
+                // Store referral code to be used on the premium page later
+                sessionStorage.setItem('referralCode', referralCode);
+                showToast(`Referral code ${referralCode} applied!`, 'success');
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         });
+
+        // =========================================================
+        // NEW FEATURE: PREMIUM MEMBERSHIP & WALLET LOGIC
+        // =========================================================
+        
+        function updateWalletDisplay() {
+            if (!currentUserData) return;
+
+            const walletDisplay = document.getElementById('headerWalletDisplay');
+            const walletBalance = document.getElementById('headerWalletBalance');
+            const premiumMenuItem = document.getElementById('premiumMenuItemText');
+
+            const isPremium = currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            
+            if (isPremium) {
+                walletDisplay.style.display = 'inline-flex';
+                walletBalance.textContent = (currentUserData.walletBalance || 0).toFixed(2);
+                premiumMenuItem.innerHTML = 'Premium Member <i class="fas fa-crown" style="color:var(--gold); margin-left: 5px;"></i>';
+            } else {
+                walletDisplay.style.display = 'none';
+                premiumMenuItem.innerHTML = 'Premium Membership';
+            }
+        }
+
+        function renderPremiumPage() {
+            if (!currentUserData) {
+                document.getElementById('premiumPageContent').innerHTML = '<p>Error: User data not found.</p>';
+                return;
+            }
+
+            const container = document.getElementById('premiumPageContent');
+            const now = Date.now();
+            const premiumInfo = currentUserData.premium;
+            const isPremium = premiumInfo && premiumInfo.expiry > now;
+            const isExpired = premiumInfo && premiumInfo.expiry <= now;
+            
+            if (isPremium) {
+                // User is an active premium member
+                const expiryDate = new Date(premiumInfo.expiry).toLocaleDateString();
+                const referralCode = currentUserData.referralCode || 'Generating...';
+                
+                container.innerHTML = `
+                    <div class="info-card" style="border: 2px solid var(--gold); background: #fffbeb;">
+                        <h4><i class="fas fa-crown"></i> You are a Premium Member</h4>
+                        <p>Your membership is active until: <strong>${expiryDate}</strong></p>
+                    </div>
+
+                    <div class="wallet-card">
+                        <div class="balance-label">Your Wallet Balance</div>
+                        <div class="balance-amount">₹${(currentUserData.walletBalance || 0).toFixed(2)}</div>
+                    </div>
+                    
+                    <h3 class="section-title" style="margin-top: 25px;">Withdraw Funds</h3>
+                    <div class="form-group">
+                        <label>Amount to Withdraw (₹)</label>
+                        <input type="number" id="withdrawalAmount" class="form-control" placeholder="Min ₹100">
+                    </div>
+                    <div class="form-group">
+                        <label>Your UPI ID</label>
+                        <input type="text" id="withdrawalUpiId" class="form-control" placeholder="e.g., yourname@oksbi">
+                    </div>
+                    <button class="btn-main" onclick="requestWithdrawal()">Request Withdrawal</button>
+                    <p style="font-size: 0.75em; text-align: center; color: var(--light-text); margin-top: 5px;">A ${globalSettings.withdrawalCharge}% processing fee will be applied.</p>
+                    
+                    <h3 class="section-title" style="margin-top: 25px;">Refer & Earn</h3>
+                    <div class="info-card">
+                        <h4>Your Referral Code</h4>
+                        <div class="referral-code-box">${referralCode}</div>
+                        <!-- IMPLEMENTATION: Updated referral info text -->
+                        <p>You can earn ₹${globalSettings.referralBonus} when a user buys a premium membership plan using your referral code.</p>
+                        <button class="btn-main" style="margin-top: 15px;" onclick="copyReferralLink()">
+                            <i class="fas fa-share-alt"></i> Share Your Link
+                        </button>
+                    </div>
+                `;
+            } else {
+                // User is not a member or has expired
+                const storedRefCode = sessionStorage.getItem('referralCode') || '';
+
+                container.innerHTML = `
+                    ${isExpired ? `
+                    <div class="info-card" style="border: 2px solid var(--danger); background: #ffebee;">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Membership Expired</h4>
+                        <p>Your premium benefits have ended. Renew now to continue enjoying them!</p>
+                    </div>
+                    ` : `
+                    <div class="info-card">
+                        <h4>Unlock Premium Benefits</h4>
+                        <p>Become a premium member to earn from referrals and enjoy exclusive perks like free delivery!</p>
+                    </div>
+                    `}
+
+                    <h3 class="section-title">Choose Your Plan</h3>
+                    <div class="plan-container">
+                        <div class="plan-card" id="monthly-plan" onclick="selectPlan('monthly')">
+                            <h3>Monthly</h3>
+                            <p>₹${globalSettings.premiumMonthlyPrice}</p>
+                            <span>per month</span>
+                        </div>
+                        <div class="plan-card" id="yearly-plan" onclick="selectPlan('yearly')">
+                            <div class="best-value">BEST VALUE</div>
+                            <h3>Yearly</h3>
+                            <p>₹${globalSettings.premiumYearlyPrice}</p>
+                            <span>per year</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Referral Code (Optional)</label>
+                        <input type="text" id="referralCodeInput" class="form-control" placeholder="Enter code from a friend" value="${storedRefCode}">
+                    </div>
+
+                    <button class="btn-main" id="buyPremiumBtn" onclick="buyPremiumPlan()" disabled>Select a Plan to Continue</button>
+                    ${isExpired ? `<button class="btn-main" style="background:var(--gold); color:#333;" id="renewPremiumBtn" onclick="renewPremiumPlan()" disabled>Renew Plan</button>` : ''}
+                `;
+            }
+        }
+
+        let selectedPlan = null;
+        window.selectPlan = (planType) => {
+            selectedPlan = planType;
+            const monthlyCard = document.getElementById('monthly-plan');
+            const yearlyCard = document.getElementById('yearly-plan');
+            const buyBtn = document.getElementById('buyPremiumBtn');
+            const renewBtn = document.getElementById('renewPremiumBtn');
+
+            monthlyCard.classList.toggle('selected', planType === 'monthly');
+            yearlyCard.classList.toggle('selected', planType === 'yearly');
+
+            if (buyBtn) {
+                buyBtn.disabled = false;
+                buyBtn.textContent = `Buy ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`;
+            }
+            if (renewBtn) {
+                renewBtn.disabled = false;
+                renewBtn.textContent = `Renew with ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`;
+            }
+        };
+
+        window.renewPremiumPlan = () => buyPremiumPlan(true);
+
+        window.buyPremiumPlan = (isRenewal = false) => {
+            if (!selectedPlan) {
+                showToast("Please select a plan first.", "error");
+                return;
+            }
+
+            const amount = selectedPlan === 'monthly' ? globalSettings.premiumMonthlyPrice : globalSettings.premiumYearlyPrice;
+            const referralCodeInput = document.getElementById('referralCodeInput');
+            const refCode = referralCodeInput ? referralCodeInput.value.trim().toUpperCase() : null;
+
+            const options = {
+                "key": "rzp_live_SUarhYm5IfBTar",
+                "amount": Math.round(amount * 100),
+                "currency": "INR",
+                "name": "Sintha Keithel Premium",
+                "description": `${isRenewal ? 'Renewal' : 'Purchase'} - ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} Plan`,
+                "handler": (response) => {
+                    activatePremium(selectedPlan, response.razorpay_payment_id, refCode);
+                },
+                "prefill": {
+                    "name": currentUserData.name,
+                    "email": currentUser.email,
+                    "contact": currentUserData.phone || ''
+                },
+                "theme": { "color": "#008743" }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
+            rzp.open();
+        };
+
+        function activatePremium(plan, paymentId, referralCode) {
+            const now = new Date();
+            let expiryDate;
+            if (plan === 'monthly') {
+                expiryDate = new Date(now.setMonth(now.getMonth() + 1));
+            } else { // yearly
+                expiryDate = new Date(now.setFullYear(now.getFullYear() + 1));
+            }
+
+            const updates = {
+                premium: {
+                    plan: plan,
+                    purchaseDate: Date.now(),
+                    expiry: expiryDate.getTime(),
+                    paymentId: paymentId
+                }
+            };
+            
+            // Generate referral code if user doesn't have one
+            if (!currentUserData.referralCode) {
+                const newRefCode = (currentUserData.name.substring(0, 4) + Math.random().toString(36).substring(2, 6)).toUpperCase();
+                updates.referralCode = newRefCode;
+            }
+
+            db.ref('users/' + currentUser.uid).update(updates).then(() => {
+                showToast("Congratulations! You are now a premium member.", "success");
+                sessionStorage.removeItem('referralCode');
+                renderPremiumPage(); // Re-render the page to show new status
+
+                // Handle referral bonus if a valid code was used
+                if (referralCode) {
+                    db.ref('users').orderByChild('referralCode').equalTo(referralCode).once('value', snap => {
+                        if (snap.exists()) {
+                            const referrerId = Object.keys(snap.val())[0];
+                            const referrerData = snap.val()[referrerId];
+
+                            // Check if referrer's own plan is active
+                            const isReferrerActive = referrerData.premium && referrerData.premium.expiry > Date.now();
+                            if(isReferrerActive) {
+                                const bonus = globalSettings.referralBonus;
+                                const newBalance = (referrerData.walletBalance || 0) + bonus;
+                                db.ref('users/' + referrerId).update({ walletBalance: newBalance });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        
+        window.copyReferralLink = () => {
+            const referralCode = currentUserData.referralCode;
+            const link = `${window.location.origin}${window.location.pathname}?ref=${referralCode}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast("Referral link copied to clipboard!", "success");
+            }, () => {
+                showToast("Failed to copy link.", "error");
+            });
+        };
+
+        window.requestWithdrawal = () => {
+            const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+            const upiId = document.getElementById('withdrawalUpiId').value.trim();
+
+            if (isNaN(amount) || amount < 100) {
+                showToast("Minimum withdrawal amount is ₹100.", "error");
+                return;
+            }
+            if (!upiId) {
+                showToast("Please enter a valid UPI ID.", "error");
+                return;
+            }
+            
+            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
+            const chargeAmount = (amount * chargePercent) / 100;
+            const totalDeduction = amount + chargeAmount;
+
+            if (currentUserData.walletBalance < totalDeduction) {
+                showToast(`Insufficient balance. You need ₹${totalDeduction.toFixed(2)} to withdraw ₹${amount.toFixed(2)}.`, "error");
+                return;
+            }
+
+            const requestData = {
+                userId: currentUser.uid,
+                type: 'customer',
+                amount: amount,
+                upiId: upiId,
+                charge: chargeAmount,
+                totalDeduction: totalDeduction,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            db.ref('withdrawalRequests').push(requestData).then(() => {
+                showToast("Withdrawal request submitted! It will be processed by the admin.", "success");
+                renderPremiumPage();
+            });
+        };
+
+        // IMPLEMENTATION: Driver withdrawal request function
+        window.requestDriverWithdrawal = () => {
+            const amount = parseFloat(document.getElementById('driverWithdrawalAmount').value);
+            const upiId = document.getElementById('driverWithdrawalUpiId').value.trim();
+            const currentEarnings = currentUserData.earnings || 0;
+
+            if (isNaN(amount) || amount < 100) {
+                showToast("Minimum withdrawal amount is ₹100.", "error");
+                return;
+            }
+            if (!upiId) {
+                showToast("Please enter a valid UPI ID.", "error");
+                return;
+            }
+            
+            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
+            const chargeAmount = (amount * chargePercent) / 100;
+            const totalDeduction = amount + chargeAmount;
+
+            if (currentEarnings < totalDeduction) {
+                showToast(`Insufficient earnings. You need ₹${totalDeduction.toFixed(2)} to withdraw ₹${amount.toFixed(2)}.`, "error");
+                return;
+            }
+
+            const requestData = {
+                userId: currentUser.uid,
+                type: 'driver',
+                amount: amount,
+                upiId: upiId,
+                charge: chargeAmount,
+                totalDeduction: totalDeduction,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            db.ref('withdrawalRequests').push(requestData).then(() => {
+                showToast("Withdrawal request submitted successfully! It will be processed by the admin.", "success");
+                document.getElementById('driverWithdrawalAmount').value = '';
+                document.getElementById('driverWithdrawalUpiId').value = '';
+            });
+        };
     </script>
 </body>
 </html>
