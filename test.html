@@ -431,23 +431,7 @@
 
         body.auth-screen .bottom-nav, body.auth-screen #cart-fab-container,
         body.in-chat #customerBottomNav, body.in-chat #cart-fab-container, body.in-chat .bottom-nav { display: none !important; }
-        /* NEW FEATURE: Chat input is above bottom nav bar */
-        /* This is a bit of a tricky request. The standard mobile UI is to hide the main nav when in a chat screen.
-           The current implementation already correctly fixes the chat input to the bottom of the screen.
-           If the nav bar were to be visible, this would be the CSS to place the input above it.
-           However, the best UX is the current one, where the nav is hidden. */
-        body.in-chat {
-            --bottom-nav-height: 55px;
-        }
-        body.in-chat #chatRoomPage {
-            /* This would push the content up if the nav were visible */
-            /* padding-bottom: var(--bottom-nav-height); */
-        }
-        body.in-chat .chat-input-area {
-            /* This would position it above the nav if it were visible */
-            /* position: fixed; bottom: var(--bottom-nav-height); left:0; right:0; z-index: 15; */
-        }
-
+        
         .cart-item {
             display: flex; align-items: center; background: var(--white);
             padding: 10px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -639,20 +623,39 @@
         .contact-info h4 { margin:0; font-size:1.1em; color:#2d3436; }
         .contact-info p { margin:4px 0 0 0; color:#636e72; font-size:0.9em; }
 
-        /* Chat Theme */
-        #chatRoomPage { padding-bottom: 0; display:flex; flex-direction:column; background:#ece5dd;}
+        /* Chat Theme - IMPLEMENTATION: Robust Layout Fix */
+        #chatRoomPage {
+            height: 100%;
+            padding-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background: #ece5dd;
+        }
         #chatRoomPage .app-header { flex-shrink: 0; }
-        .chat-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; background:#ece5dd; }
-        .chat-messages { flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .chat-bubble { max-width:75%; padding:10px 14px; border-radius:15px; position:relative; word-wrap:break-word; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
         .chat-bubble.sent { align-self:flex-end; background:#dcf8c6; border-bottom-right-radius:2px; }
         .chat-bubble.received { align-self:flex-start; background:#ffffff; border-bottom-left-radius:2px; }
         .chat-sender { font-size:0.75em; font-weight:bold; color:var(--primary-color); margin-bottom:4px; display:block; }
         .chat-time { font-size:0.65em; color:#999; text-align:right; margin-top:4px; display:block; }
-        .chat-input-area { background:#f0f0f0; padding:10px; display:flex; align-items:center; gap:10px; flex-shrink: 0; }
+        .chat-input-area {
+            background: #f0f0f0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
         .chat-input-area input { flex:1; padding:12px 15px; border-radius:25px; border:none; outline:none; font-family:inherit; }
         .chat-send-btn { background:var(--primary-color); color:white; width:45px; height:45px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:none; cursor:pointer; font-size:1.2em; }
-        .typing-indicator { font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
+        .typing-indicator { flex-shrink: 0; font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
 
         /* Store Closed Modified Background + Splash Layout */
         #storeClosedPage { 
@@ -1104,6 +1107,7 @@
         </div>
 
         <!-- CHAT ROOM PAGE -->
+        <!-- IMPLEMENTATION: Simplified chat layout for robust keyboard handling -->
         <div id="chatRoomPage" class="page" style="z-index: 20;">
             <header class="app-header" style="border-radius:0;">
                 <div class="header-top" style="justify-content: flex-start; gap: 12px;">
@@ -1111,13 +1115,11 @@
                     <h2 id="chatRoomTitle" style="margin: 0; font-size: 1.2em;">Chat</h2>
                 </div>
             </header>
-            <div class="chat-container">
-                <div id="chatMessagesContainer" class="chat-messages"></div>
-                <div id="typingIndicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type a message...">
-                    <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
+            <div id="chatMessagesContainer" class="chat-messages"></div>
+            <div id="typingIndicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
@@ -1550,6 +1552,24 @@
                         <div class="form-group"><label>Mobile Number</label><input type="tel" id="driverProfilePhone" class="form-control" placeholder="10-digit Number" style="width:100%; text-align:left;" maxlength="10"></div>
                         <button class="btn-main" id="saveDriverProfileBtn" style="margin-bottom:0;">Save Profile</button>
                     </div>
+                    <!-- IMPLEMENTATION: Driver Withdrawal UI -->
+                    <div class="header-title" style="margin-top: 25px;">Earnings & Withdrawal</div>
+                    <div class="settings-panel">
+                        <div class="wallet-card" style="background: linear-gradient(135deg, #0984e3, #2d3436); margin-bottom: 20px;">
+                            <div class="balance-label">Total Withdrawable Earnings</div>
+                            <div class="balance-amount" style="font-size: 2em;">₹<span id="driverPanelEarnings">0</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount to Withdraw (₹)</label>
+                            <input type="number" id="driverWithdrawalAmount" class="form-control" placeholder="Min ₹100" style="width:100%; text-align:left;">
+                        </div>
+                        <div class="form-group">
+                            <label>Your UPI ID</label>
+                            <input type="text" id="driverWithdrawalUpiId" class="form-control" placeholder="e.g., yourname@oksbi" style="width:100%; text-align:left;">
+                        </div>
+                        <button class="btn-main" onclick="requestDriverWithdrawal()" style="margin-bottom:0; background: var(--info);">Request Withdrawal</button>
+                        <p style="font-size: 0.75em; text-align: center; color: var(--light-text); margin-top: 5px;">A withdrawal fee may be applied by the admin.</p>
+                    </div>
                 </div>
             </div>
             <div class="bottom-nav">
@@ -1851,9 +1871,15 @@
                     `;
                 });
             }
+            
+            // IMPLEMENTATION: Check for premium free delivery benefit in invoice
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            let deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            // Fallback for older orders before this change
+            if (order.total - subtotal >= 0) {
+                 deliveryFee = order.total - subtotal;
+            }
 
-            let deliveryFee = parseFloat(order.total) - subtotal;
-            if(deliveryFee < 0) deliveryFee = 0; 
 
             invoiceEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #008743; padding-bottom: 20px; margin-bottom: 30px;">
@@ -1898,7 +1924,7 @@
                 <div style="display: flex; justify-content: flex-end;">
                     <div style="width: 280px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #636e72; font-size: 0.95em;"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;"><span>Delivery Fee:</span><span>₹${deliveryFee.toFixed(2)}</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #636e72; font-size: 0.95em;"><span>Delivery Fee:</span><span>${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toFixed(2)}`}</span></div>
                         <div style="display: flex; justify-content: space-between; border-top: 2px solid #dfe6e9; padding-top: 12px; font-weight: 700; font-size: 1.2em; color: #008743;"><span>Total Amount:</span><span>₹${parseFloat(order.total).toFixed(2)}</span></div>
                     </div>
                 </div>
@@ -2664,7 +2690,19 @@
             }
             
             document.getElementById('cart-summary').style.display='block';
-            document.getElementById('delivery-fee-display').textContent = `₹${globalSettings.deliveryCharge.toFixed(2)}`;
+
+            // IMPLEMENTATION: Check for premium free delivery benefit
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            const deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            const deliveryFeeDisplay = document.getElementById('delivery-fee-display');
+            deliveryFeeDisplay.textContent = isPremium ? 'FREE' : `₹${deliveryFee.toFixed(2)}`;
+            if (isPremium) {
+                deliveryFeeDisplay.style.color = 'var(--success)';
+                deliveryFeeDisplay.style.fontWeight = '700';
+            } else {
+                deliveryFeeDisplay.style.color = 'inherit';
+                deliveryFeeDisplay.style.fontWeight = '500';
+            }
 
             c.innerHTML='';
             let sub=0;
@@ -2689,7 +2727,7 @@
             });
             
             document.getElementById('subtotal-price').textContent = `₹${sub.toFixed(2)}`;
-            document.getElementById('total-price').textContent = `₹${(sub+globalSettings.deliveryCharge).toFixed(2)}`;
+            document.getElementById('total-price').textContent = `₹${(sub + deliveryFee).toFixed(2)}`;
             checkOrderValidity(); 
         }
 
@@ -2847,7 +2885,10 @@
 
             if (!requireLogin('checkoutPage')) return; 
 
-            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalSettings.deliveryCharge);
+            // IMPLEMENTATION: Recalculate total with premium benefit
+            const isPremium = currentUserData && currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            const deliveryFee = isPremium ? 0 : globalSettings.deliveryCharge;
+            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + deliveryFee);
 
             if (selectedPaymentMethod === 'wallet') {
                 if(currentUserData.walletBalance >= totalAmount) {
@@ -3553,7 +3594,7 @@
                             const user = userSnap.val();
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
-                                <td>${user ? user.name : 'Unknown'}</td>
+                                <td>${user ? user.name : 'Unknown'} (${req.type || 'customer'})</td>
                                 <td style="font-weight:700;">₹${req.amount}</td>
                                 <td>${req.upiId}</td>
                                 <td>${new Date(req.timestamp).toLocaleString()}</td>
@@ -3569,35 +3610,41 @@
             }
 
             window.handleWithdrawal = (reqId, newStatus) => {
-                if(newStatus === 'approved') {
-                    if(!confirm("Are you sure you want to approve this withdrawal? This will deduct the amount from the user's wallet.")) return;
-                    db.ref('withdrawalRequests/' + reqId).once('value', reqSnap => {
-                        const req = reqSnap.val();
+                db.ref('withdrawalRequests/' + reqId).once('value', reqSnap => {
+                    const req = reqSnap.val();
+                    if (!req) {
+                        showToast("Request not found.", "error");
+                        return;
+                    }
+
+                    if (newStatus === 'approved') {
+                        if(!confirm("Approve this withdrawal? The amount will be deducted from the user's balance.")) return;
+                        
                         db.ref('users/' + req.userId).once('value', userSnap => {
                             const user = userSnap.val();
-                            const currentBalance = user.walletBalance || 0;
-                            const requestedAmount = parseFloat(req.amount);
-                            
-                            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
-                            const chargeAmount = (requestedAmount * chargePercent) / 100;
-                            const totalDeduction = requestedAmount + chargeAmount;
+                            const isDriver = req.type === 'driver';
+                            const balanceField = isDriver ? 'earnings' : 'walletBalance';
+                            const currentBalance = user[balanceField] || 0;
+                            const totalDeduction = parseFloat(req.totalDeduction);
 
-                            if(currentBalance >= totalDeduction) {
+                            if (currentBalance >= totalDeduction) {
                                 const newBalance = currentBalance - totalDeduction;
-                                db.ref('users/' + req.userId).update({ walletBalance: newBalance });
+                                const updates = {};
+                                updates[balanceField] = newBalance;
+                                db.ref('users/' + req.userId).update(updates);
                                 db.ref('withdrawalRequests/' + reqId).update({ status: 'approved', processedAt: Date.now() });
                                 showToast("Withdrawal approved and amount deducted.", "success");
                             } else {
-                                showToast("User has insufficient balance to cover withdrawal and charges.", "error");
+                                showToast(`User has insufficient ${balanceField}.`, "error");
                                 db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', reason: 'Insufficient funds' });
                             }
                         });
-                    });
-                } else { // Rejected
-                    if(!confirm("Are you sure you want to reject this withdrawal?")) return;
-                    db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', processedAt: Date.now() });
-                    showToast("Withdrawal request rejected.", "info");
-                }
+                    } else { // Rejected
+                        if(!confirm("Are you sure you want to reject this withdrawal?")) return;
+                        db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', processedAt: Date.now() });
+                        showToast("Withdrawal request rejected.", "info");
+                    }
+                });
             };
 
 
@@ -3625,7 +3672,9 @@
             db.ref('users/' + currentUser.uid).on('value', snap => {
                 const u = snap.val();
                 if(u) {
-                    document.getElementById('driverHeaderEarnings').textContent = u.earnings || 0;
+                    const earnings = u.earnings || 0;
+                    document.getElementById('driverHeaderEarnings').textContent = earnings.toFixed(2);
+                    document.getElementById('driverPanelEarnings').textContent = earnings.toFixed(2);
                     document.getElementById('driverProfileName').value = u.name || currentUser.displayName || '';
                     document.getElementById('driverProfilePhone').value = u.driverPhone || '';
                 }
@@ -3788,7 +3837,7 @@
 
                 if(isCashCollected) {
                     db.ref('users/' + currentUser.uid + '/collectedCash').once('value', s => {
-                        db.ref('users/' + currentUser.uid).update({ collectedCash: (s.val() || 0) + parseFloat(orderTotal) });
+                           db.ref('users/' + currentUser.uid).update({ collectedCash: (s.val() || 0) + parseFloat(orderTotal) });
                     });
                 }
             }
@@ -4409,7 +4458,6 @@
                 // User is an active premium member
                 const expiryDate = new Date(premiumInfo.expiry).toLocaleDateString();
                 const referralCode = currentUserData.referralCode || 'Generating...';
-                const referralLink = `${window.location.origin}${window.location.pathname}?ref=${referralCode}`;
                 
                 container.innerHTML = `
                     <div class="info-card" style="border: 2px solid var(--gold); background: #fffbeb;">
@@ -4438,7 +4486,8 @@
                     <div class="info-card">
                         <h4>Your Referral Code</h4>
                         <div class="referral-code-box">${referralCode}</div>
-                        <p>Share this code with your friends. When they buy a premium plan, you'll get ₹${globalSettings.referralBonus} in your wallet!</p>
+                        <!-- IMPLEMENTATION: Updated referral info text -->
+                        <p>You can earn ₹${globalSettings.referralBonus} when a user buys a premium membership plan using your referral code.</p>
                         <button class="btn-main" style="margin-top: 15px;" onclick="copyReferralLink()">
                             <i class="fas fa-share-alt"></i> Share Your Link
                         </button>
@@ -4457,7 +4506,7 @@
                     ` : `
                     <div class="info-card">
                         <h4>Unlock Premium Benefits</h4>
-                        <p>Become a premium member to earn from referrals and enjoy exclusive perks!</p>
+                        <p>Become a premium member to earn from referrals and enjoy exclusive perks like free delivery!</p>
                     </div>
                     `}
 
@@ -4625,6 +4674,47 @@
 
             const requestData = {
                 userId: currentUser.uid,
+                type: 'customer',
+                amount: amount,
+                upiId: upiId,
+                charge: chargeAmount,
+                totalDeduction: totalDeduction,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            db.ref('withdrawalRequests').push(requestData).then(() => {
+                showToast("Withdrawal request submitted! It will be processed by the admin.", "success");
+                renderPremiumPage();
+            });
+        };
+
+        // IMPLEMENTATION: Driver withdrawal request function
+        window.requestDriverWithdrawal = () => {
+            const amount = parseFloat(document.getElementById('driverWithdrawalAmount').value);
+            const upiId = document.getElementById('driverWithdrawalUpiId').value.trim();
+            const currentEarnings = currentUserData.earnings || 0;
+
+            if (isNaN(amount) || amount < 100) {
+                showToast("Minimum withdrawal amount is ₹100.", "error");
+                return;
+            }
+            if (!upiId) {
+                showToast("Please enter a valid UPI ID.", "error");
+                return;
+            }
+            
+            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
+            const chargeAmount = (amount * chargePercent) / 100;
+            const totalDeduction = amount + chargeAmount;
+
+            if (currentEarnings < totalDeduction) {
+                showToast(`Insufficient earnings. You need ₹${totalDeduction.toFixed(2)} to withdraw ₹${amount.toFixed(2)}.`, "error");
+                return;
+            }
+
+            const requestData = {
+                userId: currentUser.uid,
+                type: 'driver',
                 amount: amount,
                 upiId: upiId,
                 charge: chargeAmount,
@@ -4634,10 +4724,10 @@
             };
             db.ref('withdrawalRequests').push(requestData).then(() => {
                 showToast("Withdrawal request submitted successfully! It will be processed by the admin.", "success");
-                renderPremiumPage();
+                document.getElementById('driverWithdrawalAmount').value = '';
+                document.getElementById('driverWithdrawalUpiId').value = '';
             });
         };
-
     </script>
 </body>
 </html>
