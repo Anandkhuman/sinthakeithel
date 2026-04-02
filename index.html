@@ -571,7 +571,7 @@
         #deliveryCodeInput_admin, #deliveryCodeInput_driver { font-size: 1.8em; text-align: center; letter-spacing: 6px; padding: 12px; margin: 12px 0; font-weight: bold; color: var(--primary-color);}
         .leaflet-marker-icon.driver-icon { background: none; border: none; }
         .settings-panel { background:var(--white); padding:15px; border-radius:15px; box-shadow:0 6px 15px rgba(0,0,0,0.04); margin-bottom:15px; }
-        .settings-panel input[type="number"], .settings-panel input[type="time"] { padding:10px; border:2px solid #f1f2f6; border-radius:8px; width:85%; font-weight:bold; outline:none; text-align:center;}
+        .settings-panel input[type="number"], .settings-panel input[type="time"] {padding:10px;border: 2px solid #00B8CF;border-radius:8px;width: 85%;font-weight:bold;outline:none;text-align:center;r;}
         .settings-panel input[type="number"]:focus, .settings-panel input[type="time"]:focus { border-color: var(--primary-color); }
 
         /* =========================================================
@@ -580,22 +580,130 @@
         /* Premium Membership Page */
         .plan-container { display: flex; gap: 15px; margin-bottom: 20px; }
         .plan-card {
-            flex: 1; text-align: center; padding: 20px 15px; border-radius: 15px;
-            border: 2px solid var(--border-color); cursor: pointer; transition: all 0.3s ease;
-            position: relative;
-        }
+    flex: 1;
+    text-align: center;
+    padding: 20px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    /* Steel + Gold Gradient */
+    background: linear-gradient(135deg, #c0c0c0, #e6e6e6, #d4af37, #ffd700);
+    background-size: 300% 300%;
+
+    /* Border glow */
+    border: 2px solid rgba(255, 215, 0, 0.6);
+
+    /* Depth */
+    box-shadow: 
+        0 4px 15px rgba(0,0,0,0.2),
+        inset 0 0 10px rgba(255,255,255,0.5);
+
+    transition: all 0.4s ease;
+}
+
+/* Shine overlay */
+.plan-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+
+    background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255,255,255,0.6),
+        transparent 70%
+    );
+
+    transform: rotate(25deg);
+    animation: shine 3s infinite;
+}
+
+/* Hover effect */
+.plan-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 
+        0 10px 30px rgba(255, 215, 0, 0.4),
+        inset 0 0 15px rgba(255,255,255,0.8);
+}
+
+/* Gradient movement */
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(25deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(25deg);
+    }
+}
         .plan-card.selected {
             border-color: var(--gold); background: #fffbeb;
             box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
         }
-        .plan-card h3 { margin: 0 0 5px 0; font-size: 1.1em; color: #2d3436; }
-        .plan-card p { margin: 0; font-size: 1.4em; font-weight: 700; color: var(--primary-dark); }
-        .plan-card span { font-size: 0.8em; color: var(--light-text); }
-        .plan-card .best-value {
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            background: var(--gold); color: #2d3436; font-size: 0.7em; font-weight: 700;
-            padding: 4px 10px; border-radius: 10px;
-        }
+        .plan-card h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.15em;
+    font-weight: 600;
+
+    /* Dark metallic text */
+    color: #2c2c2c;
+
+    /* subtle glow for readability */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+}
+
+.plan-card p {
+    margin: 5px 0;
+    font-size: 1.6em;
+    font-weight: 700;
+
+    /* Gold text effect */
+    background: linear-gradient(90deg, #f6b900, #7f6b00, #8e4804);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* soft glow */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.plan-card span {
+    font-size: 0.85em;
+    color: #555;
+
+    /* improves visibility on shiny bg */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+}
+
+/* Best value badge */
+.plan-card .best-value {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: linear-gradient(90deg, #ffd700, #ffec8b);
+    color: #2d3436;
+
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* Optional: text color tweak on hover */
+.plan-card:hover h3 {
+    color: #000;
+}
+
+.plan-card:hover span {
+    color: #333;
+}
         .info-card {
             background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;
