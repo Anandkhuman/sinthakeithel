@@ -2005,6 +2005,7 @@
             if(phone && phone.length < 10) { showError("Please enter a valid 10-digit mobile number."); return; }
             
             const addrInfo = {
+                email: email, 
                 phone: phone,
                 address: document.getElementById('regAddressText').value,
                 lat: document.getElementById('regLat').value,
