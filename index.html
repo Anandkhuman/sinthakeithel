@@ -636,7 +636,8 @@
         .review-stars { color:#f1c40f; font-size:0.9em; }
     </style>
 </head>
-<body class="auth-screen">
+<!-- IMPLEMENTATION: Removed auth-screen class to allow public view by default -->
+<body>
 
     <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container"></div>
@@ -680,7 +681,7 @@
     <div class="mobile-container">
 
         <!-- LOGIN PAGE -->
-        <div id="loginPage" class="page active">
+        <div id="loginPage" class="page">
             <div class="auth-content">
                 <div class="auth-card">
                     <div class="auth-header">
@@ -825,7 +826,7 @@
         </div>
 
         <!-- HOME -->
-        <div id="appContainer" class="page">
+        <div id="appContainer" class="page active">
             <header class="app-header">
                 <div class="header-top">
                     <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
@@ -1472,7 +1473,10 @@
         let ordersRef = null; 
         let notificationsListener = null;
         let selectedPaymentMethod = null;
-        let activePageId = 'loginPage';
+        let activePageId = 'appContainer'; // IMPLEMENTATION: Default page is now the app, not login
+
+        // IMPLEMENTATION: Variable to store the action user wanted to perform before login
+        let postLoginAction = null;
 
         let globalDeliveryCharge = 50;
         let globalDriverCommission = 20;
@@ -1805,16 +1809,42 @@
             }
 
             if(id === 'ordersPage') loadOrders();
-            if(id === 'notificationsPage') { loadNotifications(); markNotificationsAsRead(); }
+            if(id === 'notificationsPage' && currentUser) { loadNotifications(); markNotificationsAsRead(); }
         };
 
-        document.querySelectorAll('[data-target]:not(.close-modal), [data-page]').forEach(b => 
+        // IMPLEMENTATION: New function to guard protected pages
+        function requireLogin(targetPage) {
+            if (!currentUser) {
+                postLoginAction = targetPage;
+                showPage('loginPage');
+                showToast('Please log in or register to continue.', 'info');
+                return false; // Indicates that the action should stop
+            }
+            return true; // Indicates that the user is logged in and can proceed
+        }
+
+        // IMPLEMENTATION: Modified navigation to check for login on protected routes
+        document.querySelectorAll('[data-target]:not(.close-modal), [data-page]').forEach(b =>
             b.addEventListener('click', (e) => {
-                if(e.currentTarget.dataset.adminTarget || e.currentTarget.dataset.driverTarget) return; 
+                if (e.currentTarget.dataset.adminTarget || e.currentTarget.dataset.driverTarget) return;
+
                 const target = e.currentTarget.dataset.target || e.currentTarget.dataset.page;
-                if(target) showPage(target);
+                
+                // Define which pages require a user to be logged in
+                const protectedPages = ['chatSelectionPage', 'notificationsPage', 'menuPage', 'ordersPage', 'editProfilePage', 'contactUsPage'];
+
+                if (protectedPages.includes(target)) {
+                    if (requireLogin(target)) { // If requireLogin is true, proceed
+                        showPage(target);
+                    }
+                    // If requireLogin is false, it handles the redirect, so we do nothing here.
+                } else {
+                    // For public pages like home, cart, item details
+                    if (target) showPage(target);
+                }
             })
         );
+        
         document.getElementById('gotoRegister').onclick = () => showPage('registerPage');
         document.getElementById('gotoLogin').onclick = () => showPage('loginPage');
         document.getElementById('gotoForgot').onclick = () => showPage('forgotPasswordPage');
@@ -1847,9 +1877,11 @@
                 window.hasClickedVisit = false;
                 updateCartUI(); 
                 showToast("Logged out successfully.", "success");
+                // The onAuthStateChanged listener will handle the page switch to guest mode
             });
         };
         
+        // This button is public now, it just goes to the checkout page. The final order button is protected.
         document.getElementById('goToCheckoutBtn').onclick = () => {
             if(window.isStoreClosedViewOnly) {
                 showToast("Store is closed. Checkout is currently disabled.", "error");
@@ -1865,14 +1897,14 @@
         document.getElementById('trackOrderBtn').onclick = () => showPage('ordersPage');
         document.getElementById('backToHomeBtn').onclick = () => showPage('appContainer');
 
-        // Centralized and Race-Condition Safe Auth Observer 
+        // IMPLEMENTATION: Modified auth state listener for public/guest view
         auth.onAuthStateChanged(u => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 if (splash && !splash.classList.contains('hidden')) splash.classList.add('hidden');
             }, 6000);
 
-            if(u) {
+            if(u) { // User is logged in
                 db.ref('users/' + u.uid).once('value', snap => {
                     let userData = snap.val();
                     if (!userData) {
@@ -1890,12 +1922,27 @@
                         checkRoleAndProceed(u, userData);
                     }
                 });
-            } else {
-                currentUser = null; currentUserData = null;
+            } else { // User is NOT logged in (Guest Mode)
+                currentUser = null;
+                currentUserData = null;
                 window.hasClickedVisit = false;
-                showPage('loginPage');
+                postLoginAction = null; // Clear any pending actions on logout
+                
                 if (ordersRef) ordersRef.off();
                 if (notificationsListener) notificationsListener.off();
+
+                // Show the main app container for public browsing
+                showPage('appContainer');
+                
+                // Fetch public data
+                fetchData();
+                fetchAndRenderCategories();
+                checkAndEnforceStoreHours();
+                
+                // Update UI for guest
+                document.getElementById('userGreeting').innerHTML = `Hello, Guest`;
+                document.getElementById('adminSwitchSection').style.display = 'none';
+                document.getElementById('driverSwitchSection').style.display = 'none';
             }
         });
 
@@ -1931,18 +1978,18 @@
                 currentUserData.role = role; finalizeLogin(role, currentUser, currentUserData);
             });
         };
-
+        
+        // IMPLEMENTATION: Modified to handle redirection after login
         function finalizeLogin(role, u, userData) {
             currentUser.role = role;
             document.getElementById('adminSwitchSection').style.display = (role === 'admin') ? 'block' : 'none';
             document.getElementById('driverSwitchSection').style.display = (role === 'driver') ? 'block' : 'none';
             
-            showPage('appContainer'); 
             fetchData();
             fetchAndRenderCategories();
             listenForStatusUpdates(); 
             listenForUnreadNotifications();
-            listenForChatUnreadCount(); // <-- Call Chat Notification Listener
+            listenForChatUnreadCount();
             checkAndEnforceStoreHours(); 
             
             const name = userData.name || u.displayName || 'Guest';
@@ -1952,7 +1999,15 @@
             if(role === 'admin') { document.getElementById('adminGreetingName').innerText = `Hello, ${shortName}`; initAdminContext(); }
             if(role === 'driver') { document.getElementById('driverGreetingName').innerText = `Hello, ${shortName}`; initDriverContext(); }
             
-            showToast(`Welcome back, ${shortName}!`, 'success');
+            // Check for a pending action and redirect, otherwise go to home.
+            if (postLoginAction) {
+                showToast(`Welcome back, ${shortName}!`, 'success');
+                showPage(postLoginAction);
+                postLoginAction = null; // Clear the action after using it
+            } else {
+                showPage('appContainer'); 
+                showToast(`Welcome back, ${shortName}!`, 'success');
+            }
         }
 
         const showError = (msg) => {
@@ -2265,7 +2320,7 @@
 
         document.getElementById('detailAddToCartBtn').onclick = () => {
             if(!currentDetailDish || parseInt(currentDetailDish.stock) <= 0) return;
-            addToCartMulti(currentDetailDish.key, currentDetailDish.name, currentDetailDish.price, currentDetailDish.imageUrl, parseInt(currentDetailDish.stock), currentDetailQty);
+            addToCartMulti(currentDetailDish.key, currentDetailDish.name, currentDetailDish.price, parseInt(currentDetailDish.stock), currentDetailQty);
             if(!window.isStoreClosedViewOnly) showPage('appContainer');
         };
 
@@ -2597,9 +2652,15 @@
             });
         }
         
+        // IMPLEMENTATION: Added login check to the final order placement button
         orderBtn.onclick = (e) => {
             e.preventDefault();
             if(orderBtn.disabled || cart.length === 0) return;
+
+            // This is the gate. If user is not logged in, stop here and show login page.
+            if (!requireLogin('checkoutPage')) {
+                return; 
+            }
 
             if (selectedPaymentMethod === 'cod') {
                 saveOrderToFirebase('Cash on Delivery');
