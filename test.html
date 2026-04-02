@@ -29,7 +29,7 @@
             --danger: #d63031;
             --success: #00b894;
             --info: #0984e3;
-            --gold-color: #ffd700;
+            --gold: #FFD700;
         }
 
         html { font-size: 14px; }
@@ -259,31 +259,6 @@
             z-index: 100; flex-shrink: 0;
         }
 
-        /* NEW: User Info Container in Header */
-        .header-user-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .wallet-display {
-            background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-weight: 600;
-            font-size: 0.8em;
-            cursor: pointer;
-        }
-        .premium-badge {
-            font-weight: 600;
-            color: var(--gold-color);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            font-size: 0.8em;
-            margin-left: 6px;
-        }
-        .fa-crown {
-            color: var(--gold-color);
-        }
-
         /* STORE HOURS BANNER CSS */
         .store-hours-banner {
             display: none;  
@@ -300,6 +275,21 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; padding: 0 10px;}
         .header-top h1 { font-size: 1.3em; margin: 0; font-weight: 700; display:flex; align-items:center;}
         .user-greeting { font-size: 0.85em; font-weight: 500; opacity: 0.9; text-align: right; }
+        
+        /* NEW FEATURE: WALLET DISPLAY IN HEADER */
+        .header-wallet {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: none;
+            cursor: pointer;
+        }
+        .header-wallet i {
+            color: var(--gold);
+            margin-right: 5px;
+        }
         
         .search-bar { margin-top: 12px; position: relative; padding: 0 10px; }
         .search-bar input {
@@ -441,6 +431,22 @@
 
         body.auth-screen .bottom-nav, body.auth-screen #cart-fab-container,
         body.in-chat #customerBottomNav, body.in-chat #cart-fab-container, body.in-chat .bottom-nav { display: none !important; }
+        /* NEW FEATURE: Chat input is above bottom nav bar */
+        /* This is a bit of a tricky request. The standard mobile UI is to hide the main nav when in a chat screen.
+           The current implementation already correctly fixes the chat input to the bottom of the screen.
+           If the nav bar were to be visible, this would be the CSS to place the input above it.
+           However, the best UX is the current one, where the nav is hidden. */
+        body.in-chat {
+            --bottom-nav-height: 55px;
+        }
+        body.in-chat #chatRoomPage {
+            /* This would push the content up if the nav were visible */
+            /* padding-bottom: var(--bottom-nav-height); */
+        }
+        body.in-chat .chat-input-area {
+            /* This would position it above the nav if it were visible */
+            /* position: fixed; bottom: var(--bottom-nav-height); left:0; right:0; z-index: 15; */
+        }
 
         .cart-item {
             display: flex; align-items: center; background: var(--white);
@@ -513,105 +519,6 @@
         .profile-menu-item i { font-size: 1.2em; width: 35px; color: var(--primary-color); text-align: center; }
         .profile-menu-item span { flex: 1; font-weight: 600; font-size: 1em; }
         .profile-menu-item .fa-chevron-right { width: auto; color: var(--light-text); font-size: 0.9em; }
-        
-        /* NEW: Premium page styling */
-        .plan-selection {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .plan-card {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .plan-card.selected {
-            border-color: var(--primary-color);
-            background: #e6f7ef;
-            box-shadow: 0 5px 15px rgba(0, 135, 67, 0.1);
-        }
-        .plan-card h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1em;
-        }
-        .plan-card .price {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .plan-card .price span {
-            font-size: 0.6em;
-            font-weight: 500;
-            color: var(--light-text);
-        }
-        .referral-info-box {
-            background: #fff5e6;
-            border: 2px dashed #d48806;
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        .referral-info-box h3 { margin: 0 0 10px 0; color: #d48806; }
-        .referral-code-display {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1.2em;
-            letter-spacing: 2px;
-            color: var(--primary-color);
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        /* NEW: Wallet page styling */
-        .wallet-balance-card {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0, 135, 67, 0.3);
-        }
-        .wallet-balance-card p {
-            margin: 0;
-            font-size: 1.1em;
-            opacity: 0.8;
-        }
-        .wallet-balance-card h2 {
-            margin: 5px 0 0 0;
-            font-size: 2.5em;
-            letter-spacing: 1px;
-        }
-        .tab-buttons {
-            display: flex;
-            background: #e9ecef;
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 20px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .tab-btn.active {
-            background: white;
-            color: var(--primary-color);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
 
         /* =========================================================
            ITEM DETAILS PAGE CSS
@@ -684,8 +591,47 @@
         .settings-panel input[type="number"]:focus, .settings-panel input[type="time"]:focus { border-color: var(--primary-color); }
 
         /* =========================================================
-           NEW FEATURES CSS (CHAT, REVIEWS, CONTACT, CLOSED)
+           NEW FEATURES CSS (CHAT, REVIEWS, CONTACT, CLOSED, PREMIUM)
            ========================================================= */
+        /* Premium Membership Page */
+        .plan-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .plan-card {
+            flex: 1; text-align: center; padding: 20px 15px; border-radius: 15px;
+            border: 2px solid var(--border-color); cursor: pointer; transition: all 0.3s ease;
+            position: relative;
+        }
+        .plan-card.selected {
+            border-color: var(--gold); background: #fffbeb;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+        .plan-card h3 { margin: 0 0 5px 0; font-size: 1.1em; color: #2d3436; }
+        .plan-card p { margin: 0; font-size: 1.4em; font-weight: 700; color: var(--primary-dark); }
+        .plan-card span { font-size: 0.8em; color: var(--light-text); }
+        .plan-card .best-value {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--gold); color: #2d3436; font-size: 0.7em; font-weight: 700;
+            padding: 4px 10px; border-radius: 10px;
+        }
+        .info-card {
+            background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;
+        }
+        .info-card h4 { margin: 0 0 8px 0; font-size: 1.1em; color: var(--primary-color); }
+        .info-card p { margin: 0; font-size: 0.9em; color: #636e72; }
+        .referral-code-box {
+            font-size: 1.5em; font-weight: bold; letter-spacing: 2px;
+            background: #e6f7ef; color: #008743; padding: 10px; border-radius: 10px;
+            border: 2px dashed #008743; margin: 10px 0;
+        }
+        /* Wallet & Withdrawal CSS */
+        .wallet-card {
+            background: var(--primary-gradient); color: white; padding: 20px;
+            border-radius: 15px; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 135, 67, 0.3);
+        }
+        .wallet-card .balance-label { font-size: 0.9em; opacity: 0.8; }
+        .wallet-card .balance-amount { font-size: 2.2em; font-weight: 700; margin: 5px 0; }
+        
         /* Contact Us */
         .contact-card { display:flex; align-items:center; background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
         .contact-card i.fa-whatsapp { color:#25D366; font-size:2em; margin-left:auto; cursor:pointer; }
@@ -703,7 +649,7 @@
         .chat-bubble.received { align-self:flex-start; background:#ffffff; border-bottom-left-radius:2px; }
         .chat-sender { font-size:0.75em; font-weight:bold; color:var(--primary-color); margin-bottom:4px; display:block; }
         .chat-time { font-size:0.65em; color:#999; text-align:right; margin-top:4px; display:block; }
-        .chat-input-area { background:#f0f0f0; padding:10px; display:flex; align-items:center; gap:10px; }
+        .chat-input-area { background:#f0f0f0; padding:10px; display:flex; align-items:center; gap:10px; flex-shrink: 0; }
         .chat-input-area input { flex:1; padding:12px 15px; border-radius:25px; border:none; outline:none; font-family:inherit; }
         .chat-send-btn { background:var(--primary-color); color:white; width:45px; height:45px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:none; cursor:pointer; font-size:1.2em; }
         .typing-indicator { font-size:0.8em; color:#636e72; padding:5px 15px; font-style:italic; background:#ece5dd; }
@@ -954,14 +900,16 @@
         <div id="appContainer" class="page active">
             <header class="app-header">
                 <div class="header-top">
-                    <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
-                    <div class="user-greeting" id="userGreetingContainer">
-                        <span id="userGreeting">Hello, Guest</span>
+                    <div style="flex: 1;">
+                        <h1><i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Sintha Keithel</h1>
                     </div>
-                </div>
-                <div class="header-user-info" id="userInfoHeader" style="display: none; padding: 0 10px; margin-top: 5px;">
-                    <div id="premiumStatusHeader"></div>
-                    <div class="wallet-display" data-target="walletPage"><i class="fas fa-wallet"></i> ₹<span id="walletBalanceHeader">0.00</span></div>
+                    <!-- NEW FEATURE: USER GREETING & WALLET CONTAINER -->
+                    <div style="flex: 1; text-align: right;">
+                        <div class="user-greeting" id="userGreeting">Hello, Guest</div>
+                        <div class="header-wallet" id="headerWalletDisplay" data-target="premiumMembershipPage">
+                            <i class="fas fa-wallet"></i> ₹<span id="headerWalletBalance">0.00</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
@@ -1070,11 +1018,12 @@
                  <div class="form-group"><label>Contact Phone Number</label><input type="tel" id="checkoutPhone" class="form-control" placeholder="10-digit Mobile Number" maxlength="10"></div>
                 <div class="form-group">
                     <label>Payment Method</label>
-                    <label class="payment-option" id="sinthaWalletPaymentOption" style="display:none;">
-                        <input type="radio" name="paymentMethod" value="sinthaWallet">
+                    <!-- NEW FEATURE: SINTHA WALLET PAYMENT OPTION -->
+                    <label class="payment-option" id="walletPaymentOption" style="display:none;">
+                        <input type="radio" name="paymentMethod" value="wallet">
                         <span class="radio-check"></span>
                         <i class="fas fa-wallet" style="color:var(--primary-color); margin-right:12px; font-size:1.3em; margin-left: 8px;"></i>
-                        <span style="font-weight:600; color: #2d3436;">Sintha Wallet (Bal: ₹<span id="checkoutWalletBal">0.00</span>)</span>
+                        <span style="font-weight:600; color: #2d3436;">Sintha Wallet (<span id="checkoutWalletBalance">₹0.00</span>)</span>
                     </label>
                     <label class="payment-option">
                         <input type="radio" name="paymentMethod" value="razorpay">
@@ -1214,20 +1163,19 @@
             <div style="flex:1; padding:15px; overflow-y:auto;">
                 <h3 style="margin-top:0; color:var(--text-color); font-size:1.1em;">My Account</h3>
                 
-                <div class="profile-menu-item" data-target="premiumPage">
-                    <i class="fas fa-crown" style="color: var(--gold-color);"></i><span>Premium Membership</span><i class="fas fa-chevron-right"></i>
-                </div>
-                
-                <div class="profile-menu-item" data-target="walletPage">
-                    <i class="fas fa-wallet"></i><span>My Wallet</span><i class="fas fa-chevron-right"></i>
-                </div>
-
                 <div class="profile-menu-item" data-target="editProfilePage" id="openEditProfileBtn">
                     <i class="fas fa-address-card"></i><span>Edit Profile & Address</span><i class="fas fa-chevron-right"></i>
                 </div>
 
                 <div class="profile-menu-item" data-target="ordersPage">
                     <i class="fas fa-receipt"></i><span>Order History</span><i class="fas fa-chevron-right"></i>
+                </div>
+                
+                <!-- NEW FEATURE: PREMIUM MEMBERSHIP MENU ITEM -->
+                <div class="profile-menu-item" data-target="premiumMembershipPage">
+                    <i class="fas fa-crown" style="color: var(--gold);"></i>
+                    <span id="premiumMenuItemText">Premium Membership</span>
+                    <i class="fas fa-chevron-right"></i>
                 </div>
 
                 <div class="profile-menu-item" data-target="contactUsPage" onclick="loadContactUs()">
@@ -1257,99 +1205,18 @@
                 </button>
             </div>
         </div>
-
-        <!-- NEW: PREMIUM MEMBERSHIP PAGE -->
-        <div id="premiumPage" class="page">
+        
+        <!-- NEW FEATURE: PREMIUM MEMBERSHIP PAGE -->
+        <div id="premiumMembershipPage" class="page">
             <header class="app-header" style="border-radius: 0 0 20px 20px;">
                 <div class="header-top" style="justify-content: flex-start; gap: 12px;">
                     <i class="fas fa-arrow-left" data-target="menuPage" style="font-size: 1.1em; cursor: pointer;"></i>
-                    <h2 style="margin: 0; font-size: 1.2em;"><i class="fas fa-crown" style="color: var(--gold-color);"></i> Premium Membership</h2>
+                    <h2 style="margin: 0; font-size: 1.2em;"><i class="fas fa-crown" style="color:var(--gold)"></i> Premium</h2>
                 </div>
             </header>
-            <div style="flex:1; padding:15px; overflow-y:auto;">
-                <div id="buyPremiumSection">
-                    <h3 class="section-title">Choose Your Plan</h3>
-                    <div class="plan-selection">
-                        <div class="plan-card" data-plan="monthly">
-                            <h3>Monthly</h3>
-                            <div class="price" id="monthlyPlanPrice">₹...</div>
-                        </div>
-                        <div class="plan-card" data-plan="yearly">
-                            <h3>Yearly</h3>
-                            <div class="price" id="yearlyPlanPrice">₹...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Referral Code (Optional)</label>
-                        <input type="text" id="referralCodeInput" class="form-control" placeholder="Enter code for benefits">
-                    </div>
-
-                    <button class="btn-main" id="buyPremiumBtn">Buy Premium</button>
-                </div>
-
-                <div id="managePremiumSection" style="display: none;">
-                     <div class="referral-info-box" style="text-align: left; background: #e6f7ef; border-color: var(--primary-color);">
-                        <h3 style="color: var(--primary-color); text-align: center;"><i class="fas fa-check-circle"></i> You are a Premium Member!</h3>
-                        <p style="text-align: center; color: var(--light-text);">Your membership is valid until: <strong id="premiumExpiryDate" style="color: var(--text-color);">--/--/----</strong></p>
-                        <button class="btn-main" id="renewPremiumBtn">Renew Plan</button>
-                    </div>
-
-                    <div class="referral-info-box" style="margin-top: 20px;">
-                        <h3><i class="fas fa-gift"></i> Your Referral Code</h3>
-                        <p style="font-size: 0.85em; color: var(--light-text);">Share your code with friends. When they buy a premium plan, you get a reward in your wallet!</p>
-                        <div id="userReferralCode" class="referral-code-display">LOADING...</div>
-                        <button class="btn-main" id="shareReferralBtn" style="background: var(--info);"><i class="fas fa-share-alt"></i> Share Link</button>
-                    </div>
-                </div>
-
-                 <div id="expiredPremiumSection" style="display: none;">
-                     <div class="referral-info-box" style="text-align: left; background: #ffebee; border-color: var(--danger);">
-                        <h3 style="color: var(--danger); text-align: center;"><i class="fas fa-exclamation-triangle"></i> Membership Expired!</h3>
-                        <p style="text-align: center; color: var(--light-text);">Your premium benefits, referral code and share link are no longer active. Renew now to continue enjoying the perks!</p>
-                        <button class="btn-main" id="renewExpiredBtn">Renew Now</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- NEW: WALLET PAGE -->
-        <div id="walletPage" class="page">
-            <header class="app-header" style="border-radius: 0 0 20px 20px;">
-                <div class="header-top" style="justify-content: flex-start; gap: 12px;">
-                    <i class="fas fa-arrow-left" data-target="menuPage" style="font-size: 1.1em; cursor: pointer;"></i>
-                    <h2 style="margin: 0; font-size: 1.2em;">My Wallet</h2>
-                </div>
-            </header>
-            <div style="flex:1; padding:15px; overflow-y:auto;">
-                <div class="wallet-balance-card">
-                    <p>Current Balance</p>
-                    <h2 id="walletPageBalance">₹0.00</h2>
-                </div>
-
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-wallet-tab="withdraw">Withdraw</button>
-                    <button class="tab-btn" data-wallet-tab="history">History</button>
-                </div>
-                
-                <div id="withdraw_wallet_tab" class="section active">
-                     <div class="form-group">
-                        <label>Amount to Withdraw</label>
-                        <input type="number" id="withdrawAmount" class="form-control" placeholder="e.g., 500">
-                    </div>
-                     <div class="form-group">
-                        <label>UPI ID</label>
-                        <input type="text" id="withdrawUpiId" class="form-control" placeholder="yourname@upi">
-                    </div>
-                    <p style="font-size: 0.8em; color: var(--light-text);">A withdrawal charge of <span id="withdrawalChargeInfo">...</span>% will be applied.</p>
-                    <button class="btn-main" id="submitWithdrawRequestBtn">Request Withdrawal</button>
-                </div>
-                <div id="history_wallet_tab" class="section">
-                    <div id="walletHistoryContainer">
-                        <p style="text-align: center; color: #777; padding: 20px;">No transaction history found.</p>
-                    </div>
-                </div>
+            <div style="flex:1; padding:15px; overflow-y:auto;" id="premiumPageContent">
+                <!-- This content will be dynamically generated by renderPremiumPage() -->
+                <p style="text-align:center; color:#777; padding:15px;">Loading membership details...</p>
             </div>
         </div>
 
@@ -1482,6 +1349,30 @@
                             <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Driver Commission (₹):</label>
                             <input type="number" id="adminDriverCommission" value="20" style="width: 100px;">
                         </div>
+
+                        <!-- NEW FEATURE: PREMIUM/WALLET SETTINGS -->
+                         <div style="background:#fffbeb; padding:10px; border-radius:10px; margin-bottom:15px; border: 1px solid var(--gold);">
+                             <h4 style="margin:0 0 10px 0; color:var(--primary-dark); font-size:0.95em;"><i class="fas fa-crown"></i> Premium & Wallet</h4>
+                              <div style="display:flex; gap:10px; margin-bottom: 12px;">
+                                <div style="flex:1;">
+                                    <label style="font-size:0.8em; font-weight:600;">Monthly Plan (₹)</label>
+                                    <input type="number" id="adminMonthlyPlanPrice">
+                                </div>
+                                <div style="flex:1;">
+                                    <label style="font-size:0.8em; font-weight:600;">Yearly Plan (₹)</label>
+                                    <input type="number" id="adminYearlyPlanPrice">
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; margin-bottom:12px;">
+                                <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Referral Bonus (₹):</label>
+                                <input type="number" id="adminReferralBonus" style="width: 100px;">
+                            </div>
+                             <div style="display:flex; align-items:center;">
+                                <label style="flex:1; font-weight:600; color:var(--text-color); font-size:0.9em;">Withdrawal Charge (%):</label>
+                                <input type="number" id="adminWithdrawalCharge" style="width: 100px;">
+                            </div>
+                         </div>
+
                         <button class="btn-main" style="margin:0;" id="saveSettingsBtn_admin">Save Settings</button>
                     </div>
                 </div>
@@ -1515,39 +1406,20 @@
                     <div id="adminChatListContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
 
-                <!-- NEW ADMIN PREMIUM & WALLET SECTION -->
-                <div id="premium_admin" class="section">
-                    <div class="header-title">Premium & Wallet Settings</div>
-                    <div class="settings-panel">
-                        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:8px; font-size:1.05em;">Membership Plan Prices</h3>
-                        <div style="display:flex; gap:15px;">
-                            <div class="form-group" style="flex:1;">
-                                <label>Monthly Price (₹)</label>
-                                <input type="number" id="adminMonthlyPrice" placeholder="e.g., 99">
-                            </div>
-                            <div class="form-group" style="flex:1;">
-                                <label>Yearly Price (₹)</label>
-                                <input type="number" id="adminYearlyPrice" placeholder="e.g., 999">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="settings-panel">
-                         <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:8px; font-size:1.05em;">Referral & Wallet Settings</h3>
-                        <div class="form-group">
-                            <label>Referrer Reward Amount (₹)</label>
-                            <input type="number" id="adminReferrerReward" placeholder="Amount referrer gets">
-                        </div>
-                         <div class="form-group">
-                            <label>Withdrawal Charge (%)</label>
-                            <input type="number" id="adminWithdrawalCharge" placeholder="e.g., 5 for 5%">
-                        </div>
-                    </div>
-                    <button class="btn-main" id="savePremiumSettingsBtn_admin">Save Premium Settings</button>
-                    
-                    <div class="header-title" style="margin-top:25px;">Withdrawal Requests</div>
+                <!-- NEW FEATURE: WITHDRAWAL REQUESTS SECTION -->
+                <div id="withdrawals_admin" class="section">
+                    <div class="header-title">Withdrawal Requests</div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>User</th><th>Amount</th><th>UPI ID</th><th>Date</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>UPI ID</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
                             <tbody id="withdrawalRequestsTableBody_admin"></tbody>
                         </table>
                     </div>
@@ -1582,7 +1454,8 @@
                 <div class="nav-item active" data-admin-target="dashboard_admin"><i class="fas fa-chart-pie"></i><span>Home</span></div>
                 <div class="nav-item" data-admin-target="orders_admin"><i class="fas fa-receipt"></i><span>Orders</span></div>
                 <div class="nav-item" data-admin-target="menu_admin"><i class="fas fa-utensils"></i><span>Menu</span></div>
-                <div class="nav-item" data-admin-target="premium_admin"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+                <!-- NEW FEATURE: WITHDRAWALS NAV ITEM -->
+                <div class="nav-item" data-admin-target="withdrawals_admin"><i class="fas fa-hand-holding-usd"></i><span>Withdraw</span></div>
                 <div class="nav-item" data-admin-target="chat_admin" style="position:relative;">
                     <i class="fas fa-comments"></i>
                     <div id="adminChatBadge" class="chat-badge">0</div>
@@ -1757,17 +1630,16 @@
         // IMPLEMENTATION: Variable to store the action user wanted to perform before login
         let postLoginAction = null;
 
-        let globalDeliveryCharge = 50;
-        let globalDriverCommission = 20;
-        let globalEnableRoleSelection = false;
-        let globalWorkingHours = { enabled: false, start: '09:00', end: '22:00' };
-        
-        // NEW: Premium and Wallet Settings
-        let premiumSettings = {
-            monthlyPrice: 99,
-            yearlyPrice: 999,
-            referrerReward: 50,
-            withdrawalCharge: 5
+        // NEW FEATURE: Global Settings for Premium/Wallet
+        let globalSettings = {
+            deliveryCharge: 50,
+            driverCommission: 20,
+            enableRoleSelection: false,
+            workingHours: { enabled: false, start: '09:00', end: '22:00' },
+            premiumMonthlyPrice: 99,
+            premiumYearlyPrice: 999,
+            referralBonus: 50,
+            withdrawalCharge: 2
         };
 
         window.isStoreClosedViewOnly = false;
@@ -1804,46 +1676,34 @@
         db.ref('settings').on('value', snap => {
             if(snap.exists()) {
                 const s = snap.val();
-                globalDeliveryCharge = parseFloat(s.deliveryCharge) || 50;
-                globalDriverCommission = parseFloat(s.driverCommission) || 20;
-                globalEnableRoleSelection = s.enableRoleSelection !== undefined ? s.enableRoleSelection : false;
-                if(s.workingHours) globalWorkingHours = s.workingHours;
-                
-                // NEW: Fetch premium settings
-                if(s.premium) premiumSettings = {...premiumSettings, ...s.premium};
+                globalSettings = { ...globalSettings, ...s };
 
-                // Update UI elements with fetched settings
-                updateAdminPanelSettingsUI();
-                updatePremiumPageUI();
+                // Update Admin Panel fields if they exist
+                const adminFields = {
+                    adminDeliveryCharge: globalSettings.deliveryCharge,
+                    adminDriverCommission: globalSettings.driverCommission,
+                    adminEnableRoleSelect: globalSettings.enableRoleSelection,
+                    adminEnableHours: globalSettings.workingHours.enabled,
+                    adminStartTime: globalSettings.workingHours.start,
+                    adminStopTime: globalSettings.workingHours.end,
+                    adminMonthlyPlanPrice: globalSettings.premiumMonthlyPrice,
+                    adminYearlyPlanPrice: globalSettings.premiumYearlyPrice,
+                    adminReferralBonus: globalSettings.referralBonus,
+                    adminWithdrawalCharge: globalSettings.withdrawalCharge,
+                };
+                
+                for (const [id, value] of Object.entries(adminFields)) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = value;
+                        else el.value = value;
+                    }
+                }
+
                 updateCartUI();
                 checkAndEnforceStoreHours();
             }
         });
-        
-        // NEW: Helper function to update Admin UI with settings
-        function updateAdminPanelSettingsUI() {
-            const adminChg = document.getElementById('adminDeliveryCharge');
-            const adminCom = document.getElementById('adminDriverCommission');
-            const adminRoleToggle = document.getElementById('adminEnableRoleSelect');
-            const adminWH = document.getElementById('adminEnableHours');
-            const adminStart = document.getElementById('adminStartTime');
-            const adminEnd = document.getElementById('adminStopTime');
-            const adminMonthly = document.getElementById('adminMonthlyPrice');
-            const adminYearly = document.getElementById('adminYearlyPrice');
-            const adminReward = document.getElementById('adminReferrerReward');
-            const adminWithdrawal = document.getElementById('adminWithdrawalCharge');
-
-            if(adminChg) adminChg.value = globalDeliveryCharge;
-            if(adminCom) adminCom.value = globalDriverCommission;
-            if(adminRoleToggle) adminRoleToggle.checked = globalEnableRoleSelection;
-            if(adminWH) adminWH.checked = globalWorkingHours.enabled;
-            if(adminStart) adminStart.value = globalWorkingHours.start;
-            if(adminEnd) adminEnd.value = globalWorkingHours.end;
-            if(adminMonthly) adminMonthly.value = premiumSettings.monthlyPrice;
-            if(adminYearly) adminYearly.value = premiumSettings.yearlyPrice;
-            if(adminReward) adminReward.value = premiumSettings.referrerReward;
-            if(adminWithdrawal) adminWithdrawal.value = premiumSettings.withdrawalCharge;
-        }
 
         const allMaps = {};
         const allMarkers = {};
@@ -2074,10 +1934,10 @@
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             
             // Handle bottom nav active states
-            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumPage' || id === 'walletPage') {
+            if(id === 'appContainer' || id === 'notificationsPage' || id === 'menuPage' || id === 'ordersPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumMembershipPage') {
                 document.querySelectorAll('#customerBottomNav .nav-item').forEach(nav => {
                     let navPage = nav.dataset.page;
-                    if((id === 'ordersPage' || id === 'editProfilePage' || id === 'contactUsPage' || id === 'premiumPage' || id === 'walletPage') && navPage === 'menuPage') { nav.classList.add('active'); }
+                    if((id === 'ordersPage' || id === 'editProfilePage' || id === 'contactUsPage' || id === 'premiumMembershipPage') && navPage === 'menuPage') { nav.classList.add('active'); }
                     else if((id === 'cartPage' || id === 'checkoutPage') && navPage === 'appContainer') { nav.classList.add('active'); }
                     else { nav.classList.toggle('active', navPage === id); }
                 });
@@ -2086,7 +1946,7 @@
             const custNav = document.getElementById('customerBottomNav');
             const cartFab = document.getElementById('cart-fab-container');
             
-            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'itemDetailsPage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumPage' || id === 'walletPage') {
+            if (id === 'appContainer' || id === 'ordersPage' || id === 'notificationsPage' || id === 'menuPage' || id === 'cartPage' || id === 'checkoutPage' || id === 'editProfilePage' || id === 'itemDetailsPage' || id === 'chatSelectionPage' || id === 'contactUsPage' || id === 'premiumMembershipPage') {
                 custNav.style.display = 'flex';
                 cartFab.style.display = (id === 'cartPage' || id === 'checkoutPage' || id === 'itemDetailsPage') ? 'none' : 'block';
             } else {
@@ -2112,10 +1972,13 @@
                 setTimeout(() => { if(allMaps['prof-map']) allMaps['prof-map'].invalidateSize(); }, 300);
                 loadProfileDataIntoForm();
             }
+            // NEW FEATURE: Render premium page on show
+            if(id === 'premiumMembershipPage') {
+                renderPremiumPage();
+            }
 
             if(id === 'ordersPage') loadOrders();
             if(id === 'notificationsPage' && currentUser) { loadNotifications(); markNotificationsAsRead(); }
-            if(id === 'walletPage') loadWalletData(); // Load wallet data when page is shown
         };
 
         // IMPLEMENTATION: New function to guard protected pages
@@ -2137,7 +2000,7 @@
                 const target = e.currentTarget.dataset.target || e.currentTarget.dataset.page;
                 
                 // Define which pages require a user to be logged in
-                const protectedPages = ['chatSelectionPage', 'notificationsPage', 'menuPage', 'ordersPage', 'editProfilePage', 'contactUsPage', 'premiumPage', 'walletPage'];
+                const protectedPages = ['chatSelectionPage', 'notificationsPage', 'menuPage', 'ordersPage', 'editProfilePage', 'contactUsPage', 'premiumMembershipPage'];
 
                 if (protectedPages.includes(target)) {
                     if (requireLogin(target)) { // If requireLogin is true, proceed
@@ -2211,15 +2074,13 @@
             }, 6000);
 
             if(u) { // User is logged in
-                db.ref('users/' + u.uid).on('value', snap => { // Use .on() for real-time updates (wallet, premium status)
+                db.ref('users/' + u.uid).on('value', snap => { // Use .on() to listen for wallet/premium changes
                     let userData = snap.val();
                     if (!userData) {
                         userData = {
                             email: u.email,
                             name: u.displayName || pendingRegName || 'Guest',
-                            role: '', banned: false, createdAt: Date.now(),
-                            walletBalance: 0, // NEW: Initialize wallet
-                            isPremium: false  // NEW: Initialize premium status
+                            role: '', banned: false, createdAt: Date.now(), walletBalance: 0 // NEW FEATURE
                         };
                         db.ref('users/' + u.uid).set(userData).then(() => { checkRoleAndProceed(u, userData); });
                     } else {
@@ -2227,7 +2088,21 @@
                             userData.name = u.displayName || pendingRegName;
                             db.ref('users/' + u.uid).update({ name: userData.name });
                         }
-                        checkRoleAndProceed(u, userData);
+                        // NEW FEATURE: Ensure wallet balance exists
+                        if(typeof userData.walletBalance === 'undefined') {
+                            userData.walletBalance = 0;
+                            db.ref('users/' + u.uid).update({ walletBalance: 0 });
+                        }
+
+                        // if currentUser isn't set, it's the first login. Otherwise, it's a data update.
+                        if(!currentUser) {
+                           checkRoleAndProceed(u, userData);
+                        } else {
+                           // Data has been updated (e.g., wallet change), so just update UI
+                           currentUserData = userData;
+                           updateWalletDisplay();
+                           renderPremiumPage(); // Re-render in case status changed
+                        }
                     }
                 });
             } else { // User is NOT logged in (Guest Mode)
@@ -2248,46 +2123,12 @@
                 checkAndEnforceStoreHours();
                 
                 // Update UI for guest
-                document.getElementById('userGreetingContainer').style.display = 'block';
-                document.getElementById('userInfoHeader').style.display = 'none';
                 document.getElementById('userGreeting').innerHTML = `Hello, Guest`;
+                document.getElementById('headerWalletDisplay').style.display = 'none';
                 document.getElementById('adminSwitchSection').style.display = 'none';
                 document.getElementById('driverSwitchSection').style.display = 'none';
             }
         });
-        
-        // NEW: Helper function to check premium status based on expiry date
-        function isPremiumActive(userData) {
-            if (!userData || !userData.isPremium || !userData.premiumExpiry) {
-                return false;
-            }
-            return new Date().getTime() < userData.premiumExpiry;
-        }
-
-        // NEW: Centralized function to update header UI
-        function updateHeaderUI() {
-            if (!currentUser || !currentUserData) return;
-
-            const name = currentUserData.name || currentUser.displayName || 'Guest';
-            const shortName = name.split(' ')[0];
-            const isPremium = isPremiumActive(currentUserData);
-
-            document.getElementById('userGreetingContainer').style.display = 'none';
-            document.getElementById('userInfoHeader').style.display = 'flex';
-
-            document.getElementById('userGreeting').innerHTML = `Hello, ${shortName}`;
-            
-            if (isPremium) {
-                document.getElementById('premiumStatusHeader').innerHTML = `<i class="fas fa-crown"></i> Premium`;
-                document.getElementById('premiumStatusHeader').classList.add('premium-badge');
-            } else {
-                document.getElementById('premiumStatusHeader').innerHTML = '';
-                 document.getElementById('premiumStatusHeader').classList.remove('premium-badge');
-            }
-
-            const walletBalance = currentUserData.walletBalance || 0;
-            document.getElementById('walletBalanceHeader').textContent = walletBalance.toFixed(2);
-        }
 
         function checkRoleAndProceed(u, userData) {
             if(userData.banned) { 
@@ -2298,24 +2139,14 @@
             currentUser = u;
             currentUserData = userData;
 
-            updateHeaderUI(); // NEW: Update header with user info
-            updatePremiumPageUI(); // NEW: Update premium page based on user status
-
             if(!userData.role || userData.role === '') {
-                db.ref('settings').once('value').then(setSnap => {
-                    let canSelect = false;
-                    if(setSnap.exists() && setSnap.val().enableRoleSelection !== undefined) canSelect = setSnap.val().enableRoleSelection;
-                    if(canSelect === true || canSelect === "true") showPage('roleSelectPage');
-                    else {
-                        db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
-                            userData.role = 'customer'; finalizeLogin('customer', u, userData);
-                        });
-                    }
-                }).catch(err => {
+                if(globalSettings.enableRoleSelection === true || globalSettings.enableRoleSelection === "true") {
+                     showPage('roleSelectPage');
+                } else {
                     db.ref('users/' + u.uid).update({ role: 'customer' }).then(() => {
                         userData.role = 'customer'; finalizeLogin('customer', u, userData);
                     });
-                });
+                }
             } else finalizeLogin(userData.role, u, userData);
         }
 
@@ -2341,6 +2172,8 @@
             const name = userData.name || u.displayName || 'Guest';
             const shortName = name.split(' ')[0];
             document.getElementById('userGreeting').innerHTML = `Hello, ${shortName}`;
+            
+            updateWalletDisplay();
 
             if(role === 'admin') { document.getElementById('adminGreetingName').innerText = `Hello, ${shortName}`; initAdminContext(); }
             if(role === 'driver') { document.getElementById('driverGreetingName').innerText = `Hello, ${shortName}`; initDriverContext(); }
@@ -2351,10 +2184,8 @@
                 showPage(postLoginAction);
                 postLoginAction = null; // Clear the action after using it
             } else {
-                if (activePageId === 'loginPage' || activePageId === 'registerPage' || activePageId === 'roleSelectPage') {
-                    showPage('appContainer'); 
-                    showToast(`Welcome back, ${shortName}!`, 'success');
-                }
+                showPage('appContainer'); 
+                showToast(`Welcome back, ${shortName}!`, 'success');
             }
         }
 
@@ -2521,12 +2352,12 @@
                 }
             }
 
-            // Wallet payment option visibility
-            const walletOption = document.getElementById('sinthaWalletPaymentOption');
-            const walletBal = currentUserData.walletBalance || 0;
-            document.getElementById('checkoutWalletBal').textContent = walletBal.toFixed(2);
-            if (walletBal > 0) {
+            // NEW FEATURE: Update wallet display on checkout page
+            const walletOption = document.getElementById('walletPaymentOption');
+            const walletBalanceDisplay = document.getElementById('checkoutWalletBalance');
+            if(currentUserData.walletBalance > 0) {
                 walletOption.style.display = 'flex';
+                walletBalanceDisplay.textContent = `₹${currentUserData.walletBalance.toFixed(2)}`;
             } else {
                 walletOption.style.display = 'none';
             }
@@ -2555,7 +2386,7 @@
                 orderBtn.style.opacity = '1';
                 if(selectedPaymentMethod === 'razorpay') orderBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Pay';
                 else if (selectedPaymentMethod === 'cod') orderBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                else if (selectedPaymentMethod === 'sinthaWallet') orderBtn.innerHTML = '<i class="fas fa-wallet"></i> Pay with Wallet';
+                else if (selectedPaymentMethod === 'wallet') orderBtn.innerHTML = '<i class="fas fa-wallet"></i> Pay with Wallet';
             } else {
                 orderBtn.disabled = true;
                 orderBtn.style.opacity = '0.6';
@@ -2833,7 +2664,7 @@
             }
             
             document.getElementById('cart-summary').style.display='block';
-            document.getElementById('delivery-fee-display').textContent = `₹${globalDeliveryCharge.toFixed(2)}`;
+            document.getElementById('delivery-fee-display').textContent = `₹${globalSettings.deliveryCharge.toFixed(2)}`;
 
             c.innerHTML='';
             let sub=0;
@@ -2858,7 +2689,7 @@
             });
             
             document.getElementById('subtotal-price').textContent = `₹${sub.toFixed(2)}`;
-            document.getElementById('total-price').textContent = `₹${(sub+globalDeliveryCharge).toFixed(2)}`;
+            document.getElementById('total-price').textContent = `₹${(sub+globalSettings.deliveryCharge).toFixed(2)}`;
             checkOrderValidity(); 
         }
 
@@ -2981,10 +2812,8 @@
             });
         }
 
-        function saveOrderToFirebase(paymentMethod, paymentId = null) {
-            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalDeliveryCharge);
+        function saveOrderToFirebase(paymentMethod, paymentId = null, totalAmount) {
             const dCode = Math.floor(100000 + Math.random() * 900000);
-            
             const uName = nameInput.value.trim() || currentUserData.name || currentUser.displayName || 'Unknown';
 
             const order = {
@@ -3011,34 +2840,32 @@
             });
         }
         
-        // IMPLEMENTATION: Added login check and wallet payment logic to the final order placement button
+        // IMPLEMENTATION: Added login check and wallet payment logic
         orderBtn.onclick = (e) => {
             e.preventDefault();
             if(orderBtn.disabled || cart.length === 0) return;
 
             if (!requireLogin('checkoutPage')) return; 
 
-            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalDeliveryCharge);
+            const totalAmount = (cart.reduce((a, b) => a + b.price * b.quantity, 0) + globalSettings.deliveryCharge);
 
-            if (selectedPaymentMethod === 'cod') {
-                saveOrderToFirebase('Cash on Delivery');
-            } else if (selectedPaymentMethod === 'sinthaWallet') {
-                const currentBalance = currentUserData.walletBalance || 0;
-                if (currentBalance >= totalAmount) {
-                    const newBalance = currentBalance - totalAmount;
-                    db.ref(`users/${currentUser.uid}`).update({ walletBalance: newBalance }).then(() => {
-                        saveOrderToFirebase('Sintha Wallet', `wallet_${new Date().getTime()}`);
-                        addTransactionToHistory(currentUser.uid, 'debit', totalAmount, 'Food Order Purchase');
+            if (selectedPaymentMethod === 'wallet') {
+                if(currentUserData.walletBalance >= totalAmount) {
+                    const newBalance = currentUserData.walletBalance - totalAmount;
+                    db.ref('users/' + currentUser.uid).update({ walletBalance: newBalance }).then(() => {
+                        saveOrderToFirebase('Sintha Wallet', `wallet_${Date.now()}`, totalAmount);
                     });
                 } else {
-                    showToast("Insufficient wallet balance. Please add funds or choose another payment method.", "error");
+                    showToast("Insufficient wallet balance.", "error");
                 }
+            } else if (selectedPaymentMethod === 'cod') {
+                saveOrderToFirebase('Cash on Delivery', null, totalAmount);
             } else if (selectedPaymentMethod === 'razorpay') {
                 const options = {
                     "key": "rzp_live_SUarhYm5IfBTar", "amount": Math.round(totalAmount * 100), "currency": "INR",
                     "name": "Sintha Keithel", "description": "Food Order Payment",
                     "image": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-                    "handler": (response) => saveOrderToFirebase('Razorpay', response.razorpay_payment_id),
+                    "handler": (response) => saveOrderToFirebase('Razorpay', response.razorpay_payment_id, totalAmount),
                     "prefill": { "name": nameInput.value.trim(), "email": currentUser.email, "contact": phoneInput.value.trim() },
                     "theme": { "color": "#008743" }
                 };
@@ -3250,39 +3077,23 @@
             }
 
             document.getElementById('saveSettingsBtn_admin').onclick = () => {
-                const dc = parseFloat(document.getElementById('adminDeliveryCharge').value);
-                const cc = parseFloat(document.getElementById('adminDriverCommission').value);
-                const enableRole = document.getElementById('adminEnableRoleSelect').checked;
-                
-                const whEnabled = document.getElementById('adminEnableHours').checked;
-                const whStart = document.getElementById('adminStartTime').value || '09:00';
-                const whEnd = document.getElementById('adminStopTime').value || '22:00';
-
-                db.ref('settings').update({
-                    deliveryCharge: dc,
-                    driverCommission: cc,
-                    enableRoleSelection: enableRole,
+                const settingsData = {
+                    deliveryCharge: parseFloat(document.getElementById('adminDeliveryCharge').value) || 50,
+                    driverCommission: parseFloat(document.getElementById('adminDriverCommission').value) || 20,
+                    enableRoleSelection: document.getElementById('adminEnableRoleSelect').checked,
                     workingHours: {
-                        enabled: whEnabled,
-                        start: whStart,
-                        end: whEnd
-                    }
-                }).then(()=>showToast("General Settings Saved!", "success"));
-            };
+                        enabled: document.getElementById('adminEnableHours').checked,
+                        start: document.getElementById('adminStartTime').value || '09:00',
+                        end: document.getElementById('adminStopTime').value || '22:00'
+                    },
+                    // NEW FEATURE: Save premium/wallet settings
+                    premiumMonthlyPrice: parseFloat(document.getElementById('adminMonthlyPlanPrice').value) || 99,
+                    premiumYearlyPrice: parseFloat(document.getElementById('adminYearlyPlanPrice').value) || 999,
+                    referralBonus: parseFloat(document.getElementById('adminReferralBonus').value) || 50,
+                    withdrawalCharge: parseFloat(document.getElementById('adminWithdrawalCharge').value) || 2,
+                };
 
-            // NEW: Save premium settings
-            document.getElementById('savePremiumSettingsBtn_admin').onclick = () => {
-                const monthly = parseFloat(document.getElementById('adminMonthlyPrice').value);
-                const yearly = parseFloat(document.getElementById('adminYearlyPrice').value);
-                const reward = parseFloat(document.getElementById('adminReferrerReward').value);
-                const charge = parseFloat(document.getElementById('adminWithdrawalCharge').value);
-                
-                db.ref('settings/premium').update({
-                    monthlyPrice: monthly,
-                    yearlyPrice: yearly,
-                    referrerReward: reward,
-                    withdrawalCharge: charge
-                }).then(() => showToast("Premium & Wallet Settings Saved!", "success"));
+                db.ref('settings').update(settingsData).then(()=>showToast("Settings Saved successfully!", "success"));
             };
 
             document.getElementById('csvFileInput_admin').addEventListener('change', function(e) {
@@ -3725,11 +3536,11 @@
                     });
                 });
             }
-
-            // NEW: Fetch and handle withdrawal requests
+            
+            // NEW FEATURE: WITHDRAWAL REQUESTS
             function fetchWithdrawalRequests_admin() {
-                const tbody = document.getElementById('withdrawalRequestsTableBody_admin');
                 db.ref('withdrawalRequests').orderByChild('status').equalTo('pending').on('value', snap => {
+                    const tbody = document.getElementById('withdrawalRequestsTableBody_admin');
                     tbody.innerHTML = '';
                     if (!snap.exists()) {
                         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#777;">No pending requests.</td></tr>';
@@ -3738,64 +3549,64 @@
                     snap.forEach(child => {
                         const req = child.val();
                         const reqId = child.key;
-                        const date = new Date(req.timestamp).toLocaleDateString();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${req.userName}<br><span style="font-size:0.8em; color: var(--light-text);">${req.userEmail}</span></td>
-                            <td style="font-weight:700;">₹${req.amount}</td>
-                            <td>${req.upiId}</td>
-                            <td>${date}</td>
-                            <td><button class="btn-main" style="margin:0; padding: 6px 12px; font-size:0.85em;" onclick="approveWithdrawal_admin('${reqId}')">Approve</button></td>
-                        `;
-                        tbody.appendChild(row);
+                        db.ref('users/' + req.userId).once('value', userSnap => {
+                            const user = userSnap.val();
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${user ? user.name : 'Unknown'}</td>
+                                <td style="font-weight:700;">₹${req.amount}</td>
+                                <td>${req.upiId}</td>
+                                <td>${new Date(req.timestamp).toLocaleString()}</td>
+                                <td>
+                                    <button onclick="handleWithdrawal('${reqId}', 'approved')" style="background:var(--success); color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em; margin-right:5px;">Approve</button>
+                                    <button onclick="handleWithdrawal('${reqId}', 'rejected')" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.8em;">Reject</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
                     });
                 });
             }
-            
-            window.approveWithdrawal_admin = (reqId) => {
-                if(!confirm("Are you sure you want to approve this withdrawal request? The amount will be deducted from the user's wallet.")) return;
 
-                db.ref('withdrawalRequests/' + reqId).once('value', snap => {
-                    const req = snap.val();
-                    if (req.status !== 'pending') {
-                        showToast("This request has already been processed.", "info");
-                        return;
-                    }
-                    
-                    const amountToWithdraw = parseFloat(req.amount);
-                    const chargePercent = premiumSettings.withdrawalCharge / 100;
-                    const chargeAmount = amountToWithdraw * chargePercent;
-                    const totalDeduction = amountToWithdraw + chargeAmount;
-                    
-                    const userWalletRef = db.ref('users/' + req.userId + '/walletBalance');
+            window.handleWithdrawal = (reqId, newStatus) => {
+                if(newStatus === 'approved') {
+                    if(!confirm("Are you sure you want to approve this withdrawal? This will deduct the amount from the user's wallet.")) return;
+                    db.ref('withdrawalRequests/' + reqId).once('value', reqSnap => {
+                        const req = reqSnap.val();
+                        db.ref('users/' + req.userId).once('value', userSnap => {
+                            const user = userSnap.val();
+                            const currentBalance = user.walletBalance || 0;
+                            const requestedAmount = parseFloat(req.amount);
+                            
+                            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
+                            const chargeAmount = (requestedAmount * chargePercent) / 100;
+                            const totalDeduction = requestedAmount + chargeAmount;
 
-                    userWalletRef.transaction(currentBalance => {
-                        if (currentBalance === null) currentBalance = 0;
-                        if (currentBalance >= amountToWithdraw) {
-                            return currentBalance - amountToWithdraw; // Only deduct requested amount from wallet, charge is just a fee.
-                        } else {
-                            return; // Abort transaction if insufficient funds
-                        }
-                    }, (error, committed, snapshot) => {
-                        if (error) {
-                            showToast("Transaction failed: " + error, "error");
-                        } else if (!committed) {
-                            showToast("Insufficient funds in user's wallet to complete withdrawal.", "error");
-                        } else {
-                            db.ref('withdrawalRequests/' + reqId).update({ status: 'approved', approvedAt: Date.now() });
-                            addTransactionToHistory(req.userId, 'debit', amountToWithdraw, `Withdrawal to UPI: ${req.upiId}`);
-                            showToast("Withdrawal approved and amount deducted successfully.", "success");
-                        }
+                            if(currentBalance >= totalDeduction) {
+                                const newBalance = currentBalance - totalDeduction;
+                                db.ref('users/' + req.userId).update({ walletBalance: newBalance });
+                                db.ref('withdrawalRequests/' + reqId).update({ status: 'approved', processedAt: Date.now() });
+                                showToast("Withdrawal approved and amount deducted.", "success");
+                            } else {
+                                showToast("User has insufficient balance to cover withdrawal and charges.", "error");
+                                db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', reason: 'Insufficient funds' });
+                            }
+                        });
                     });
-                });
+                } else { // Rejected
+                    if(!confirm("Are you sure you want to reject this withdrawal?")) return;
+                    db.ref('withdrawalRequests/' + reqId).update({ status: 'rejected', processedAt: Date.now() });
+                    showToast("Withdrawal request rejected.", "info");
+                }
             };
+
 
             fetchOrders_admin();
             fetchDishes_admin();
             fetchCategories_admin();
             fetchUsers_admin();
-            fetchAdminChatList(); 
-            fetchWithdrawalRequests_admin(); // Fetch requests
+            fetchAdminChatList();
+            fetchWithdrawalRequests_admin();
         }
 
         // =========================================================
@@ -3972,7 +3783,7 @@
                 }
                 
                 db.ref('users/' + currentUser.uid + '/earnings').once('value', s => {
-                    db.ref('users/' + currentUser.uid).update({ earnings: (s.val() || 0) + globalDriverCommission });
+                    db.ref('users/' + currentUser.uid).update({ earnings: (s.val() || 0) + globalSettings.driverCommission });
                 });
 
                 if(isCashCollected) {
@@ -4362,7 +4173,7 @@
         function checkAndEnforceStoreHours() {
             const banner = document.getElementById('storeHoursBanner');
 
-            if(!globalWorkingHours.enabled) {
+            if(!globalSettings.workingHours.enabled) {
                 if(activePageId === 'storeClosedPage') showPage('appContainer');
                 else document.getElementById('storeClosedPage').classList.remove('active');
                 
@@ -4385,8 +4196,8 @@
                 const currentSeconds = now.getSeconds();
                 const currentTimeInSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
 
-                const [startH, startM] = globalWorkingHours.start.split(':').map(Number);
-                const [endH, endM] = globalWorkingHours.end.split(':').map(Number);
+                const [startH, startM] = globalSettings.workingHours.start.split(':').map(Number);
+                const [endH, endM] = globalSettings.workingHours.end.split(':').map(Number);
                 const startTimeInSeconds = startH * 3600 + startM * 60;
                 const endTimeInSeconds = endH * 3600 + endM * 60;
 
@@ -4500,21 +4311,14 @@
         };
 
         // =========================================================
-        // RAZORPAY QR & REFERRAL LINK AUTO-DETECTION 
-        // =========================================================
+        // RAZORPAY QR & NEW FEATURE: REFERRAL LINK DETECTION
+        // ========================================================== */
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
             const payOrderId = urlParams.get('payOrder');
-            const refCode = urlParams.get('ref');
+            const referralCode = urlParams.get('ref'); // NEW FEATURE
 
-            if (refCode) {
-                const referralInput = document.getElementById('referralCodeInput');
-                if (referralInput) {
-                    referralInput.value = refCode;
-                    showToast(`Referral code ${refCode} applied!`, 'success');
-                }
-            }
-            
+            // Existing Razorpay QR logic
             if (payOrderId) {
                 setTimeout(() => {
                     db.ref('orders/' + payOrderId).once('value', snap => {
@@ -4542,289 +4346,298 @@
                             };
                             try {
                                 const rzp1 = new Razorpay(options);
-                                rzp1.on('payment.failed', (response) => {
-                                    showToast("Payment Failed: " + response.error.description, "error");
-                                    window.history.replaceState({}, document.title, window.location.pathname);
-                                });
+                                rzp1.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
                                 rzp1.open();
-                            } catch(e) { 
-                                showToast("Payment gateway failed to load.", "error"); 
-                                window.history.replaceState({}, document.title, window.location.pathname);
-                            }
+                            } catch(e) { showToast("Payment gateway failed to load.", "error"); }
                         } else if (order && order.paymentStatus === 'Paid') {
                             showToast("This order is already paid.", "info");
-                             window.history.replaceState({}, document.title, window.location.pathname);
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         } else {
                             showToast("Order not found.", "error");
-                             window.history.replaceState({}, document.title, window.location.pathname);
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         }
                     });
                 }, 1500); 
             }
+
+            // NEW FEATURE: Referral Code Detection
+            if (referralCode) {
+                // Store referral code to be used on the premium page later
+                sessionStorage.setItem('referralCode', referralCode);
+                showToast(`Referral code ${referralCode} applied!`, 'success');
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         });
 
         // =========================================================
-        // NEW FEATURE: PREMIUM, REFERRAL, WALLET & WITHDRAWAL LOGIC
+        // NEW FEATURE: PREMIUM MEMBERSHIP & WALLET LOGIC
         // =========================================================
-
-        let selectedPlan = null;
-
-        function updatePremiumPageUI() {
-            // Update plan prices on the "Buy" page
-            document.getElementById('monthlyPlanPrice').textContent = `₹${premiumSettings.monthlyPrice}`;
-            document.getElementById('yearlyPlanPrice').textContent = `₹${premiumSettings.yearlyPrice}`;
-
+        
+        function updateWalletDisplay() {
             if (!currentUserData) return;
 
-            const isPremium = isPremiumActive(currentUserData);
-            const isExpired = currentUserData.isPremium && !isPremium;
+            const walletDisplay = document.getElementById('headerWalletDisplay');
+            const walletBalance = document.getElementById('headerWalletBalance');
+            const premiumMenuItem = document.getElementById('premiumMenuItemText');
 
-            document.getElementById('buyPremiumSection').style.display = (!isPremium && !isExpired) ? 'block' : 'none';
-            document.getElementById('managePremiumSection').style.display = isPremium ? 'block' : 'none';
-            document.getElementById('expiredPremiumSection').style.display = isExpired ? 'block' : 'none';
-
+            const isPremium = currentUserData.premium && currentUserData.premium.expiry > Date.now();
+            
             if (isPremium) {
-                const expiry = new Date(currentUserData.premiumExpiry).toLocaleDateString();
-                document.getElementById('premiumExpiryDate').textContent = expiry;
-                document.getElementById('userReferralCode').textContent = currentUserData.referralCode || 'Generating...';
+                walletDisplay.style.display = 'inline-flex';
+                walletBalance.textContent = (currentUserData.walletBalance || 0).toFixed(2);
+                premiumMenuItem.innerHTML = 'Premium Member <i class="fas fa-crown" style="color:var(--gold); margin-left: 5px;"></i>';
+            } else {
+                walletDisplay.style.display = 'none';
+                premiumMenuItem.innerHTML = 'Premium Membership';
             }
         }
-        
-        // Plan selection click listeners
-        document.querySelectorAll('.plan-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedPlan = card.dataset.plan;
-            });
-        });
 
-        // Buy/Renew button logic
-        document.getElementById('buyPremiumBtn').addEventListener('click', () => initiatePremiumPurchase());
-        document.getElementById('renewPremiumBtn').addEventListener('click', () => initiatePremiumPurchase());
-        document.getElementById('renewExpiredBtn').addEventListener('click', () => initiatePremiumPurchase());
+        function renderPremiumPage() {
+            if (!currentUserData) {
+                document.getElementById('premiumPageContent').innerHTML = '<p>Error: User data not found.</p>';
+                return;
+            }
 
-        function initiatePremiumPurchase() {
+            const container = document.getElementById('premiumPageContent');
+            const now = Date.now();
+            const premiumInfo = currentUserData.premium;
+            const isPremium = premiumInfo && premiumInfo.expiry > now;
+            const isExpired = premiumInfo && premiumInfo.expiry <= now;
+            
+            if (isPremium) {
+                // User is an active premium member
+                const expiryDate = new Date(premiumInfo.expiry).toLocaleDateString();
+                const referralCode = currentUserData.referralCode || 'Generating...';
+                const referralLink = `${window.location.origin}${window.location.pathname}?ref=${referralCode}`;
+                
+                container.innerHTML = `
+                    <div class="info-card" style="border: 2px solid var(--gold); background: #fffbeb;">
+                        <h4><i class="fas fa-crown"></i> You are a Premium Member</h4>
+                        <p>Your membership is active until: <strong>${expiryDate}</strong></p>
+                    </div>
+
+                    <div class="wallet-card">
+                        <div class="balance-label">Your Wallet Balance</div>
+                        <div class="balance-amount">₹${(currentUserData.walletBalance || 0).toFixed(2)}</div>
+                    </div>
+                    
+                    <h3 class="section-title" style="margin-top: 25px;">Withdraw Funds</h3>
+                    <div class="form-group">
+                        <label>Amount to Withdraw (₹)</label>
+                        <input type="number" id="withdrawalAmount" class="form-control" placeholder="Min ₹100">
+                    </div>
+                    <div class="form-group">
+                        <label>Your UPI ID</label>
+                        <input type="text" id="withdrawalUpiId" class="form-control" placeholder="e.g., yourname@oksbi">
+                    </div>
+                    <button class="btn-main" onclick="requestWithdrawal()">Request Withdrawal</button>
+                    <p style="font-size: 0.75em; text-align: center; color: var(--light-text); margin-top: 5px;">A ${globalSettings.withdrawalCharge}% processing fee will be applied.</p>
+                    
+                    <h3 class="section-title" style="margin-top: 25px;">Refer & Earn</h3>
+                    <div class="info-card">
+                        <h4>Your Referral Code</h4>
+                        <div class="referral-code-box">${referralCode}</div>
+                        <p>Share this code with your friends. When they buy a premium plan, you'll get ₹${globalSettings.referralBonus} in your wallet!</p>
+                        <button class="btn-main" style="margin-top: 15px;" onclick="copyReferralLink()">
+                            <i class="fas fa-share-alt"></i> Share Your Link
+                        </button>
+                    </div>
+                `;
+            } else {
+                // User is not a member or has expired
+                const storedRefCode = sessionStorage.getItem('referralCode') || '';
+
+                container.innerHTML = `
+                    ${isExpired ? `
+                    <div class="info-card" style="border: 2px solid var(--danger); background: #ffebee;">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Membership Expired</h4>
+                        <p>Your premium benefits have ended. Renew now to continue enjoying them!</p>
+                    </div>
+                    ` : `
+                    <div class="info-card">
+                        <h4>Unlock Premium Benefits</h4>
+                        <p>Become a premium member to earn from referrals and enjoy exclusive perks!</p>
+                    </div>
+                    `}
+
+                    <h3 class="section-title">Choose Your Plan</h3>
+                    <div class="plan-container">
+                        <div class="plan-card" id="monthly-plan" onclick="selectPlan('monthly')">
+                            <h3>Monthly</h3>
+                            <p>₹${globalSettings.premiumMonthlyPrice}</p>
+                            <span>per month</span>
+                        </div>
+                        <div class="plan-card" id="yearly-plan" onclick="selectPlan('yearly')">
+                            <div class="best-value">BEST VALUE</div>
+                            <h3>Yearly</h3>
+                            <p>₹${globalSettings.premiumYearlyPrice}</p>
+                            <span>per year</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Referral Code (Optional)</label>
+                        <input type="text" id="referralCodeInput" class="form-control" placeholder="Enter code from a friend" value="${storedRefCode}">
+                    </div>
+
+                    <button class="btn-main" id="buyPremiumBtn" onclick="buyPremiumPlan()" disabled>Select a Plan to Continue</button>
+                    ${isExpired ? `<button class="btn-main" style="background:var(--gold); color:#333;" id="renewPremiumBtn" onclick="renewPremiumPlan()" disabled>Renew Plan</button>` : ''}
+                `;
+            }
+        }
+
+        let selectedPlan = null;
+        window.selectPlan = (planType) => {
+            selectedPlan = planType;
+            const monthlyCard = document.getElementById('monthly-plan');
+            const yearlyCard = document.getElementById('yearly-plan');
+            const buyBtn = document.getElementById('buyPremiumBtn');
+            const renewBtn = document.getElementById('renewPremiumBtn');
+
+            monthlyCard.classList.toggle('selected', planType === 'monthly');
+            yearlyCard.classList.toggle('selected', planType === 'yearly');
+
+            if (buyBtn) {
+                buyBtn.disabled = false;
+                buyBtn.textContent = `Buy ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`;
+            }
+            if (renewBtn) {
+                renewBtn.disabled = false;
+                renewBtn.textContent = `Renew with ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`;
+            }
+        };
+
+        window.renewPremiumPlan = () => buyPremiumPlan(true);
+
+        window.buyPremiumPlan = (isRenewal = false) => {
             if (!selectedPlan) {
                 showToast("Please select a plan first.", "error");
                 return;
             }
 
-            const isRenewing = isPremiumActive(currentUserData);
-            const planPrice = selectedPlan === 'monthly' ? premiumSettings.monthlyPrice : premiumSettings.yearlyPrice;
-            const planName = selectedPlan === 'monthly' ? 'Monthly Premium' : 'Yearly Premium';
+            const amount = selectedPlan === 'monthly' ? globalSettings.premiumMonthlyPrice : globalSettings.premiumYearlyPrice;
+            const referralCodeInput = document.getElementById('referralCodeInput');
+            const refCode = referralCodeInput ? referralCodeInput.value.trim().toUpperCase() : null;
 
             const options = {
                 "key": "rzp_live_SUarhYm5IfBTar",
-                "amount": planPrice * 100,
+                "amount": Math.round(amount * 100),
                 "currency": "INR",
                 "name": "Sintha Keithel Premium",
-                "description": `Purchase ${planName}`,
+                "description": `${isRenewal ? 'Renewal' : 'Purchase'} - ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} Plan`,
                 "handler": (response) => {
-                    handleSuccessfulPremiumPayment(response.razorpay_payment_id, isRenewing);
+                    activatePremium(selectedPlan, response.razorpay_payment_id, refCode);
                 },
-                "prefill": { "name": currentUserData.name, "email": currentUser.email },
+                "prefill": {
+                    "name": currentUserData.name,
+                    "email": currentUser.email,
+                    "contact": currentUserData.phone || ''
+                },
                 "theme": { "color": "#008743" }
             };
-            try {
-                const rzp = new Razorpay(options);
-                rzp.on('payment.failed', (res) => showToast(`Payment Failed: ${res.error.description}`, "error"));
-                rzp.open();
-            } catch (err) {
-                showToast("Payment interface failed to load.", "error");
-            }
-        }
-        
-        async function handleSuccessfulPremiumPayment(paymentId, isRenewing) {
-            let updates = {};
-            
-            // 1. Generate referral code if it doesn't exist
-            let userRefCode = currentUserData.referralCode;
-            if (!userRefCode) {
-                userRefCode = `SK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-                updates.referralCode = userRefCode;
-            }
-            
-            // 2. Calculate new expiry date
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', (response) => showToast("Payment Failed: " + response.error.description, "error"));
+            rzp.open();
+        };
+
+        function activatePremium(plan, paymentId, referralCode) {
             const now = new Date();
             let expiryDate;
-
-            if (isRenewing) {
-                expiryDate = new Date(currentUserData.premiumExpiry);
-            } else {
-                expiryDate = now;
+            if (plan === 'monthly') {
+                expiryDate = new Date(now.setMonth(now.getMonth() + 1));
+            } else { // yearly
+                expiryDate = new Date(now.setFullYear(now.getFullYear() + 1));
             }
 
-            if (selectedPlan === 'monthly') {
-                expiryDate.setMonth(expiryDate.getMonth() + 1);
-            } else {
-                expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-            }
-            updates.isPremium = true;
-            updates.premiumExpiry = expiryDate.getTime();
-
-            // 3. Handle referral code input
-            const referralCodeInput = document.getElementById('referralCodeInput').value.trim();
-            if (referralCodeInput && !isRenewing) {
-                 await applyReferral(referralCodeInput);
-            }
+            const updates = {
+                premium: {
+                    plan: plan,
+                    purchaseDate: Date.now(),
+                    expiry: expiryDate.getTime(),
+                    paymentId: paymentId
+                }
+            };
             
-            // 4. Update user data and add transaction
-            db.ref(`users/${currentUser.uid}`).update(updates).then(() => {
-                showToast("Welcome to Premium! Your membership is active.", "success");
-                addTransactionToHistory(currentUser.uid, 'debit', selectedPlan === 'monthly' ? premiumSettings.monthlyPrice : premiumSettings.yearlyPrice, `Premium Purchase (${selectedPlan})`);
-                updatePremiumPageUI(); // Refresh the page UI
+            // Generate referral code if user doesn't have one
+            if (!currentUserData.referralCode) {
+                const newRefCode = (currentUserData.name.substring(0, 4) + Math.random().toString(36).substring(2, 6)).toUpperCase();
+                updates.referralCode = newRefCode;
+            }
+
+            db.ref('users/' + currentUser.uid).update(updates).then(() => {
+                showToast("Congratulations! You are now a premium member.", "success");
+                sessionStorage.removeItem('referralCode');
+                renderPremiumPage(); // Re-render the page to show new status
+
+                // Handle referral bonus if a valid code was used
+                if (referralCode) {
+                    db.ref('users').orderByChild('referralCode').equalTo(referralCode).once('value', snap => {
+                        if (snap.exists()) {
+                            const referrerId = Object.keys(snap.val())[0];
+                            const referrerData = snap.val()[referrerId];
+
+                            // Check if referrer's own plan is active
+                            const isReferrerActive = referrerData.premium && referrerData.premium.expiry > Date.now();
+                            if(isReferrerActive) {
+                                const bonus = globalSettings.referralBonus;
+                                const newBalance = (referrerData.walletBalance || 0) + bonus;
+                                db.ref('users/' + referrerId).update({ walletBalance: newBalance });
+                            }
+                        }
+                    });
+                }
             });
         }
         
-        async function applyReferral(code) {
-            const referrerQuery = db.ref('users').orderByChild('referralCode').equalTo(code).limitToFirst(1);
-            const snapshot = await referrerQuery.once('value');
+        window.copyReferralLink = () => {
+            const referralCode = currentUserData.referralCode;
+            const link = `${window.location.origin}${window.location.pathname}?ref=${referralCode}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast("Referral link copied to clipboard!", "success");
+            }, () => {
+                showToast("Failed to copy link.", "error");
+            });
+        };
 
-            if (snapshot.exists()) {
-                const referrerId = Object.keys(snapshot.val())[0];
-                const referrerData = snapshot.val()[referrerId];
+        window.requestWithdrawal = () => {
+            const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+            const upiId = document.getElementById('withdrawalUpiId').value.trim();
 
-                // Check if referrer is a currently active premium member
-                if (isPremiumActive(referrerData)) {
-                    const currentBalance = referrerData.walletBalance || 0;
-                    const newBalance = currentBalance + premiumSettings.referrerReward;
-                    
-                    await db.ref(`users/${referrerId}`).update({ walletBalance: newBalance });
-                    await addTransactionToHistory(referrerId, 'credit', premiumSettings.referrerReward, `Referral bonus from ${currentUserData.name}`);
-                    
-                    showToast("Valid referral code applied! Your friend has been rewarded.", "success");
-                } else {
-                     showToast("This referral code is from an inactive premium member.", "error");
-                }
-            } else {
-                showToast("Invalid referral code.", "error");
-            }
-        }
-
-        // Share button logic
-        document.getElementById('shareReferralBtn').addEventListener('click', () => {
-            if (!isPremiumActive(currentUserData)) {
-                showToast("Your membership has expired. Referral link is inactive.", "error");
+            if (isNaN(amount) || amount < 100) {
+                showToast("Minimum withdrawal amount is ₹100.", "error");
                 return;
             }
-            const refCode = currentUserData.referralCode;
-            if (refCode) {
-                const shareLink = `${window.location.origin}${window.location.pathname}?ref=${refCode}`;
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Join me on Sintha Keithel!',
-                        text: `Use my referral code to get benefits on Sintha Keithel.`,
-                        url: shareLink,
-                    }).catch(console.error);
-                } else {
-                    navigator.clipboard.writeText(shareLink).then(() => {
-                        showToast("Referral link copied to clipboard!", "success");
-                    });
-                }
-            }
-        });
-
-        document.getElementById('userReferralCode').addEventListener('click', (e) => {
-             if (navigator.clipboard) {
-                navigator.clipboard.writeText(e.target.textContent).then(() => {
-                    showToast("Referral code copied!", "success");
-                });
-            }
-        });
-
-        // Wallet Page Logic
-        function loadWalletData() {
-            document.getElementById('walletPageBalance').textContent = `₹${(currentUserData.walletBalance || 0).toFixed(2)}`;
-            document.getElementById('withdrawalChargeInfo').textContent = premiumSettings.withdrawalCharge;
-            loadWalletHistory();
-        }
-
-        function loadWalletHistory() {
-            const container = document.getElementById('walletHistoryContainer');
-            db.ref(`users/${currentUser.uid}/walletHistory`).orderByChild('timestamp').once('value', snap => {
-                if (!snap.exists()) {
-                    container.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">No transaction history found.</p>';
-                    return;
-                }
-                let html = '';
-                let history = [];
-                snap.forEach(child => history.push(child.val()));
-                history.reverse(); // Show newest first
-
-                history.forEach(tx => {
-                    const isCredit = tx.type === 'credit';
-                    html += `
-                        <div class="notification-card" style="border-left: 4px solid ${isCredit ? 'var(--success)' : 'var(--danger)'};">
-                            <div class="notif-icon-box" style="background:${isCredit ? '#e6f7ef' : '#ffebee'}; color:${isCredit ? 'var(--success)' : 'var(--danger)'};">
-                                <i class="fas ${isCredit ? 'fa-plus' : 'fa-minus'}"></i>
-                            </div>
-                            <div class="notif-content" style="flex:1;">
-                                <div style="display:flex; justify-content: space-between;">
-                                    <h4 style="margin:0; font-size:1em;">${isCredit ? 'Credited' : 'Debited'}</h4>
-                                    <strong style="color:${isCredit ? 'var(--success)' : 'var(--danger)'};">${isCredit ? '+' : '-'}₹${tx.amount.toFixed(2)}</strong>
-                                </div>
-                                <p style="margin:4px 0; font-size:0.85em; color:#636e72;">${tx.description}</p>
-                                <span style="font-size:0.75em; color:#b2bec3;">${new Date(tx.timestamp).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            });
-        }
-
-        async function addTransactionToHistory(uid, type, amount, description) {
-            await db.ref(`users/${uid}/walletHistory`).push({
-                type,
-                amount: parseFloat(amount),
-                description,
-                timestamp: Date.now()
-            });
-        }
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                const targetTab = e.target.dataset.walletTab;
-                document.querySelectorAll('#walletPage .section').forEach(sec => {
-                    sec.classList.toggle('active', sec.id.startsWith(targetTab));
-                });
-            });
-        });
-
-        document.getElementById('submitWithdrawRequestBtn').onclick = () => {
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const upiId = document.getElementById('withdrawUpiId').value.trim();
-
-            if (!amount || amount <= 0) {
-                showToast("Please enter a valid amount.", "error"); return;
-            }
-            if (!upiId || !upiId.includes('@')) {
-                showToast("Please enter a valid UPI ID.", "error"); return;
-            }
-            if (amount > (currentUserData.walletBalance || 0)) {
-                showToast("Withdrawal amount cannot exceed your wallet balance.", "error"); return;
+            if (!upiId) {
+                showToast("Please enter a valid UPI ID.", "error");
+                return;
             }
             
-            const request = {
+            const chargePercent = parseFloat(globalSettings.withdrawalCharge) || 0;
+            const chargeAmount = (amount * chargePercent) / 100;
+            const totalDeduction = amount + chargeAmount;
+
+            if (currentUserData.walletBalance < totalDeduction) {
+                showToast(`Insufficient balance. You need ₹${totalDeduction.toFixed(2)} to withdraw ₹${amount.toFixed(2)}.`, "error");
+                return;
+            }
+
+            const requestData = {
                 userId: currentUser.uid,
-                userName: currentUserData.name,
-                userEmail: currentUser.email,
                 amount: amount,
                 upiId: upiId,
-                status: 'pending',
-                timestamp: Date.now()
+                charge: chargeAmount,
+                totalDeduction: totalDeduction,
+                timestamp: Date.now(),
+                status: 'pending'
             };
-
-            db.ref('withdrawalRequests').push(request).then(() => {
-                showToast("Withdrawal request submitted successfully. It will be processed soon.", "success");
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawUpiId').value = '';
-            }).catch(e => showToast("Failed to submit request. Please try again.", "error"));
+            db.ref('withdrawalRequests').push(requestData).then(() => {
+                showToast("Withdrawal request submitted successfully! It will be processed by the admin.", "success");
+                renderPremiumPage();
+            });
         };
+
     </script>
 </body>
 </html>
