@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tambola Domains & Registration</title>
 
 <!-- Razorpay & jsPDF CDNs -->
@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-/* Global Styles */
+/* Global Styles & Compact Layout (Slidey Decrease) */
 * {
   margin: 0;
   padding: 0;
@@ -24,128 +24,215 @@ body {
   color: #fff;
   min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Changed to column for top bar */
-  justify-content: center;
+  flex-direction: column; 
   align-items: center;
-  padding: 20px 0;
+  padding: 15px 0 80px 0; /* Extra bottom padding for Nav Bar */
+  overflow-x: hidden;
 }
 
-/* ================= NEW: PURCHASED DOMAIN INFO BAR (TOP) ================= */
+/* ================= BOTTOM NAVIGATION BAR ================= */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(15, 32, 39, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 255, 204, 0.3);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  z-index: 999;
+}
+
+.nav-item {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #aaa;
+  cursor: pointer;
+  flex: 1;
+  padding: 5px 0;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.nav-item.active {
+  color: #00ffcc;
+  font-weight: bold;
+}
+
+.nav-item i {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 3px;
+}
+
+/* ================= PAGES (SWIPEABLE CONTAINERS) ================= */
+.page-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex: 1; /* Helps container take up available space for better touch handling */
+}
+
+.page-section {
+  display: none;
+  width: 95%;
+  max-width: 1000px;
+  animation: slideIn 0.3s ease;
+}
+
+.page-section.active {
+  display: block;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Info Pages (Contact, Privacy, Refund) Styles */
+.info-box {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  margin-bottom: 20px;
+}
+.info-box h2 {
+  color: #00ffcc;
+  margin-bottom: 12px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+.info-box p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  color: #e0e0e0;
+}
+
+/* ================= PURCHASED DOMAIN INFO BAR (TOP) ================= */
 .purchased-domain-info {
-    display: none; /* Hidden by default */
+    display: none; 
     background: rgba(0, 255, 204, 0.1);
     border: 1px solid #00ffcc;
-    padding: 15px 20px;
+    padding: 12px 15px;
     border-radius: 12px;
     text-align: center;
-    max-width: 1100px;
+    max-width: 1000px;
     width: 95%;
-    margin: 0 auto 20px auto;
+    margin: 0 auto 15px auto;
     box-shadow: 0 5px 20px rgba(0, 255, 204, 0.15);
 }
 
 .purchased-domain-info h3 {
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
 .purchased-domain-info .domain-name {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     font-weight: bold;
     color: #ffd166;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .purchased-domain-info .countdown-timer {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #eee;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 .purchased-domain-info .countdown-timer strong {
     color: #00ffcc;
 }
 
-.btn-renew {
-    padding: 8px 18px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #ff8008, #ffc837);
-    color: #003;
-    transition: transform 0.2s;
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-.btn-renew:hover {
-    transform: scale(1.05);
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: #003;
 }
+.btn-sm:hover { transform: scale(1.05); }
+
+.btn-renew { background: linear-gradient(135deg, #ff8008, #ffc837); }
+.btn-view { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; }
+.btn-download { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
 
 
 /* ================= SECTION 1: OFFERS PAGE ================= */
 .offers-container {
-  max-width: 1100px;
-  width: 95%;
-  margin: auto;
-  padding: 20px;
+  width: 100%;
 }
 
 .offers-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .offers-header h1 {
-  font-size: 2rem;
+  font-size: 1.6rem;
 }
 
 .offers-header p {
-  margin-top: 8px;
+  margin-top: 5px;
+  font-size: 0.9rem;
   opacity: 0.85;
 }
 
 .cards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 15px;
 }
 
 @media (min-width: 768px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .cards { grid-template-columns: repeat(2, 1fr); }
 }
 
 .card {
   background: rgba(255,255,255,0.12);
   backdrop-filter: blur(12px);
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
 
 .card h2 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
+  font-size: 1.25rem;
+  margin-bottom: 8px;
 }
 
 .price {
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: #00ffcc;
-  margin: 12px 0;
+  margin: 10px 0;
 }
 
 .card ul {
   list-style: none;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
 }
 
 .card ul li {
-  margin-bottom: 8px;
-  padding-left: 22px;
+  margin-bottom: 6px;
+  padding-left: 20px;
   position: relative;
 }
 
@@ -158,24 +245,24 @@ body {
 
 .card select, .card input[type="number"], .card input[type="email"] {
   width: 100%;
-  margin-top: 15px;
-  padding: 12px;
-  border-radius: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
   border: none;
-  font-size: 1rem;
+  font-size: 0.9rem;
   outline: none;
   background: white;
   color: black;
 }
 
 .btn-primary {
-  margin-top: 18px;
+  margin-top: 12px;
   width: 100%;
-  padding: 14px;
-  font-size: 1rem;
+  padding: 12px;
+  font-size: 0.95rem;
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   background: linear-gradient(135deg, #00ffcc, #00c6ff);
   color: #003;
@@ -188,37 +275,38 @@ body {
 
 .message {
   display: none;
-  margin-top: 25px;
+  margin-top: 20px;
   background: rgba(0,0,0,0.35);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 12px;
   text-align: center;
+  font-size: 0.9rem;
 }
 
 /* Credentials Box for Ready Domains */
 .credentials-box {
   display: none;
-  margin-top: 15px;
+  margin-top: 12px;
   background: rgba(0, 255, 204, 0.2);
   border: 1px solid #00ffcc;
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 8px;
+  padding: 12px;
   color: #fff;
 }
-.credentials-box h3 { color: #00ffcc; margin-bottom: 10px; font-size: 1.1rem; }
-.credentials-box p { margin-bottom: 5px; font-size: 0.95rem; }
+.credentials-box h3 { color: #00ffcc; margin-bottom: 8px; font-size: 1rem; }
+.credentials-box p { margin-bottom: 4px; font-size: 0.85rem; }
 .credentials-box strong { color: #ffd166; }
 
 /* ================= SECTION 2: FORM PAGE ================= */
 .form-container {
   display: none; /* Initially Hidden */
-  width: 95%;
-  max-width: 600px;
-  padding: 30px;
-  border-radius: 25px;
+  width: 100%;
+  max-width: 550px;
+  padding: 20px;
+  border-radius: 18px;
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.5);
   margin: auto;
 }
 
@@ -226,188 +314,93 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .back-btn {
   background: rgba(255,255,255,0.2);
   color: white;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.back-btn:hover {
-  background: rgba(255,255,255,0.3);
-}
+.back-btn:hover { background: rgba(255,255,255,0.3); }
 
 .form-container h1 {
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
 }
 
 .form-container input, .form-container select {
   width: 100%;
-  padding: 14px;
-  margin: 10px 0;
+  padding: 12px;
+  margin: 8px 0;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.15);
   color: white;
   outline: none;
+  font-size: 0.9rem;
 }
 
-.form-container select {
-  background: rgba(255,255,255,0.9);
-  color: black;
-}
-
-.form-container input::placeholder {
-  color: #ddd;
-}
+.form-container select { background: rgba(255,255,255,0.9); color: black; }
+.form-container input::placeholder { color: #ddd; }
 
 /* Domain Wrap & Preview */
-.domain-wrap {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
+.domain-wrap { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
 .preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: bold;
-  color: #00ffcc;
-  min-width: 130px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 8px;
+  font-weight: bold; color: #00ffcc; min-width: 110px; font-size: 0.85rem;
 }
-
-.info-text {
-  font-size: 0.85rem;
-  color: #ffd166;
-  margin: 5px 0 10px 5px;
-}
+.info-text { font-size: 0.8rem; color: #ffd166; margin: 4px 0 8px 4px; }
 
 /* Domain Suggestions Styling */
-.suggestions-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
+.suggestions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .suggestion-chip {
-  background: rgba(0, 255, 204, 0.15);
-  color: #00ffcc;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  border: 1px solid #00ffcc;
-  transition: all 0.2s;
+  background: rgba(0, 255, 204, 0.15); color: #00ffcc;
+  padding: 6px 12px; border-radius: 6px; font-size: 0.8rem;
+  cursor: pointer; border: 1px solid #00ffcc; transition: all 0.2s;
 }
-
-.suggestion-chip:hover {
-  background: #00ffcc;
-  color: #003;
-  transform: translateY(-2px);
-}
+.suggestion-chip:hover { background: #00ffcc; color: #003; transform: translateY(-2px); }
 
 .btn-pay {
-  width: 100%;
-  padding: 15px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #00c6ff, #0072ff);
-  color: white;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
+  width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 8px;
+  background: linear-gradient(90deg, #00c6ff, #0072ff); color: white;
+  font-size: 1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;
 }
-
-.btn-pay:hover {
-  transform: scale(1.05);
-}
+.btn-pay:hover { transform: scale(1.05); }
 
 /* ================= NEW POPUP MODAL STYLES ================= */
 .modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 1000;
+  justify-content: center; align-items: center;
 }
 
 .modal-content {
-  background: #1a2a33;
-  padding: 30px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 10px 40px rgba(0,255,204,0.3);
-  text-align: center;
+  background: #1a2a33; padding: 25px; border-radius: 14px;
+  width: 90%; max-width: 380px; box-shadow: 0 10px 40px rgba(0,255,204,0.3); text-align: center;
 }
 
-.modal-content h3 {
-  color: #00ffcc;
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-}
-
+.modal-content h3 { color: #00ffcc; margin-bottom: 15px; font-size: 1.3rem; }
 .modal-content input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  outline: none;
+  width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 6px;
+  border: none; background: rgba(255,255,255,0.1); color: white; outline: none; font-size: 0.9rem;
 }
+.modal-content input::placeholder { color: #bbb; }
 
-.modal-content input::placeholder {
-  color: #bbb;
-}
-
-.password-wrap {
-  position: relative;
-  width: 100%;
-}
-
-.password-wrap span {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
+.password-wrap { position: relative; width: 100%; }
+.password-wrap span { position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 1.1rem; }
 
 .btn-submit-modal {
-  width: 100%;
-  padding: 14px;
-  background: #00ffcc;
-  color: #003;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
+  width: 100%; padding: 12px; background: #00ffcc; color: #003; border: none;
+  border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 8px;
 }
-.btn-submit-modal:hover {
-  background: #00e6b8;
-}
+.btn-submit-modal:hover { background: #00e6b8; }
 </style>
 </head>
 
@@ -418,75 +411,167 @@ body {
   <h3>Your Active Domain</h3>
   <p class="domain-name" id="purchasedDomainName"></p>
   <p class="countdown-timer" id="countdownTimer">Time remaining: <strong>-- : -- : -- : --</strong></p>
-  <button id="renewButton" class="btn-renew">Renew Now</button>
+  
+  <div class="action-buttons">
+      <button id="renewButton" class="btn-sm btn-renew">Renew Now</button>
+      <button id="viewDetailsBtn" class="btn-sm btn-view">View Details</button>
+      <button id="downloadInfoBtn" class="btn-sm btn-download">Download App/Info</button>
+  </div>
 </div>
 
+<div class="page-wrapper" id="swipeContainer">
 
-<!-- ================= SECTION 1: OFFERS ================= -->
-<div class="offers-container" id="offersSection">
-  <div class="offers-header">
-    <h1>Online Tambola Domain Available</h1>
-    <p>Select your domain and start your Tambola business</p>
+  <!-- ================= PAGE 1: HOME (OFFERS & FORM) ================= -->
+  <div id="page-home" class="page-section active">
+      <div class="offers-container" id="offersSection">
+        <div class="offers-header">
+          <h1>Online Tambola Domain Available</h1>
+          <p>Select your domain and start your Tambola business</p>
+        </div>
+
+        <section class="cards">
+          <!-- New Domain / Custom Domain -->
+          <div class="card">
+            <h2>New Custom Domain</h2>
+            <div class="price">₹4,000 / month</div>
+            <ul>
+              <li>Brand new domain</li>
+              <li>Custom domain name (.in)</li>
+              <li>Premium branding</li>
+            </ul>
+            <button class="btn-primary" onclick="showForm()">
+              Select Plan & Register
+            </button>
+          </div>
+
+          <!-- Ready-Made Domains -->
+          <div class="card">
+            <h2>Ready-Made Domain List</h2>
+            <div class="price" id="dynamicPriceDisplay">Select Days for Price</div>
+            <ul>
+              <li>1 to 15 Days = ₹200/day</li>
+              <li>16 to 29 Days = ₹150/day</li>
+              <li>1 Month (30 Days) = ₹3500 fixed</li>
+              <li>Create Your Own Admin Details</li>
+            </ul>
+
+            <select id="domainSelect">
+              <option value="">Loading Domains...</option>
+            </select>
+            
+            <input type="number" id="validityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateDynamicPrice()">
+            <input type="email" id="buyerEmail" placeholder="Enter Your Email Address">
+
+            <button class="btn-primary" onclick="payForReadyDomain()">
+              Pay & Create Admin
+            </button>
+
+            <!-- Div to show credentials after successful creation -->
+            <div id="credentialsBox" class="credentials-box"></div>
+          </div>
+        </section>
+
+        <div class="message" id="messageBox"></div>
+      </div>
+
+      <!-- REGISTRATION FORM -->
+      <div class="form-container" id="formSection">
+        <div class="form-header">
+          <button class="back-btn" onclick="hideForm()">Back</button>
+          <h1>🚀 Sintha Developer</h1>
+          <div style="width: 60px;"></div>
+        </div>
+
+        <input id="name" placeholder="Your Name">
+        <input id="title" placeholder="Website Title" oninput="generateSuggestions()">
+
+        <p class="info-text">👉 Note: We only support and register <strong>.in</strong> domains.</p>
+        
+        <div class="domain-wrap">
+          <input id="domain" placeholder="Enter base domain name" oninput="updatePreview()">
+          <div class="preview" id="preview">yourname.in</div>
+        </div>
+
+        <div id="domainSuggestions" class="suggestions-list"></div>
+
+        <input id="email" type="email" placeholder="Email">
+        <input id="mobile" type="tel" placeholder="Mobile Number">
+        <input id="address" placeholder="Address">
+
+        <select id="plan">
+          <option value="4000">Monthly ₹4000</option>
+          <option value="32000">Yearly ₹32000</option>
+        </select>
+
+        <button class="btn-pay" onclick="payNow()">Pay Now</button>
+      </div>
   </div>
 
-  <section class="cards">
-    <!-- New Domain / Custom Domain -->
-    <div class="card">
-      <h2>New Custom Domain</h2>
-      <div class="price">₹4,000 / month</div>
-      <ul>
-        <li>Brand new domain</li>
-        <li>Custom domain name (.in)</li>
-        <li>Premium branding</li>
-      </ul>
-      <button class="btn-primary" onclick="showForm()">
-        Select Plan & Register
-      </button>
-    </div>
+  <!-- ================= PAGE 2: CONTACT US ================= -->
+  <div id="page-contact" class="page-section">
+      <div class="info-box">
+          <h2>Contact Us</h2>
+          <p>We are here to help! If you have any questions, concerns, or need support with your Tambola domain setup, reach out to us.</p>
+          <p><strong>Email:</strong> contact@sinthateam.in</p>
+          <p><strong>Phone / WhatsApp:</strong> +91 9366193440</p>
+          <p><strong>Address:</strong> Heirok, Thoubal District, Manipur, India.</p>
+          <button class="btn-primary" style="margin-top: 15px;" onclick="window.location.href='https://wa.me/919366193440'">Chat on WhatsApp</button>
+      </div>
+  </div>
 
-    <!-- Ready-Made Domains -->
-    <div class="card">
-      <h2>Ready-Made Domain List</h2>
-      <div class="price" id="dynamicPriceDisplay">Select Days for Price</div>
-      <ul>
-        <li>1 to 15 Days = ₹200/day</li>
-        <li>16 to 29 Days = ₹150/day</li>
-        <li>1 Month (30 Days) = ₹3500 fixed</li>
-        <li>Create Your Own Admin Details</li>
-      </ul>
+  <!-- ================= PAGE 3: PRIVACY POLICY ================= -->
+  <div id="page-privacy" class="page-section">
+      <div class="info-box">
+          <h2>Privacy Policy</h2>
+          <p>Your privacy is important to us. This Privacy Policy outlines how Sintha Developer collects, uses, and protects your information.</p>
+          <p><strong>1. Information Collection:</strong> We collect your name, email, phone number, and transaction details securely to process domain registrations.</p>
+          <p><strong>2. Data Usage:</strong> We use your data solely for account setup, billing, and providing customer support.</p>
+          <p><strong>3. Third-Party Sharing:</strong> We do not sell or share your personal data with third parties. Payments are securely processed via Razorpay.</p>
+          <p><strong>4. Security:</strong> We implement strict security measures through Firebase to ensure your admin credentials remain safe.</p>
+      </div>
+  </div>
 
-      <select id="domainSelect">
-        <option value="">Loading Domains...</option>
-      </select>
-      
-      <input type="number" id="validityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateDynamicPrice()">
-      <input type="email" id="buyerEmail" placeholder="Enter Your Email Address">
+  <!-- ================= PAGE 4: REFUND POLICY ================= -->
+  <div id="page-refund" class="page-section">
+      <div class="info-box">
+          <h2>Refund Policy</h2>
+          <p>Please read our terms regarding refunds carefully before making a purchase.</p>
+          <p><strong>1. Digital Goods:</strong> Domains and ready-made platform rentals are digital services. Once provisioned, they are non-refundable.</p>
+          <p><strong>2. Setup Failures:</strong> In the rare event that our system fails to create your domain or admin account after successful payment, a 100% refund will be processed within 5-7 working days.</p>
+          <p><strong>3. Cancellation:</strong> You can choose not to renew after your validity expires. However, mid-term cancellations do not qualify for partial refunds.</p>
+      </div>
+  </div>
 
-      <button class="btn-primary" onclick="payForReadyDomain()">
-        Pay & Create Admin
-      </button>
-
-      <!-- Div to show credentials after successful creation -->
-      <div id="credentialsBox" class="credentials-box"></div>
-    </div>
-  </section>
-
-  <div class="message" id="messageBox"></div>
 </div>
 
+<!-- ================= BOTTOM NAVIGATION MENU ================= -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="switchPage('page-home')">
+      <i>🏠</i> Home
+  </div>
+  <div class="nav-item" id="nav-contact" onclick="switchPage('page-contact')">
+      <i>📞</i> Contact
+  </div>
+  <div class="nav-item" id="nav-privacy" onclick="switchPage('page-privacy')">
+      <i>🔒</i> Privacy
+  </div>
+  <div class="nav-item" id="nav-refund" onclick="switchPage('page-refund')">
+      <i>💸</i> Refund
+  </div>
+</div>
 
 <!-- ================= ADMIN CREATION MODAL ================= -->
 <div class="modal-overlay" id="adminPopup">
   <div class="modal-content">
     <h3>Create Admin Account</h3>
-    <p style="font-size: 0.85rem; margin-bottom:15px; color:#ddd;">Payment Successful! Please create your admin login credentials for the selected domain.</p>
+    <p style="font-size: 0.8rem; margin-bottom:12px; color:#ddd;">Payment Successful! Create your admin login credentials for the selected domain.</p>
     
     <input type="text" id="adminName" placeholder="Full Name">
     <input type="tel" id="adminPhone" placeholder="Mobile Number">
     <input type="email" id="adminEmailInput" placeholder="Admin Email">
     
     <div class="password-wrap">
-      <input type="password" id="adminPassword" placeholder="Set Admin Password (min. 6 characters)">
+      <input type="password" id="adminPassword" placeholder="Set Admin Password (min. 6 char)">
       <span id="eyeIcon" onclick="togglePassword()">👁️</span>
     </div>
     
@@ -498,50 +583,17 @@ body {
 <div class="modal-overlay" id="renewPopup">
   <div class="modal-content">
     <h3>Renew Domain</h3>
-    <p id="renewDomainNameDisplay" style="color: #ffd166; font-size: 1.2rem; margin-bottom: 10px;"></p>
+    <p id="renewDomainNameDisplay" style="color: #ffd166; font-size: 1.1rem; margin-bottom: 10px;"></p>
     
     <input type="number" id="renewValidityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateRenewPrice()">
-    <div class="price" id="renewPriceDisplay" style="font-size: 1.2rem; margin-bottom: 15px; color: #00ffcc;">Select Days for Price</div>
+    <div class="price" id="renewPriceDisplay" style="font-size: 1.1rem; margin-bottom: 12px; color: #00ffcc;">Select Days for Price</div>
     
     <input type="email" id="renewUserEmail" placeholder="Enter Your Email Address">
     
     <button class="btn-submit-modal" onclick="payForRenewal()">Pay & Renew</button>
-    <button class="btn-submit-modal" style="background: rgba(255,255,255,0.2); color: white; margin-top: 10px;" onclick="closeRenewPopup()">Cancel</button>
+    <button class="btn-submit-modal" style="background: rgba(255,255,255,0.2); color: white; margin-top: 8px;" onclick="closeRenewPopup()">Cancel</button>
   </div>
 </div>
-
-<!-- ================= SECTION 2: REGISTRATION FORM ================= -->
-<div class="form-container" id="formSection">
-  <div class="form-header">
-    <button class="back-btn" onclick="hideForm()">⬅ Back</button>
-    <h1>🚀 Sintha Developer</h1>
-    <div style="width: 60px;"></div>
-  </div>
-
-  <input id="name" placeholder="Your Name">
-  <input id="title" placeholder="Website Title" oninput="generateSuggestions()">
-
-  <p class="info-text">👉 Note: We only support and register <strong>.in</strong> domains.</p>
-  
-  <div class="domain-wrap">
-    <input id="domain" placeholder="Enter base domain name" oninput="updatePreview()">
-    <div class="preview" id="preview">yourname.in</div>
-  </div>
-
-  <div id="domainSuggestions" class="suggestions-list"></div>
-
-  <input id="email" type="email" placeholder="Email">
-  <input id="mobile" type="tel" placeholder="Mobile Number">
-  <input id="address" placeholder="Address">
-
-  <select id="plan">
-    <option value="4000">Monthly ₹4000</option>
-    <option value="32000">Yearly ₹32000</option>
-  </select>
-
-  <button class="btn-pay" onclick="payNow()">Pay Now</button>
-</div>
-
 
 <!-- ================= JAVASCRIPT & FIREBASE ================= -->
 <script type="module">
@@ -613,7 +665,15 @@ body {
       messagingSenderId: "382852347843",
       appId: "1:382852347843:web:84c2274d2bc239e99a6f76",
       measurementId: "G-RJQ7EECZEJ"
-    }
+    },
+   "gentlemanhousie.in": {
+      apiKey: "AIzaSyBkXUpeK_wPwarE3ALh1t9ZF7KDc_ncBIE",
+      authDomain: "gentlemanhousie.firebaseapp.com",
+      projectId: "gentlemanhousie",
+      storageBucket: "gentlemanhousie.firebasestorage.app",
+      messagingSenderId: "489313335381",
+      appId: "1:489313335381:web:a0e7fa582503c12790fcdc"
+    }, 
   };
 
   const dbs = {};
@@ -672,6 +732,19 @@ body {
           renewBtn.onclick = () => {
               window.openRenewPopup();
           };
+
+          // --- NEW BUTTON FUNCTIONS ---
+          const viewDetailsBtn = document.getElementById('viewDetailsBtn');
+          viewDetailsBtn.onclick = () => {
+              window.open('https://' + purchasedDomain, '_blank');
+          };
+
+          const downloadInfoBtn = document.getElementById('downloadInfoBtn');
+          downloadInfoBtn.onclick = () => {
+              alert("Preparing download details for " + purchasedDomain + ". If you recently purchased, check your device downloads for the PDF Invoice. App links will be sent via WhatsApp.");
+              // You can map this to generate a specific invoice or download apk
+          };
+          // ----------------------------
           
           startCountdown(parseInt(domainExpiry));
       } else {
@@ -735,7 +808,7 @@ body {
         document.getElementById("validityDays").value = 30;
     }
 
-    if (days >= 1 && days <= 15) { amount = days * 1; } 
+    if (days >= 1 && days <= 15) { amount = days * 200; } 
     else if (days >= 16 && days <= 29) { amount = days * 150; } 
     else if (days >= 30) { amount = 3500; }
 
@@ -844,10 +917,11 @@ body {
       localStorage.setItem('domainExpiry', expiryTimestamp);
       
       alert("Domain purchased successfully! The page will now reload.");
-      window.location.reload();
       
       window.generateInvoice(name, domain, amount, paymentId, phone, email, pass);
       window.tempPaymentData = null;
+
+      setTimeout(() => { window.location.reload(); }, 2000);
 
     } catch (error) {
       console.error("Error creating admin account:", error);
@@ -949,7 +1023,6 @@ body {
                 let userUid = uids[0];
                 await set(ref(db, `users/${userUid}/expiryDate`), newExpiryTimestamp);
                 await set(ref(db, `users/${userUid}/paymentId`), paymentId);
-                // Also optionally update DB email for contact reference
                 await set(ref(db, `users/${userUid}/email`), email);
             }
         }
@@ -965,7 +1038,7 @@ body {
         window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true);
 
         alert("Domain renewed successfully! The page will now reload.");
-        window.location.reload();
+        setTimeout(() => { window.location.reload(); }, 2000);
         
     } catch (error) {
         console.error("Error during renewal:", error);
@@ -1153,6 +1226,76 @@ body {
       doc.save(`${domain}_invoice.pdf`);
   };
 
+</script>
+
+<!-- ================= NAVIGATION & SWIPE SCRIPT ================= -->
+<script>
+  // Page Array mapping to HTML elements
+  const pages = ['page-home', 'page-contact', 'page-privacy', 'page-refund'];
+  let currentPageIndex = 0;
+
+  // Switch function for Navigation Bar
+  window.switchPage = function(pageId) {
+      // Hide all pages & remove active class from navs
+      pages.forEach((p, idx) => {
+          document.getElementById(p).classList.remove('active');
+          document.getElementById('nav-' + p.split('-')[1]).classList.remove('active');
+          if (p === pageId) currentPageIndex = idx;
+      });
+      
+      // Show Target Page
+      document.getElementById(pageId).classList.add('active');
+      document.getElementById('nav-' + pageId.split('-')[1]).classList.add('active');
+
+      // Special rule: If navigating away from Home, reset the form view to offers view
+      if(pageId !== 'page-home') {
+          document.getElementById("formSection").style.display = "none";
+          document.getElementById("offersSection").style.display = "block";
+      }
+  };
+
+  // ================= ENHANCED SWIPE GESTURES LOGIC =================
+  let touchstartX = 0;
+  let touchendX = 0;
+  let touchstartY = 0;
+  let touchendY = 0;
+
+  function handleSwipe() {
+      const minSwipeDistance = 50; 
+      // maxVerticalRatio ensures we don't change pages if the user is scrolling up/down
+      const maxVerticalRatio = 0.6; 
+
+      let diffX = touchstartX - touchendX;
+      let diffY = touchstartY - touchendY;
+
+      // Check if it's a valid horizontal swipe (ignores vertical scrolls)
+      if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffY) < Math.abs(diffX) * maxVerticalRatio) {
+          
+          if (diffX > 0) {
+              // Swiped Left -> Go to Next Page
+              if (currentPageIndex < pages.length - 1) {
+                  window.switchPage(pages[currentPageIndex + 1]);
+              }
+          } else {
+              // Swiped Right -> Go to Previous Page
+              if (currentPageIndex > 0) {
+                  window.switchPage(pages[currentPageIndex - 1]);
+              }
+          }
+      }
+  }
+
+  // Bind the event listener to the whole document so it works anywhere on the screen
+  document.addEventListener('touchstart', e => {
+      touchstartX = e.changedTouches[0].screenX;
+      touchstartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+      touchendX = e.changedTouches[0].screenX;
+      touchendY = e.changedTouches[0].screenY;
+      handleSwipe();
+  }, { passive: true });
 </script>
 
 </body>
