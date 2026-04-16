@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -486,7 +485,7 @@ body {
     <input type="email" id="adminEmailInput" placeholder="Admin Email (e.g. admin@domain.in)">
     
     <div class="password-wrap">
-      <input type="password" id="adminPassword" placeholder="Set Admin Password">
+      <input type="password" id="adminPassword" placeholder="Set Admin Password (min. 6 characters)">
       <span id="eyeIcon" onclick="togglePassword()">👁️</span>
     </div>
     
@@ -528,14 +527,16 @@ body {
 </div>
 
 
-<!-- ================= JAVASCRIPT & FIREBASE REALTIME DB ================= -->
+<!-- ================= JAVASCRIPT & FIREBASE ================= -->
 <script type="module">
-  // NOTE: This code uses FIREBASE REALTIME DATABASE.
+  // Import Firebase modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  // NEW: Import 'get' to fetch data once
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   // =================================================================
-  // YAHAN APNE 10 ALAG-ALAG FIREBASE PROJECTS KI PURI DETAILS DAALEIN
+  // Your Firebase project configurations
   // =================================================================
   const allDomainScripts = {
     "manipurhousietambola.in": {
@@ -601,23 +602,25 @@ body {
   };
 
   const dbs = {};
+  const auths = {}; 
   for (let domainName in allDomainScripts) {
     try {
       const app = initializeApp(allDomainScripts[domainName], domainName);
       dbs[domainName] = getDatabase(app);
+      auths[domainName] = getAuth(app); 
     } catch (e) {
-        // Errors are ignored for duplicate initializations which can happen with hot-reloading
+        // Errors are ignored for duplicate initializations
     }
   }
   
-  // To manage the countdown timer
+  // NEW: Define a central database to store the list of sold domains.
+  // We'll use the first one from your config as the "master" DB.
+  const centralDB = dbs['manipurhousietambola.in'];
+  
   let countdownInterval = null;
 
-  // ================= NEW/MODIFIED FUNCTIONS FOR READY-MADE DOMAINS =================
-
-  // NEW: This function starts the countdown timer
   function startCountdown(expiryTimestamp) {
-      if (countdownInterval) clearInterval(countdownInterval); // Clear any existing timer
+      if (countdownInterval) clearInterval(countdownInterval);
       const timerElement = document.getElementById('countdownTimer');
 
       countdownInterval = setInterval(() => {
@@ -627,6 +630,10 @@ body {
           if (distance < 0) {
               clearInterval(countdownInterval);
               timerElement.innerHTML = "<strong>Status: Expired</strong>";
+              localStorage.removeItem('purchasedDomain');
+              localStorage.removeItem('domainExpiry');
+              // Reload the page to refresh domain list and hide the bar
+              window.location.reload();
               return;
           }
 
@@ -638,61 +645,77 @@ body {
           timerElement.innerHTML = `Time remaining: <strong>${days}d ${hours}h ${minutes}m ${seconds}s</strong>`;
       }, 1000);
   }
-
-  // NEW: This checks localStorage on page load to show the purchased domain info
+  
+  // This function still works with localStorage for the user-specific info bar
   function checkAndDisplayPurchasedDomain() {
       const purchasedDomain = localStorage.getItem('purchasedDomain');
       const domainExpiry = localStorage.getItem('domainExpiry');
+      const infoBar = document.getElementById('purchasedDomainInfo');
 
-      if (purchasedDomain && domainExpiry) {
-          document.getElementById('purchasedDomainInfo').style.display = 'block';
+      if (purchasedDomain && domainExpiry && new Date().getTime() < parseInt(domainExpiry)) {
+          infoBar.style.display = 'block';
           document.getElementById('purchasedDomainName').innerText = purchasedDomain;
           
           const renewBtn = document.getElementById('renewButton');
           renewBtn.onclick = () => {
               alert(`To renew ${purchasedDomain}, please select it from the list below and choose your validity period.`);
-              document.getElementById('domainSelect').value = purchasedDomain; // Pre-select in dropdown
-              document.getElementById('validityDays').focus(); // Focus on days input
+              document.getElementById('domainSelect').value = purchasedDomain;
+              calculateDynamicPrice();
+              document.getElementById('validityDays').focus();
           };
           
           startCountdown(parseInt(domainExpiry));
+      } else {
+          infoBar.style.display = 'none';
       }
   }
 
-  // MODIFIED: This now checks localStorage and hides purchased domains from the list
-  function loadAvailableDomains() {
+  // MODIFIED: This function now accepts the list of sold domains
+  function loadAvailableDomains(soldDomains = {}) {
     const selectBox = document.getElementById("domainSelect");
-    selectBox.innerHTML = '<option value="">Select Domain</option>';
+    selectBox.innerHTML = '<option value="">Select a Domain</option>';
     
-    // Get the domain that was already purchased by this user
-    const purchasedDomain = localStorage.getItem('purchasedDomain');
-
     const allConfiguredDomains = Object.keys(allDomainScripts);
 
-    if (allConfiguredDomains.length === 0) {
-      selectBox.innerHTML = '<option value="">No domains configured</option>';
-    } else {
-      let availableDomains = 0;
-      allConfiguredDomains.forEach(domain => {
-        // Only add the domain to the list if it's NOT the one they already purchased
-        if (domain !== purchasedDomain) {
+    let availableDomainsCount = 0;
+    const now = new Date().getTime();
+
+    allConfiguredDomains.forEach(domain => {
+      // Firebase keys cannot contain '.', so we replace it with '_'
+      const domainKey = domain.replace(/\./g, '_');
+      const expiryTimestamp = soldDomains[domainKey];
+      
+      // A domain is available IF:
+      // 1. It's not in the soldDomains list (expiryTimestamp is undefined)
+      // 2. Or, its expiry time has passed (it's expired)
+      if (!expiryTimestamp || expiryTimestamp < now) {
           const option = document.createElement("option");
           option.value = domain;
           option.text = domain;
           selectBox.appendChild(option);
-          availableDomains++;
-        }
-      });
-      if (availableDomains === 0) {
-          selectBox.innerHTML = '<option value="">No other domains available</option>';
+          availableDomainsCount++;
       }
+    });
+
+    if (availableDomainsCount === 0) {
+        selectBox.innerHTML = '<option value="">No domains currently available</option>';
     }
   }
 
-  // MODIFIED: This is called when the page loads
-  window.onload = () => {
-      loadAvailableDomains();
-      checkAndDisplayPurchasedDomain();
+  // MODIFIED: The page load sequence now fetches from Firebase first
+  window.onload = async () => {
+      checkAndDisplayPurchasedDomain(); // Check for user-specific bar
+
+      try {
+        const soldDomainsRef = ref(centralDB, 'soldDomains');
+        const snapshot = await get(soldDomainsRef);
+        const soldDomains = snapshot.val() || {}; // Get sold domains list, or empty object
+        loadAvailableDomains(soldDomains); // Load dropdown with the filtered list
+      } catch (error) {
+        console.error("Could not fetch sold domains list:", error);
+        // Fallback: load all domains if Firebase fails
+        loadAvailableDomains(); 
+      }
   };
 
   window.calculateDynamicPrice = function() {
@@ -701,20 +724,17 @@ body {
     let amount = 0;
 
     if (!days || days < 1) {
-      priceDisplay.innerText = "Select valid Days";
+      priceDisplay.innerText = "Enter valid Days";
       return 0;
     }
-    
-    // Clamp days to max 30
-    if (days > 30) days = 30;
-
-    if (days >= 1 && days <= 15) {
-      amount = days * 200;
-    } else if (days >= 16 && days <= 29) {
-      amount = days * 150;
-    } else if (days >= 30) {
-      amount = 3500;
+    if (days > 30) {
+        days = 30;
+        document.getElementById("validityDays").value = 30;
     }
+
+    if (days >= 1 && days <= 15) { amount = days * 200; } 
+    else if (days >= 16 && days <= 29) { amount = days * 150; } 
+    else if (days >= 30) { amount = 3500; }
 
     priceDisplay.innerText = "Total: ₹" + amount;
     return amount;
@@ -734,7 +754,7 @@ body {
     if (amount === 0) return alert("Invalid Amount.");
 
     var options = {
-      key: "rzp_live_SUarhYm5IfBTar", // Replace with your Razorpay Key
+      key: "rzp_live_SUarhYm5IfBTar",
       amount: amount * 100,
       currency: "INR",
       name: "Sintha Developer",
@@ -769,87 +789,82 @@ body {
     }
   };
 
-  // MODIFIED: This function now clears data, creates admin, and updates the entire UI
   window.saveAdminToFirebase = async function() {
-    let name = document.getElementById("adminName").value.trim();
-    let phone = document.getElementById("adminPhone").value.trim();
-    let email = document.getElementById("adminEmailInput").value.trim();
-    let pass = document.getElementById("adminPassword").value.trim();
+    const name = document.getElementById("adminName").value.trim();
+    const phone = document.getElementById("adminPhone").value.trim();
+    const email = document.getElementById("adminEmailInput").value.trim();
+    const pass = document.getElementById("adminPassword").value.trim();
 
     if (!name || !phone || !email || !pass) {
-      alert("Please fill all details for the Admin Account.");
-      return;
+      return alert("Please fill all details for the Admin Account.");
+    }
+    if (pass.length < 6) {
+      return alert("Password must be at least 6 characters long.");
     }
 
-    let { domain, days, amount, paymentId } = window.tempPaymentData;
+    const { domain, days, amount, paymentId } = window.tempPaymentData;
     
-    if (!dbs[domain]) {
-        alert(`Error: Firebase is not configured correctly for the domain '${domain}'.`);
+    const db = dbs[domain];
+    const auth = auths[domain];
+
+    if (!db || !auth) {
+        alert(`Error: Firebase is not configured correctly for '${domain}'.`);
         return;
     }
 
-    let createdAt = new Date().getTime();
+    const createdAt = new Date().getTime();
     let expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
     const expiryTimestamp = expiryDate.getTime();
 
     try {
-      const db = dbs[domain];
-      const usersRef = ref(db, 'users');
-
-      // 1. CLEAR all previous user data for this domain
-      await set(usersRef, null);
-      console.log(`Successfully cleared 'users' data for ${domain}.`);
-
-      // 2. CREATE the new admin user
-      const newUserRef = push(usersRef); // Generate unique ID
-      await set(newUserRef, {
-        createdAt: createdAt,
-        email: email,
-        name: name,
-        phone: phone,
-        role: "admin",
-        password: pass,
-        expiryDate: expiryTimestamp,
-        paymentId: paymentId
-      });
-      console.log(`Successfully created new admin for ${domain}.`);
-
-      // 3. UPDATE UI after successful database operations
-      document.getElementById("adminPopup").style.display = "none";
+      // Step 1: Create the Auth user in the domain-specific Firebase project
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      const newUserUid = userCredential.user.uid;
       
-      // Show credentials in the card
+      // Step 2: Clear previous users and set new admin in the domain-specific DB
+      await set(ref(db, 'users'), null);
+      await set(ref(db, 'users/' + newUserUid), {
+        name, email, phone,
+        role: "admin", createdAt, expiryDate: expiryTimestamp, paymentId
+      });
+      
+      // NEW: Step 3: Add the domain to the central "soldDomains" list
+      const domainKey = domain.replace(/\./g, '_'); // Replace '.' with '_'
+      const soldDomainRef = ref(centralDB, 'soldDomains/' + domainKey);
+      await set(soldDomainRef, expiryTimestamp); // Save with its expiry date
+
+      // Step 4: Update the UI for the current user
+      document.getElementById("adminPopup").style.display = "none";
       let credBox = document.getElementById("credentialsBox");
       credBox.style.display = "block";
-      credBox.innerHTML = `
-        <h3>✅ Admin Account Created Successfully!</h3>
-        <p><strong>Domain:</strong> ${domain}</p>
-        <p><strong>Admin Login:</strong> ${email}</p>
-        <p><strong>Password:</strong> ${pass}</p>
-        <p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>
-        <p style="font-size: 0.8rem; margin-top:10px;">Please save these details. They will expire automatically after ${days} days.</p>
-      `;
+      credBox.innerHTML = `<h3>✅ Admin Account Created!</h3><p><strong>Domain:</strong> ${domain}</p><p><strong>Login:</strong> ${email}</p><p><strong>Password:</strong> ${pass}</p><p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>`;
       
-      // Save purchase info to localStorage
       localStorage.setItem('purchasedDomain', domain);
       localStorage.setItem('domainExpiry', expiryTimestamp);
-
-      // Refresh the UI to show the top bar and remove domain from list
-      checkAndDisplayPurchasedDomain();
-      loadAvailableDomains();
       
-      // Generate Invoice
-      window.generateInvoice(name, domain, amount, paymentId);
+      // Reload the page to reflect the changes for everyone
+      alert("Domain purchased successfully! The page will now reload.");
+      window.location.reload();
+      
+      // This will run before reload
+      window.generateInvoice(name, domain, amount, paymentId, phone, email, pass);
       window.tempPaymentData = null;
 
-    } catch (e) {
-      console.error("Error during admin creation process: ", e);
-      alert("Failed to save Admin Details. Please contact support with Payment ID: " + paymentId);
+    } catch (error) {
+      console.error("Error creating admin account:", error);
+      let errorMessage = error.message;
+      if (error.code === 'auth/email-already-in-use') {
+          errorMessage = "This email address is already registered. Please use a different email.";
+      } else if (error.code === 'auth/weak-password') {
+          errorMessage = "The password is too weak. Please use a stronger password.";
+      }
+      alert(`Failed to create Admin Account: ${errorMessage}\n\nPlease contact support with your Payment ID: ${paymentId}`);
     }
   };
 
-  // ================= ORIGINAL SECTION 2 JS LOGIC (Unchanged) =================
-  
+  // --- No changes to the functions below this line ---
+
   window.showForm = function() {
     document.getElementById("offersSection").style.display = "none";
     document.getElementById("formSection").style.display = "block";
@@ -911,7 +926,7 @@ body {
       name: "Sintha Developer",
       description: "Custom Domain Order",
       handler: function(response){
-        window.generateInvoice(name, domain, amount, response.razorpay_payment_id);
+        window.generateInvoice(name, domain, amount, response.razorpay_payment_id, mobile, email, null);
 
         const msg = `New Order:\nName: ${name}\nTitle: ${title}\nDomain: ${domain}\nEmail: ${email}\nMobile: ${mobile}\nAddress: ${address}\nAmount: ₹${amount}\nPaymentID: ${response.razorpay_payment_id}`;
 
@@ -924,18 +939,104 @@ body {
     new Razorpay(options).open();
   };
 
-  // Original PDF Function
-  window.generateInvoice = function(name, domain, amount, paymentId){
-    const { jsPDF } = window.jspdf;
-    let doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.text("Sintha Developer - Invoice", 20, 20);
-    doc.setFontSize(14);
-    doc.text("Name: " + name, 20, 40);
-    doc.text("Domain: " + domain, 20, 50);
-    doc.text("Amount Paid: Rs " + amount, 20, 60);
-    doc.text("Payment ID: " + paymentId, 20, 70);
-    doc.save(domain + "_invoice.pdf");
+  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const invoiceDate = new Date().toLocaleDateString('en-IN');
+      const invoiceId = paymentId.substring(4).toUpperCase();
+      amount = Number(amount);
+
+      doc.setFillColor(44, 83, 100);
+      doc.rect(0, 0, 210, 35, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.setTextColor(255, 255, 255);
+      doc.text("INVOICE", 14, 23);
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(230, 230, 230);
+      doc.text("Sintha Developer", 196, 15, { align: 'right' });
+      doc.text("contact@sinthadeveloper.com", 196, 20, { align: 'right' });
+      doc.text("+91 93661 93440", 196, 25, { align: 'right' });
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text("BILL TO:", 14, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.text(customerName, 14, 57);
+      doc.text(customerEmail, 14, 64);
+      doc.text(customerPhone, 14, 71);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text("Invoice #:", 130, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.text(invoiceId, 155, 50);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text("Date:", 130, 57);
+      doc.setFont('helvetica', 'normal');
+      doc.text(invoiceDate, 155, 57);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text("Payment ID:", 130, 64);
+      doc.setFont('helvetica', 'normal');
+      doc.text(paymentId, 155, 64, { maxWidth: 45 });
+
+      let tableStartY = 90;
+      doc.setFillColor(240, 240, 240);
+      doc.rect(14, tableStartY, 182, 10, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0);
+      doc.text("DESCRIPTION", 18, tableStartY + 7);
+      doc.text("AMOUNT", 180, tableStartY + 7, { align: 'right' });
+
+      let itemDescription = adminPassword ? `Ready-Made Domain Rental (${domain})` : `New Custom Domain Registration (${domain})`;
+      doc.setFont('helvetica', 'normal');
+      doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 140 });
+      doc.text(`₹${amount.toFixed(2)}`, 180, tableStartY + 17, { align: 'right' });
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, tableStartY + 25, 196, tableStartY + 25);
+
+      let totalY = tableStartY + 35;
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text("TOTAL", 130, totalY);
+      doc.text(`₹${amount.toFixed(2)}`, 180, totalY, { align: 'right' });
+
+      if (adminPassword) {
+          let credsY = totalY + 20;
+          doc.setFillColor(255, 253, 230);
+          doc.rect(14, credsY, 182, 35, 'F');
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(0, 0, 0);
+          doc.text("Admin Account Credentials", 18, credsY + 8);
+          
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Login Email:`, 20, credsY + 18);
+          doc.setFont('courier', 'bold');
+          doc.text(`${email}`, 50, credsY + 18);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Password:`, 20, credsY + 26);
+          doc.setFont('courier', 'bold');
+          doc.setTextColor(200, 0, 0);
+          doc.text(`${adminPassword}`, 50, credsY + 26);
+      }
+      
+      let footerY = 270;
+      doc.setDrawColor(44, 83, 100);
+      doc.line(14, footerY, 196, footerY);
+      doc.setFontSize(10);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Thank you for your business!", 105, footerY + 8, { align: 'center' });
+      doc.text("This is a computer-generated invoice and does not require a signature.", 105, footerY + 13, { align: 'center' });
+
+      doc.save(`${domain}_invoice.pdf`);
   };
 
 </script>
