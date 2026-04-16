@@ -414,8 +414,8 @@ body {
   
   <div class="action-buttons">
       <button id="renewButton" class="btn-sm btn-renew">Renew Now</button>
-      <button id="viewDetailsBtn" class="btn-sm btn-view">View Details</button>
-      <button id="downloadInfoBtn" class="btn-sm btn-download">Download App/Info</button>
+      <button id="viewDetailsBtn" class="btn-sm btn-view">View website</button>
+      <button id="downloadInfoBtn" class="btn-sm btn-download">Download Info</button>
   </div>
 </div>
 
@@ -584,9 +584,9 @@ body {
   <div class="modal-content">
     <h3>Renew Domain</h3>
     <p id="renewDomainNameDisplay" style="color: #ffd166; font-size: 1.1rem; margin-bottom: 10px;"></p>
-    
+        <div class="price" id="renewPriceDisplay" style="font-size: 1.1rem; margin-bottom: 12px; color: #00ffcc;">Select Days for Price</div>
     <input type="number" id="renewValidityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateRenewPrice()">
-    <div class="price" id="renewPriceDisplay" style="font-size: 1.1rem; margin-bottom: 12px; color: #00ffcc;">Select Days for Price</div>
+
     
     <input type="email" id="renewUserEmail" placeholder="Enter Your Email Address">
     
