@@ -24,10 +24,65 @@ body {
   color: #fff;
   min-height: 100vh;
   display: flex;
+  flex-direction: column; /* Changed to column for top bar */
   justify-content: center;
   align-items: center;
   padding: 20px 0;
 }
+
+/* ================= NEW: PURCHASED DOMAIN INFO BAR (TOP) ================= */
+.purchased-domain-info {
+    display: none; /* Hidden by default */
+    background: rgba(0, 255, 204, 0.1);
+    border: 1px solid #00ffcc;
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 1100px;
+    width: 95%;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.15);
+}
+
+.purchased-domain-info h3 {
+    margin-bottom: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.purchased-domain-info .domain-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffd166;
+    margin-bottom: 8px;
+}
+
+.purchased-domain-info .countdown-timer {
+    font-size: 1rem;
+    color: #eee;
+    margin-bottom: 12px;
+}
+.purchased-domain-info .countdown-timer strong {
+    color: #00ffcc;
+}
+
+.btn-renew {
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff8008, #ffc837);
+    color: #003;
+    transition: transform 0.2s;
+}
+
+.btn-renew:hover {
+    transform: scale(1.05);
+}
+
 
 /* ================= SECTION 1: OFFERS PAGE ================= */
 .offers-container {
@@ -358,6 +413,15 @@ body {
 
 <body>
 
+<!-- ================= NEW: PURCHASED DOMAIN INFO BAR (TOP) ================= -->
+<div id="purchasedDomainInfo" class="purchased-domain-info">
+  <h3>Your Active Domain</h3>
+  <p class="domain-name" id="purchasedDomainName"></p>
+  <p class="countdown-timer" id="countdownTimer">Time remaining: <strong>-- : -- : -- : --</strong></p>
+  <button id="renewButton" class="btn-renew">Renew Now</button>
+</div>
+
+
 <!-- ================= SECTION 1: OFFERS ================= -->
 <div class="offers-container" id="offersSection">
   <div class="offers-header">
@@ -476,114 +540,161 @@ body {
   const allDomainScripts = {
     "manipurhousietambola.in": {
       apiKey: "AIzaSyDrfrgYYY69ufupGKbktPDY0jtKKVOzR-0",
-  authDomain: "manipurhousie-45674.firebaseapp.com",
-  databaseURL: "https://manipurhousie-45674-default-rtdb.firebaseio.com",
-  projectId: "manipurhousie-45674",
-  storageBucket: "manipurhousie-45674.firebasestorage.app",
-  messagingSenderId: "887925712516",
-  appId: "1:887925712516:web:b03d27f5759dd5719c84d1",
-  measurementId: "G-H3GRHB177F"
-},
-
+      authDomain: "manipurhousie-45674.firebaseapp.com",
+      databaseURL: "https://manipurhousie-45674-default-rtdb.firebaseio.com",
+      projectId: "manipurhousie-45674",
+      storageBucket: "manipurhousie-45674.appspot.com",
+      messagingSenderId: "887925712516",
+      appId: "1:887925712516:web:b03d27f5759dd5719c84d1",
+      measurementId: "G-H3GRHB177F"
+    },
     "imphalhousie.in": {
       apiKey: "AIzaSyCyxIhlGD-lDoj4sJN2bUAWMKCmg7khV0o",
-  authDomain: "imphalhousie.firebaseapp.com",
-  databaseURL: "https://imphalhousie-default-rtdb.firebaseio.com",
-  projectId: "imphalhousie",
-  storageBucket: "imphalhousie.firebasestorage.app",
-  messagingSenderId: "211890685857",
-  appId: "1:211890685857:web:10a590033b9eeb3ec9ede0",
-  measurementId: "G-XRWNM16EGM"
-},
-
+      authDomain: "imphalhousie.firebaseapp.com",
+      databaseURL: "https://imphalhousie-default-rtdb.firebaseio.com",
+      projectId: "imphalhousie",
+      storageBucket: "imphalhousie.appspot.com",
+      messagingSenderId: "211890685857",
+      appId: "1:211890685857:web:10a590033b9eeb3ec9ede0",
+      measurementId: "G-XRWNM16EGM"
+    },
     "yaiphaminarasi-ngasi.in": {
       apiKey: "AIzaSyBJV79KTol9d8Ox882Lu1mhqHJbGFqaIe4",
-  authDomain: "peacehousie.firebaseapp.com",
-  databaseURL: "https://peacehousie-default-rtdb.firebaseio.com",
-  projectId: "peacehousie",
-  storageBucket: "peacehousie.firebasestorage.app",
-  messagingSenderId: "166571305818",
-  appId: "1:166571305818:web:b5900f75e44ec3c9726163",
-  measurementId: "G-L1HD0RWKBG"
-},
-
-
+      authDomain: "peacehousie.firebaseapp.com",
+      databaseURL: "https://peacehousie-default-rtdb.firebaseio.com",
+      projectId: "peacehousie",
+      storageBucket: "peacehousie.appspot.com",
+      messagingSenderId: "166571305818",
+      appId: "1:166571305818:web:b5900f75e44ec3c9726163",
+      measurementId: "G-L1HD0RWKBG"
+    },
     "gangpartytambola.in": {
       apiKey: "AIzaSyAvtxo-P6vrV6M9bdgLfpcrRfwsjeF5TxA",
-  authDomain: "gangpartytambola.firebaseapp.com",
-  databaseURL: "https://gangpartytambola-default-rtdb.firebaseio.com",
-  projectId: "gangpartytambola",
-  storageBucket: "gangpartytambola.firebasestorage.app",
-  messagingSenderId: "927866790189",
-  appId: "1:927866790189:web:8f5437030b5ed0918db3a4",
-  measurementId: "G-CNREKSSTN7"
-},
+      authDomain: "gangpartytambola.firebaseapp.com",
+      databaseURL: "https://gangpartytambola-default-rtdb.firebaseio.com",
+      projectId: "gangpartytambola",
+      storageBucket: "gangpartytambola.appspot.com",
+      messagingSenderId: "927866790189",
+      appId: "1:927866790189:web:8f5437030b5ed0918db3a4",
+      measurementId: "G-CNREKSSTN7"
+    },
     "pothaphamhousie.in": {
       apiKey: "AIzaSyBDhmUhwqj_aYXg10DPFvRJI89p0PvxtmA",
-  authDomain: "daily-housie.firebaseapp.com",
-  databaseURL: "https://daily-housie-default-rtdb.firebaseio.com",
-  projectId: "daily-housie",
-  storageBucket: "daily-housie.firebasestorage.app",
-  messagingSenderId: "336383808677",
-  appId: "1:336383808677:web:787e0710d5800152e9a94c",
-  measurementId: "G-KLZ93N1FHB"
-},
-
+      authDomain: "daily-housie.firebaseapp.com",
+      databaseURL: "https://daily-housie-default-rtdb.firebaseio.com",
+      projectId: "daily-housie",
+      storageBucket: "daily-housie.appspot.com",
+      messagingSenderId: "336383808677",
+      appId: "1:336383808677:web:787e0710d5800152e9a94c",
+      measurementId: "G-KLZ93N1FHB"
+    },
     "hiyaihousie.in": {
       apiKey: "AIzaSyBwa-fMdgrhogvYKvmb-fVne1YpOD7Xe7c",
-  authDomain: "hiyaihousie.firebaseapp.com",
-  databaseURL: "https://hiyaihousie-default-rtdb.firebaseio.com",
-  projectId: "hiyaihousie",
-  storageBucket: "hiyaihousie.firebasestorage.app",
-  messagingSenderId: "382852347843",
-  appId: "1:382852347843:web:84c2274d2bc239e99a6f76",
-  measurementId: "G-RJQ7EECZEJ"
-}
-
- 
+      authDomain: "hiyaihousie.firebaseapp.com",
+      databaseURL: "https://hiyaihousie-default-rtdb.firebaseio.com",
+      projectId: "hiyaihousie",
+      storageBucket: "hiyaihousie.appspot.com",
+      messagingSenderId: "382852347843",
+      appId: "1:382852347843:web:84c2274d2bc239e99a6f76",
+      measurementId: "G-RJQ7EECZEJ"
+    }
   };
 
-  // Har ek domain ki config ko initialize karke ek object me save kar rahe hain
   const dbs = {};
   for (let domainName in allDomainScripts) {
     try {
       const app = initializeApp(allDomainScripts[domainName], domainName);
       dbs[domainName] = getDatabase(app);
     } catch (e) {
-      // It's okay if some fail due to placeholder keys, the app will continue.
-      // console.error(`Could not initialize Firebase for ${domainName}. It might be using placeholder credentials.`);
+        // Errors are ignored for duplicate initializations which can happen with hot-reloading
     }
   }
-
-  // ================= FIREBASE LOGIC (Realtime DB) =================
   
-  // IMPLEMENTED: This function now correctly populates the domain list.
-  // It reads all the domain names from your 'allDomainScripts' object above
-  // and adds them to the dropdown menu so the user can see them.
+  // To manage the countdown timer
+  let countdownInterval = null;
+
+  // ================= NEW/MODIFIED FUNCTIONS FOR READY-MADE DOMAINS =================
+
+  // NEW: This function starts the countdown timer
+  function startCountdown(expiryTimestamp) {
+      if (countdownInterval) clearInterval(countdownInterval); // Clear any existing timer
+      const timerElement = document.getElementById('countdownTimer');
+
+      countdownInterval = setInterval(() => {
+          const now = new Date().getTime();
+          const distance = expiryTimestamp - now;
+
+          if (distance < 0) {
+              clearInterval(countdownInterval);
+              timerElement.innerHTML = "<strong>Status: Expired</strong>";
+              return;
+          }
+
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+          timerElement.innerHTML = `Time remaining: <strong>${days}d ${hours}h ${minutes}m ${seconds}s</strong>`;
+      }, 1000);
+  }
+
+  // NEW: This checks localStorage on page load to show the purchased domain info
+  function checkAndDisplayPurchasedDomain() {
+      const purchasedDomain = localStorage.getItem('purchasedDomain');
+      const domainExpiry = localStorage.getItem('domainExpiry');
+
+      if (purchasedDomain && domainExpiry) {
+          document.getElementById('purchasedDomainInfo').style.display = 'block';
+          document.getElementById('purchasedDomainName').innerText = purchasedDomain;
+          
+          const renewBtn = document.getElementById('renewButton');
+          renewBtn.onclick = () => {
+              alert(`To renew ${purchasedDomain}, please select it from the list below and choose your validity period.`);
+              document.getElementById('domainSelect').value = purchasedDomain; // Pre-select in dropdown
+              document.getElementById('validityDays').focus(); // Focus on days input
+          };
+          
+          startCountdown(parseInt(domainExpiry));
+      }
+  }
+
+  // MODIFIED: This now checks localStorage and hides purchased domains from the list
   function loadAvailableDomains() {
     const selectBox = document.getElementById("domainSelect");
-    selectBox.innerHTML = '<option value="">Select Domain</option>'; // Clear default text
+    selectBox.innerHTML = '<option value="">Select Domain</option>';
     
-    // Get all the domain names from our configuration object
+    // Get the domain that was already purchased by this user
+    const purchasedDomain = localStorage.getItem('purchasedDomain');
+
     const allConfiguredDomains = Object.keys(allDomainScripts);
 
     if (allConfiguredDomains.length === 0) {
       selectBox.innerHTML = '<option value="">No domains configured</option>';
     } else {
-      // Loop through each domain and add it as an option in the dropdown
+      let availableDomains = 0;
       allConfiguredDomains.forEach(domain => {
-        const option = document.createElement("option");
-        option.value = domain;
-        option.text = domain;
-        selectBox.appendChild(option);
+        // Only add the domain to the list if it's NOT the one they already purchased
+        if (domain !== purchasedDomain) {
+          const option = document.createElement("option");
+          option.value = domain;
+          option.text = domain;
+          selectBox.appendChild(option);
+          availableDomains++;
+        }
       });
+      if (availableDomains === 0) {
+          selectBox.innerHTML = '<option value="">No other domains available</option>';
+      }
     }
   }
 
-  // Run on Page Load
-  window.onload = loadAvailableDomains;
+  // MODIFIED: This is called when the page loads
+  window.onload = () => {
+      loadAvailableDomains();
+      checkAndDisplayPurchasedDomain();
+  };
 
-  // 2. Dynamic Price Calculator
   window.calculateDynamicPrice = function() {
     let days = parseInt(document.getElementById("validityDays").value);
     let priceDisplay = document.getElementById("dynamicPriceDisplay");
@@ -593,6 +704,9 @@ body {
       priceDisplay.innerText = "Select valid Days";
       return 0;
     }
+    
+    // Clamp days to max 30
+    if (days > 30) days = 30;
 
     if (days >= 1 && days <= 15) {
       amount = days * 200;
@@ -606,10 +720,8 @@ body {
     return amount;
   };
 
-  // 3. Temporary variable to hold payment info for the Popup
   window.tempPaymentData = null;
 
-  // 4. Payment Trigger
   window.payForReadyDomain = function() {
     let domain = document.getElementById("domainSelect").value;
     let days = parseInt(document.getElementById("validityDays").value);
@@ -626,7 +738,7 @@ body {
       amount: amount * 100,
       currency: "INR",
       name: "Sintha Developer",
-      description: "Ready Domain Purchase",
+      description: `Purchase of ${domain} for ${days} days`,
       handler: function(response) {
         window.tempPaymentData = {
           domain: domain,
@@ -645,7 +757,6 @@ body {
     new Razorpay(options).open();
   };
 
-  // 5. Toggle Password Visibility in Modal
   window.togglePassword = function() {
     let pwd = document.getElementById("adminPassword");
     let icon = document.getElementById("eyeIcon");
@@ -658,7 +769,7 @@ body {
     }
   };
 
-  // 6. Save Custom Admin to the Selected Domain's Firebase
+  // MODIFIED: This function now clears data, creates admin, and updates the entire UI
   window.saveAdminToFirebase = async function() {
     let name = document.getElementById("adminName").value.trim();
     let phone = document.getElementById("adminPhone").value.trim();
@@ -672,21 +783,26 @@ body {
 
     let { domain, days, amount, paymentId } = window.tempPaymentData;
     
-    // Check if a database connection exists for the selected domain
     if (!dbs[domain]) {
-        alert(`Error: Firebase is not configured correctly for the domain '${domain}'. Please check the credentials.`);
+        alert(`Error: Firebase is not configured correctly for the domain '${domain}'.`);
         return;
     }
 
     let createdAt = new Date().getTime();
     let expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
+    const expiryTimestamp = expiryDate.getTime();
 
     try {
       const db = dbs[domain];
       const usersRef = ref(db, 'users');
-      const newUserRef = push(usersRef); // Generate unique ID
 
+      // 1. CLEAR all previous user data for this domain
+      await set(usersRef, null);
+      console.log(`Successfully cleared 'users' data for ${domain}.`);
+
+      // 2. CREATE the new admin user
+      const newUserRef = push(usersRef); // Generate unique ID
       await set(newUserRef, {
         createdAt: createdAt,
         email: email,
@@ -694,12 +810,15 @@ body {
         phone: phone,
         role: "admin",
         password: pass,
-        expiryDate: expiryDate.getTime(),
+        expiryDate: expiryTimestamp,
         paymentId: paymentId
       });
+      console.log(`Successfully created new admin for ${domain}.`);
 
+      // 3. UPDATE UI after successful database operations
       document.getElementById("adminPopup").style.display = "none";
-
+      
+      // Show credentials in the card
       let credBox = document.getElementById("credentialsBox");
       credBox.style.display = "block";
       credBox.innerHTML = `
@@ -710,14 +829,21 @@ body {
         <p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>
         <p style="font-size: 0.8rem; margin-top:10px;">Please save these details. They will expire automatically after ${days} days.</p>
       `;
+      
+      // Save purchase info to localStorage
+      localStorage.setItem('purchasedDomain', domain);
+      localStorage.setItem('domainExpiry', expiryTimestamp);
 
+      // Refresh the UI to show the top bar and remove domain from list
+      checkAndDisplayPurchasedDomain();
+      loadAvailableDomains();
+      
+      // Generate Invoice
       window.generateInvoice(name, domain, amount, paymentId);
       window.tempPaymentData = null;
-      // You may want to refresh the available domains list here if needed in the future
-      // loadAvailableDomains(); 
 
     } catch (e) {
-      console.error("Error saving admin to Firebase: ", e);
+      console.error("Error during admin creation process: ", e);
       alert("Failed to save Admin Details. Please contact support with Payment ID: " + paymentId);
     }
   };
