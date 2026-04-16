@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -482,7 +483,7 @@ body {
     
     <input type="text" id="adminName" placeholder="Full Name">
     <input type="tel" id="adminPhone" placeholder="Mobile Number">
-    <input type="email" id="adminEmailInput" placeholder="Admin Email (e.g. admin@domain.in)">
+    <input type="email" id="adminEmailInput" placeholder="Admin Email">
     
     <div class="password-wrap">
       <input type="password" id="adminPassword" placeholder="Set Admin Password (min. 6 characters)">
@@ -493,6 +494,21 @@ body {
   </div>
 </div>
 
+<!-- ================= RENEW DOMAIN MODAL ================= -->
+<div class="modal-overlay" id="renewPopup">
+  <div class="modal-content">
+    <h3>Renew Domain</h3>
+    <p id="renewDomainNameDisplay" style="color: #ffd166; font-size: 1.2rem; margin-bottom: 10px;"></p>
+    
+    <input type="number" id="renewValidityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateRenewPrice()">
+    <div class="price" id="renewPriceDisplay" style="font-size: 1.2rem; margin-bottom: 15px; color: #00ffcc;">Select Days for Price</div>
+    
+    <input type="email" id="renewUserEmail" placeholder="Enter Your Email Address">
+    
+    <button class="btn-submit-modal" onclick="payForRenewal()">Pay & Renew</button>
+    <button class="btn-submit-modal" style="background: rgba(255,255,255,0.2); color: white; margin-top: 10px;" onclick="closeRenewPopup()">Cancel</button>
+  </div>
+</div>
 
 <!-- ================= SECTION 2: REGISTRATION FORM ================= -->
 <div class="form-container" id="formSection">
@@ -531,7 +547,6 @@ body {
 <script type="module">
   // Import Firebase modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  // NEW: Import 'get' to fetch data once
   import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -613,8 +628,6 @@ body {
     }
   }
   
-  // NEW: Define a central database to store the list of sold domains.
-  // We'll use the first one from your config as the "master" DB.
   const centralDB = dbs['manipurhousietambola.in'];
   
   let countdownInterval = null;
@@ -646,7 +659,6 @@ body {
       }, 1000);
   }
   
-  // This function still works with localStorage for the user-specific info bar
   function checkAndDisplayPurchasedDomain() {
       const purchasedDomain = localStorage.getItem('purchasedDomain');
       const domainExpiry = localStorage.getItem('domainExpiry');
@@ -658,10 +670,7 @@ body {
           
           const renewBtn = document.getElementById('renewButton');
           renewBtn.onclick = () => {
-              alert(`To renew ${purchasedDomain}, please select it from the list below and choose your validity period.`);
-              document.getElementById('domainSelect').value = purchasedDomain;
-              calculateDynamicPrice();
-              document.getElementById('validityDays').focus();
+              window.openRenewPopup();
           };
           
           startCountdown(parseInt(domainExpiry));
@@ -670,7 +679,6 @@ body {
       }
   }
 
-  // MODIFIED: This function now accepts the list of sold domains
   function loadAvailableDomains(soldDomains = {}) {
     const selectBox = document.getElementById("domainSelect");
     selectBox.innerHTML = '<option value="">Select a Domain</option>';
@@ -685,9 +693,6 @@ body {
       const domainKey = domain.replace(/\./g, '_');
       const expiryTimestamp = soldDomains[domainKey];
       
-      // A domain is available IF:
-      // 1. It's not in the soldDomains list (expiryTimestamp is undefined)
-      // 2. Or, its expiry time has passed (it's expired)
       if (!expiryTimestamp || expiryTimestamp < now) {
           const option = document.createElement("option");
           option.value = domain;
@@ -702,18 +707,16 @@ body {
     }
   }
 
-  // MODIFIED: The page load sequence now fetches from Firebase first
   window.onload = async () => {
-      checkAndDisplayPurchasedDomain(); // Check for user-specific bar
+      checkAndDisplayPurchasedDomain();
 
       try {
         const soldDomainsRef = ref(centralDB, 'soldDomains');
         const snapshot = await get(soldDomainsRef);
-        const soldDomains = snapshot.val() || {}; // Get sold domains list, or empty object
-        loadAvailableDomains(soldDomains); // Load dropdown with the filtered list
+        const soldDomains = snapshot.val() || {}; 
+        loadAvailableDomains(soldDomains);
       } catch (error) {
         console.error("Could not fetch sold domains list:", error);
-        // Fallback: load all domains if Firebase fails
         loadAvailableDomains(); 
       }
   };
@@ -732,7 +735,7 @@ body {
         document.getElementById("validityDays").value = 30;
     }
 
-    if (days >= 1 && days <= 15) { amount = days * 200; } 
+    if (days >= 1 && days <= 15) { amount = days * 1; } 
     else if (days >= 16 && days <= 29) { amount = days * 150; } 
     else if (days >= 30) { amount = 3500; }
 
@@ -767,7 +770,8 @@ body {
           buyerEmail: buyerEmail,
           paymentId: response.razorpay_payment_id
         };
-        document.getElementById("adminEmailInput").value = "admin@" + domain;
+        // Use user entered email instead of admin@domain.in
+        document.getElementById("adminEmailInput").value = buyerEmail;
         document.getElementById("adminPopup").style.display = "flex";
       },
       prefill: { email: buyerEmail },
@@ -818,23 +822,19 @@ body {
     const expiryTimestamp = expiryDate.getTime();
 
     try {
-      // Step 1: Create the Auth user in the domain-specific Firebase project
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
       const newUserUid = userCredential.user.uid;
       
-      // Step 2: Clear previous users and set new admin in the domain-specific DB
       await set(ref(db, 'users'), null);
       await set(ref(db, 'users/' + newUserUid), {
         name, email, phone,
         role: "admin", createdAt, expiryDate: expiryTimestamp, paymentId
       });
       
-      // NEW: Step 3: Add the domain to the central "soldDomains" list
-      const domainKey = domain.replace(/\./g, '_'); // Replace '.' with '_'
+      const domainKey = domain.replace(/\./g, '_'); 
       const soldDomainRef = ref(centralDB, 'soldDomains/' + domainKey);
-      await set(soldDomainRef, expiryTimestamp); // Save with its expiry date
+      await set(soldDomainRef, expiryTimestamp);
 
-      // Step 4: Update the UI for the current user
       document.getElementById("adminPopup").style.display = "none";
       let credBox = document.getElementById("credentialsBox");
       credBox.style.display = "block";
@@ -843,11 +843,9 @@ body {
       localStorage.setItem('purchasedDomain', domain);
       localStorage.setItem('domainExpiry', expiryTimestamp);
       
-      // Reload the page to reflect the changes for everyone
       alert("Domain purchased successfully! The page will now reload.");
       window.location.reload();
       
-      // This will run before reload
       window.generateInvoice(name, domain, amount, paymentId, phone, email, pass);
       window.tempPaymentData = null;
 
@@ -863,7 +861,117 @@ body {
     }
   };
 
-  // --- No changes to the functions below this line ---
+  // ================= RENEW FUNCTIONS =================
+  window.openRenewPopup = function() {
+    const purchasedDomain = localStorage.getItem('purchasedDomain');
+    if(purchasedDomain) {
+      document.getElementById("renewDomainNameDisplay").innerText = purchasedDomain;
+      document.getElementById("renewPopup").style.display = "flex";
+    }
+  };
+
+  window.closeRenewPopup = function() {
+    document.getElementById("renewPopup").style.display = "none";
+  };
+
+  window.calculateRenewPrice = function() {
+    let days = parseInt(document.getElementById("renewValidityDays").value);
+    let priceDisplay = document.getElementById("renewPriceDisplay");
+    let amount = 0;
+
+    if (!days || days < 1) {
+      priceDisplay.innerText = "Enter valid Days";
+      return 0;
+    }
+    if (days > 30) {
+        days = 30;
+        document.getElementById("renewValidityDays").value = 30;
+    }
+
+    if (days >= 1 && days <= 15) { amount = days * 200; } 
+    else if (days >= 16 && days <= 29) { amount = days * 150; } 
+    else if (days >= 30) { amount = 3500; }
+
+    priceDisplay.innerText = "Total: ₹" + amount;
+    return amount;
+  };
+
+  window.payForRenewal = function() {
+    let domain = localStorage.getItem('purchasedDomain');
+    let days = parseInt(document.getElementById("renewValidityDays").value);
+    let email = document.getElementById("renewUserEmail").value.trim();
+    let amount = window.calculateRenewPrice();
+
+    if (!domain) return alert("No domain found to renew.");
+    if (!days || days < 1 || days > 30) return alert("Please enter validity between 1 to 30 days.");
+    if (!email) return alert("Please enter your email.");
+    if (amount === 0) return alert("Invalid Amount.");
+
+    var options = {
+      key: "rzp_live_SUarhYm5IfBTar",
+      amount: amount * 100,
+      currency: "INR",
+      name: "Sintha Developer",
+      description: `Renewal of ${domain} for ${days} days`,
+      handler: async function(response) {
+         let paymentId = response.razorpay_payment_id;
+         await window.processRenewal(domain, days, amount, paymentId, email);
+      },
+      prefill: { email: email },
+      method: { upi: true, card: true, netbanking: true, wallet: true, emi: true }
+    };
+
+    new Razorpay(options).open();
+  };
+
+  window.processRenewal = async function(domain, days, amount, paymentId, email) {
+    const db = dbs[domain];
+    if (!db) {
+        alert(`Error: Firebase is not configured correctly for '${domain}'.`);
+        return;
+    }
+
+    try {
+        let currentExpiry = localStorage.getItem('domainExpiry') ? parseInt(localStorage.getItem('domainExpiry')) : new Date().getTime();
+        let now = new Date().getTime();
+        let baseTime = currentExpiry > now ? currentExpiry : now;
+        
+        let addedMs = days * 24 * 60 * 60 * 1000;
+        let newExpiryTimestamp = baseTime + addedMs;
+
+        const usersRef = ref(db, 'users');
+        const snapshot = await get(usersRef);
+        let usersData = snapshot.val();
+
+        if (usersData) {
+            let uids = Object.keys(usersData);
+            if (uids.length > 0) {
+                let userUid = uids[0];
+                await set(ref(db, `users/${userUid}/expiryDate`), newExpiryTimestamp);
+                await set(ref(db, `users/${userUid}/paymentId`), paymentId);
+                // Also optionally update DB email for contact reference
+                await set(ref(db, `users/${userUid}/email`), email);
+            }
+        }
+        
+        const domainKey = domain.replace(/\./g, '_');
+        await set(ref(centralDB, 'soldDomains/' + domainKey), newExpiryTimestamp);
+
+        localStorage.setItem('domainExpiry', newExpiryTimestamp);
+
+        document.getElementById("renewPopup").style.display = "none";
+        
+        // Generate Invoice specifically for renewal
+        window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true);
+
+        alert("Domain renewed successfully! The page will now reload.");
+        window.location.reload();
+        
+    } catch (error) {
+        console.error("Error during renewal:", error);
+        alert(`Failed to renew domain. Please contact support with Payment ID: ${paymentId}`);
+    }
+  };
 
   window.showForm = function() {
     document.getElementById("offersSection").style.display = "none";
@@ -939,7 +1047,7 @@ body {
     new Razorpay(options).open();
   };
 
-  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null) {
+  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null, isRenewal = false) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const invoiceDate = new Date().toLocaleDateString('en-IN');
@@ -992,7 +1100,13 @@ body {
       doc.text("DESCRIPTION", 18, tableStartY + 7);
       doc.text("AMOUNT", 180, tableStartY + 7, { align: 'right' });
 
-      let itemDescription = adminPassword ? `Ready-Made Domain Rental (${domain})` : `New Custom Domain Registration (${domain})`;
+      let itemDescription = "";
+      if (isRenewal) {
+          itemDescription = `Domain Renewal (${domain})`;
+      } else {
+          itemDescription = adminPassword ? `Ready-Made Domain Rental (${domain})` : `New Custom Domain Registration (${domain})`;
+      }
+      
       doc.setFont('helvetica', 'normal');
       doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 140 });
       doc.text(`₹${amount.toFixed(2)}`, 180, tableStartY + 17, { align: 'right' });
@@ -1019,7 +1133,7 @@ body {
           doc.setFont('helvetica', 'normal');
           doc.text(`Login Email:`, 20, credsY + 18);
           doc.setFont('courier', 'bold');
-          doc.text(`${email}`, 50, credsY + 18);
+          doc.text(`${customerEmail}`, 50, credsY + 18);
           
           doc.setFont('helvetica', 'normal');
           doc.text(`Password:`, 20, credsY + 26);
