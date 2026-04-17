@@ -878,7 +878,8 @@ body {
       
       if (domainData && domainData.invoice) {
           const data = domainData.invoice;
-          window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false);
+          // Passing data.days (validity) to invoice generator
+          window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false, data.days || "N/A");
       } else {
           alert("Invoice details not found for this domain on this device.");
       }
@@ -919,6 +920,37 @@ body {
         const soldDomainsRef = ref(centralDB, 'soldDomains');
         const snapshot = await get(soldDomainsRef);
         const soldDomains = snapshot.val() || {}; 
+
+        // ==============================================================================
+        // AUTOMATED CLEANUP: This revokes Admin access in the DB if their validity has expired
+        // ensuring the admin login automatically stops working!
+        // ==============================================================================
+        const now = new Date().getTime();
+        for (let domain in allDomainScripts) {
+            const domainKey = domain.replace(/\./g, '_');
+            const expiryTimestamp = soldDomains[domainKey];
+
+            if (expiryTimestamp && expiryTimestamp < now) {
+                try {
+                    const targetDb = dbs[domain];
+                    if(targetDb) {
+                        const usersRef = ref(targetDb, 'users');
+                        const usersSnap = await get(usersRef);
+                        if (usersSnap.exists()) {
+                            const usersData = usersSnap.val();
+                            for (let uid in usersData) {
+                                // If validity is over, change the role from "admin" to "expired"
+                                if (usersData[uid].role === 'admin') {
+                                    await set(ref(targetDb, `users/${uid}/role`), 'expired');
+                                }
+                            }
+                        }
+                    }
+                } catch(e) { console.error("Access revoke failed for", domain, e); }
+            }
+        }
+        // ==============================================================================
+
         loadAvailableDomains(soldDomains);
       } catch (error) {
         console.error("Could not fetch sold domains list:", error);
@@ -1054,7 +1086,7 @@ body {
       credBox.style.display = "block";
       credBox.innerHTML = `<h3>✅ Admin Account Created!</h3><p><strong>Domain:</strong> ${domain}</p><p><strong>Login:</strong> ${email}</p><p><strong>Password:</strong> ${pass}</p><p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>`;
       
-      // Create invoice data
+      // Create invoice data saving 'days' too
       const invoiceData = {
           name: name,
           domain: domain,
@@ -1063,7 +1095,8 @@ body {
           phone: phone,
           email: email,
           password: pass,
-          isRenewal: false
+          isRenewal: false,
+          days: days
       };
 
       // Add to array of purchased domains
@@ -1079,7 +1112,7 @@ body {
       
       alert("Domain purchased successfully! The page will now reload.");
       
-      window.generateInvoice(name, domain, amount, paymentId, phone, email, pass);
+      window.generateInvoice(name, domain, amount, paymentId, phone, email, pass, false, days);
       window.tempPaymentData = null;
 
       setTimeout(() => { window.location.reload(); }, 2000);
@@ -1189,6 +1222,8 @@ body {
                 await set(ref(db, `users/${userUid}/expiryDate`), newExpiryTimestamp);
                 await set(ref(db, `users/${userUid}/paymentId`), paymentId);
                 await set(ref(db, `users/${userUid}/email`), email);
+                // IF User was blocked due to expiry, restore their "admin" role upon successful renewal
+                await set(ref(db, `users/${userUid}/role`), "admin");
             }
         }
         
@@ -1204,7 +1239,8 @@ body {
             phone: "N/A",
             email: email,
             password: null,
-            isRenewal: true
+            isRenewal: true,
+            days: days
         };
 
         if(domainIndex !== -1) {
@@ -1217,8 +1253,8 @@ body {
 
         document.getElementById("renewPopup").style.display = "none";
         
-        // Generate Invoice specifically for renewal
-        window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true);
+        // Generate Invoice specifically for renewal with valid days passed
+        window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true, days);
 
         alert("Domain renewed successfully! The page will now reload.");
         setTimeout(() => { window.location.reload(); }, 2000);
@@ -1290,7 +1326,10 @@ body {
       name: "Sintha Developer",
       description: "Custom Domain Order",
       handler: function(response){
-        window.generateInvoice(name, domain, amount, response.razorpay_payment_id, mobile, email, null);
+        
+        // Pass "30 Days" or "365 Days" for custom domains depending on the selected plan
+        let validityDays = amount == "4000" ? "30 Days" : "365 Days";
+        window.generateInvoice(name, domain, amount, response.razorpay_payment_id, mobile, email, null, false, validityDays);
 
         const msg = `New Order:\nName: ${name}\nTitle: ${title}\nDomain: ${domain}\nEmail: ${email}\nMobile: ${mobile}\nAddress: ${address}\nAmount: ₹${amount}\nPaymentID: ${response.razorpay_payment_id}`;
 
@@ -1303,7 +1342,8 @@ body {
     new Razorpay(options).open();
   };
 
-  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null, isRenewal = false) {
+  // Modified GenerateInvoice function to include Validity
+  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null, isRenewal = false, validityDays = "N/A") {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const invoiceDate = new Date().toLocaleDateString('en-IN');
@@ -1354,6 +1394,9 @@ body {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
       doc.text("DESCRIPTION", 18, tableStartY + 7);
+      
+      // Added VALIDITY Header 
+      doc.text("VALIDITY", 130, tableStartY + 7);
       doc.text("AMOUNT", 180, tableStartY + 7, { align: 'right' });
 
       let itemDescription = "";
@@ -1364,7 +1407,13 @@ body {
       }
       
       doc.setFont('helvetica', 'normal');
-      doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 140 });
+      doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 100 });
+      
+      // Print the valid amount of days
+      let validityStr = validityDays;
+      if (!isNaN(validityDays)) validityStr = `${validityDays} Days`;
+      doc.text(validityStr, 130, tableStartY + 17);
+
       doc.text(`₹${amount.toFixed(2)}`, 180, tableStartY + 17, { align: 'right' });
 
       doc.setDrawColor(200, 200, 200);
