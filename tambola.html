@@ -513,7 +513,11 @@ body {
           <h2>Contact Us</h2>
           <p>We are here to help! If you have any questions, concerns, or need support with your Tambola domain setup, reach out to us.</p>
           <p><strong>Email:</strong> contact@sinthateam.in</p>
-          <p><strong>Phone / WhatsApp:</strong> +91 9366193440</p>
+          <p><strong>Phone / WhatsApp:</strong><br>
+             Anand Khuman: +91 9366193440<br>
+             Pari Thokchom: +91 8415934211<br>
+             Sadananda Mangang: +91 6009020876
+          </p>
           <p><strong>Address:</strong> Heirok, Thoubal District, Manipur, India.</p>
           <button class="btn-primary" style="margin-top: 15px;" onclick="window.location.href='https://wa.me/919366193440'">Chat on WhatsApp</button>
       </div>
@@ -741,8 +745,13 @@ body {
 
           const downloadInfoBtn = document.getElementById('downloadInfoBtn');
           downloadInfoBtn.onclick = () => {
-              alert("Preparing download details for " + purchasedDomain + ". If you recently purchased, check your device downloads for the PDF Invoice. App links will be sent via WhatsApp.");
-              // You can map this to generate a specific invoice or download apk
+              const storedInvoice = localStorage.getItem('domainInvoiceData');
+              if (storedInvoice) {
+                  const data = JSON.parse(storedInvoice);
+                  window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false);
+              } else {
+                  alert("Invoice details not found on this device. If you recently purchased, please check your files or contact support.");
+              }
           };
           // ----------------------------
           
@@ -868,7 +877,7 @@ body {
 
   window.saveAdminToFirebase = async function() {
     const name = document.getElementById("adminName").value.trim();
-    const phone = document.getElementById("adminPhone").value.trim();
+    let phone = document.getElementById("adminPhone").value.trim();
     const email = document.getElementById("adminEmailInput").value.trim();
     const pass = document.getElementById("adminPassword").value.trim();
 
@@ -877,6 +886,15 @@ body {
     }
     if (pass.length < 6) {
       return alert("Password must be at least 6 characters long.");
+    }
+
+    // Automatically prepend +91 for the database if not present
+    if (!phone.startsWith("+91")) {
+        if (phone.startsWith("91") && phone.length >= 10) {
+            phone = "+91 " + phone.substring(2).trim();
+        } else {
+            phone = "+91 " + phone;
+        }
     }
 
     const { domain, days, amount, paymentId } = window.tempPaymentData;
@@ -915,6 +933,19 @@ body {
       
       localStorage.setItem('purchasedDomain', domain);
       localStorage.setItem('domainExpiry', expiryTimestamp);
+      
+      // Store invoice details to allow later downloads
+      const invoiceData = {
+          name: name,
+          domain: domain,
+          amount: amount,
+          paymentId: paymentId,
+          phone: phone,
+          email: email,
+          password: pass,
+          isRenewal: false
+      };
+      localStorage.setItem('domainInvoiceData', JSON.stringify(invoiceData));
       
       alert("Domain purchased successfully! The page will now reload.");
       
@@ -1034,6 +1065,19 @@ body {
 
         document.getElementById("renewPopup").style.display = "none";
         
+        // Save renewal invoice data
+        const invoiceData = {
+            name: "Valued Customer",
+            domain: domain,
+            amount: amount,
+            paymentId: paymentId,
+            phone: "N/A",
+            email: email,
+            password: null,
+            isRenewal: true
+        };
+        localStorage.setItem('domainInvoiceData', JSON.stringify(invoiceData));
+
         // Generate Invoice specifically for renewal
         window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true);
 
