@@ -113,40 +113,53 @@ body {
   color: #e0e0e0;
 }
 
-/* ================= PURCHASED DOMAIN INFO BAR (TOP) ================= */
+/* ================= PURCHASED DOMAIN INFO BAR (TOP SLIDER) ================= */
 .purchased-domain-info {
     display: none; 
     background: rgba(0, 255, 204, 0.1);
     border: 1px solid #00ffcc;
-    padding: 12px 15px;
     border-radius: 12px;
-    text-align: center;
     max-width: 1000px;
     width: 95%;
     margin: 0 auto 15px auto;
     box-shadow: 0 5px 20px rgba(0, 255, 204, 0.15);
+    overflow: hidden; /* Hide overflow for slider */
+    position: relative;
 }
 
-.purchased-domain-info h3 {
+.slider-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+}
+
+.domain-slide {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.domain-slide h3 {
     margin-bottom: 5px;
     color: #fff;
     font-size: 1rem;
     font-weight: 500;
 }
 
-.purchased-domain-info .domain-name {
+.domain-slide .domain-name {
     font-size: 1.15rem;
     font-weight: bold;
     color: #ffd166;
     margin-bottom: 5px;
 }
 
-.purchased-domain-info .countdown-timer {
+.domain-slide .countdown-timer {
     font-size: 0.9rem;
     color: #eee;
     margin-bottom: 10px;
 }
-.purchased-domain-info .countdown-timer strong {
+.domain-slide .countdown-timer strong {
     color: #00ffcc;
 }
 
@@ -172,6 +185,18 @@ body {
 .btn-renew { background: linear-gradient(135deg, #ff8008, #ffc837); }
 .btn-view { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; }
 .btn-download { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+
+/* Slider Dots (Optional purely visual indicator) */
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding-bottom: 8px;
+}
+.dot {
+    height: 6px; width: 6px; background: #fff; border-radius: 50%; opacity: 0.3; transition: 0.3s;
+}
+.dot.active { opacity: 1; background: #00ffcc; transform: scale(1.2); }
 
 
 /* ================= SECTION 1: OFFERS PAGE ================= */
@@ -406,17 +431,12 @@ body {
 
 <body>
 
-<!-- ================= NEW: PURCHASED DOMAIN INFO BAR (TOP) ================= -->
+<!-- ================= MODIFIED: PURCHASED DOMAIN INFO BAR (TOP SLIDER) ================= -->
 <div id="purchasedDomainInfo" class="purchased-domain-info">
-  <h3>Your Active Domain</h3>
-  <p class="domain-name" id="purchasedDomainName"></p>
-  <p class="countdown-timer" id="countdownTimer">Time remaining: <strong>-- : -- : -- : --</strong></p>
-  
-  <div class="action-buttons">
-      <button id="renewButton" class="btn-sm btn-renew">Renew Now</button>
-      <button id="viewDetailsBtn" class="btn-sm btn-view">View website</button>
-      <button id="downloadInfoBtn" class="btn-sm btn-download">Download Info</button>
+  <div class="slider-track" id="sliderTrack">
+      <!-- Slides will be dynamically injected here by JS -->
   </div>
+  <div class="slider-dots" id="sliderDots"></div>
 </div>
 
 <div class="page-wrapper" id="swipeContainer">
@@ -694,72 +714,175 @@ body {
   
   const centralDB = dbs['manipurhousietambola.in'];
   
+  // ================= Slider & Multiple Domains State =================
   let countdownInterval = null;
+  let sliderInterval = null;
+  let currentSlideIndex = 0;
+  window.renewingDomain = null; // Temp holder for renewal
 
-  function startCountdown(expiryTimestamp) {
+  function migrateOldData() {
+      // Moves single domain logic to the new array standard without breaking old users
+      let oldDomain = localStorage.getItem('purchasedDomain');
+      let oldExpiry = localStorage.getItem('domainExpiry');
+      let oldInvoice = localStorage.getItem('domainInvoiceData');
+
+      if(oldDomain && oldExpiry) {
+          let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+          if(!list.find(item => item.domain === oldDomain)) {
+              list.push({
+                  domain: oldDomain,
+                  expiry: parseInt(oldExpiry),
+                  invoice: oldInvoice ? JSON.parse(oldInvoice) : null
+              });
+              localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
+          }
+          // Remove old individual keys to cleanly migrate
+          localStorage.removeItem('purchasedDomain');
+          localStorage.removeItem('domainExpiry');
+          localStorage.removeItem('domainInvoiceData');
+      }
+  }
+
+  function startCountdown(activeDomains) {
       if (countdownInterval) clearInterval(countdownInterval);
-      const timerElement = document.getElementById('countdownTimer');
 
       countdownInterval = setInterval(() => {
           const now = new Date().getTime();
-          const distance = expiryTimestamp - now;
+          let needsRefresh = false;
 
-          if (distance < 0) {
+          activeDomains.forEach(domainData => {
+              const timerElement = document.getElementById(`timer_${domainData.domain.replace(/\./g, '_')}`);
+              if(!timerElement) return;
+
+              const distance = domainData.expiry - now;
+
+              if (distance < 0) {
+                  timerElement.innerHTML = "<strong>Status: Expired</strong>";
+                  // Find and remove from localStorage
+                  let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+                  list = list.filter(item => item.domain !== domainData.domain);
+                  localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
+                  needsRefresh = true;
+              } else {
+                  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  timerElement.innerHTML = `Time remaining: <strong>${days}d ${hours}h ${minutes}m ${seconds}s</strong>`;
+              }
+          });
+
+          if(needsRefresh) {
               clearInterval(countdownInterval);
-              timerElement.innerHTML = "<strong>Status: Expired</strong>";
-              localStorage.removeItem('purchasedDomain');
-              localStorage.removeItem('domainExpiry');
-              // Reload the page to refresh domain list and hide the bar
               window.location.reload();
-              return;
           }
-
-          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-          timerElement.innerHTML = `Time remaining: <strong>${days}d ${hours}h ${minutes}m ${seconds}s</strong>`;
       }, 1000);
   }
-  
-  function checkAndDisplayPurchasedDomain() {
-      const purchasedDomain = localStorage.getItem('purchasedDomain');
-      const domainExpiry = localStorage.getItem('domainExpiry');
+
+  function setupSlider(totalSlides) {
+      const track = document.getElementById('sliderTrack');
+      const dots = document.getElementById('sliderDots');
       const infoBar = document.getElementById('purchasedDomainInfo');
+      
+      if(sliderInterval) clearInterval(sliderInterval);
+      
+      // Setup Dots visually
+      dots.innerHTML = '';
+      for(let i=0; i<totalSlides; i++) {
+          let dot = document.createElement('div');
+          dot.className = `dot ${i === 0 ? 'active' : ''}`;
+          dots.appendChild(dot);
+      }
 
-      if (purchasedDomain && domainExpiry && new Date().getTime() < parseInt(domainExpiry)) {
+      if(totalSlides <= 1) return; // Don't slide if only 1 domain
+
+      const moveSlide = () => {
+          currentSlideIndex++;
+          if (currentSlideIndex >= totalSlides) currentSlideIndex = 0;
+          track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+          
+          // Update Dots
+          let allDots = document.querySelectorAll('.dot');
+          allDots.forEach((d, idx) => {
+              if(idx === currentSlideIndex) d.classList.add('active');
+              else d.classList.remove('active');
+          });
+      };
+
+      sliderInterval = setInterval(moveSlide, 4000);
+
+      // Pause slider on hover or touch so user can click buttons
+      infoBar.addEventListener('mouseenter', () => clearInterval(sliderInterval));
+      infoBar.addEventListener('touchstart', () => clearInterval(sliderInterval), {passive: true});
+      infoBar.addEventListener('mouseleave', () => {
+          clearInterval(sliderInterval);
+          sliderInterval = setInterval(moveSlide, 4000);
+      });
+      infoBar.addEventListener('touchend', () => {
+          clearInterval(sliderInterval);
+          sliderInterval = setInterval(moveSlide, 4000);
+      }, {passive: true});
+  }
+
+  function checkAndDisplayPurchasedDomain() {
+      migrateOldData(); // Run migration logic first
+      
+      const list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+      const infoBar = document.getElementById('purchasedDomainInfo');
+      const track = document.getElementById('sliderTrack');
+      
+      const now = new Date().getTime();
+      const activeDomains = list.filter(d => d.expiry > now);
+
+      // Clean up array if any expired quietly
+      if(activeDomains.length !== list.length) {
+          localStorage.setItem('purchasedDomainsList', JSON.stringify(activeDomains));
+      }
+
+      if (activeDomains.length > 0) {
           infoBar.style.display = 'block';
-          document.getElementById('purchasedDomainName').innerText = purchasedDomain;
-          
-          const renewBtn = document.getElementById('renewButton');
-          renewBtn.onclick = () => {
-              window.openRenewPopup();
-          };
+          track.innerHTML = ''; // Clear track
 
-          // --- NEW BUTTON FUNCTIONS ---
-          const viewDetailsBtn = document.getElementById('viewDetailsBtn');
-          viewDetailsBtn.onclick = () => {
-              window.open('https://' + purchasedDomain, '_blank');
-          };
+          activeDomains.forEach((domainObj) => {
+              const slide = document.createElement('div');
+              slide.className = 'domain-slide';
+              
+              const safeId = domainObj.domain.replace(/\./g, '_');
+              
+              slide.innerHTML = `
+                  <h3>Your Active Domain</h3>
+                  <p class="domain-name">${domainObj.domain}</p>
+                  <p class="countdown-timer" id="timer_${safeId}">Time remaining: <strong>-- : -- : -- : --</strong></p>
+                  
+                  <div class="action-buttons">
+                      <button class="btn-sm btn-renew" onclick="window.openRenewPopup('${domainObj.domain}')">Renew Now</button>
+                      <button class="btn-sm btn-view" onclick="window.open('https://${domainObj.domain}', '_blank')">View website</button>
+                      <button class="btn-sm btn-download" onclick="window.downloadSpecificInvoice('${domainObj.domain}')">Download Info</button>
+                  </div>
+              `;
+              track.appendChild(slide);
+          });
 
-          const downloadInfoBtn = document.getElementById('downloadInfoBtn');
-          downloadInfoBtn.onclick = () => {
-              const storedInvoice = localStorage.getItem('domainInvoiceData');
-              if (storedInvoice) {
-                  const data = JSON.parse(storedInvoice);
-                  window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false);
-              } else {
-                  alert("Invoice details not found on this device. If you recently purchased, please check your files or contact support.");
-              }
-          };
-          // ----------------------------
-          
-          startCountdown(parseInt(domainExpiry));
+          startCountdown(activeDomains);
+          setupSlider(activeDomains.length);
+
       } else {
           infoBar.style.display = 'none';
       }
   }
+
+  // --- NEW INVOICE DOWNLOADER FOR MULTIPLE DOMAINS ---
+  window.downloadSpecificInvoice = function(domainName) {
+      const list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+      const domainData = list.find(d => d.domain === domainName);
+      
+      if (domainData && domainData.invoice) {
+          const data = domainData.invoice;
+          window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false);
+      } else {
+          alert("Invoice details not found for this domain on this device.");
+      }
+  };
 
   function loadAvailableDomains(soldDomains = {}) {
     const selectBox = document.getElementById("domainSelect");
@@ -931,10 +1054,7 @@ body {
       credBox.style.display = "block";
       credBox.innerHTML = `<h3>✅ Admin Account Created!</h3><p><strong>Domain:</strong> ${domain}</p><p><strong>Login:</strong> ${email}</p><p><strong>Password:</strong> ${pass}</p><p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>`;
       
-      localStorage.setItem('purchasedDomain', domain);
-      localStorage.setItem('domainExpiry', expiryTimestamp);
-      
-      // Store invoice details to allow later downloads
+      // Create invoice data
       const invoiceData = {
           name: name,
           domain: domain,
@@ -945,7 +1065,17 @@ body {
           password: pass,
           isRenewal: false
       };
-      localStorage.setItem('domainInvoiceData', JSON.stringify(invoiceData));
+
+      // Add to array of purchased domains
+      let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+      // Filter out any older entry for this specific domain just in case
+      list = list.filter(d => d.domain !== domain); 
+      list.push({
+          domain: domain,
+          expiry: expiryTimestamp,
+          invoice: invoiceData
+      });
+      localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
       
       alert("Domain purchased successfully! The page will now reload.");
       
@@ -967,16 +1097,17 @@ body {
   };
 
   // ================= RENEW FUNCTIONS =================
-  window.openRenewPopup = function() {
-    const purchasedDomain = localStorage.getItem('purchasedDomain');
-    if(purchasedDomain) {
-      document.getElementById("renewDomainNameDisplay").innerText = purchasedDomain;
+  window.openRenewPopup = function(domainName) {
+    if(domainName) {
+      window.renewingDomain = domainName;
+      document.getElementById("renewDomainNameDisplay").innerText = domainName;
       document.getElementById("renewPopup").style.display = "flex";
     }
   };
 
   window.closeRenewPopup = function() {
     document.getElementById("renewPopup").style.display = "none";
+    window.renewingDomain = null;
   };
 
   window.calculateRenewPrice = function() {
@@ -1002,12 +1133,12 @@ body {
   };
 
   window.payForRenewal = function() {
-    let domain = localStorage.getItem('purchasedDomain');
+    let domain = window.renewingDomain;
     let days = parseInt(document.getElementById("renewValidityDays").value);
     let email = document.getElementById("renewUserEmail").value.trim();
     let amount = window.calculateRenewPrice();
 
-    if (!domain) return alert("No domain found to renew.");
+    if (!domain) return alert("No domain selected for renewal.");
     if (!days || days < 1 || days > 30) return alert("Please enter validity between 1 to 30 days.");
     if (!email) return alert("Please enter your email.");
     if (amount === 0) return alert("Invalid Amount.");
@@ -1037,7 +1168,10 @@ body {
     }
 
     try {
-        let currentExpiry = localStorage.getItem('domainExpiry') ? parseInt(localStorage.getItem('domainExpiry')) : new Date().getTime();
+        let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
+        let domainIndex = list.findIndex(d => d.domain === domain);
+        
+        let currentExpiry = domainIndex !== -1 ? list[domainIndex].expiry : new Date().getTime();
         let now = new Date().getTime();
         let baseTime = currentExpiry > now ? currentExpiry : now;
         
@@ -1061,11 +1195,7 @@ body {
         const domainKey = domain.replace(/\./g, '_');
         await set(ref(centralDB, 'soldDomains/' + domainKey), newExpiryTimestamp);
 
-        localStorage.setItem('domainExpiry', newExpiryTimestamp);
-
-        document.getElementById("renewPopup").style.display = "none";
-        
-        // Save renewal invoice data
+        // Update expiry and invoice in LocalStorage Array
         const invoiceData = {
             name: "Valued Customer",
             domain: domain,
@@ -1076,8 +1206,17 @@ body {
             password: null,
             isRenewal: true
         };
-        localStorage.setItem('domainInvoiceData', JSON.stringify(invoiceData));
 
+        if(domainIndex !== -1) {
+            list[domainIndex].expiry = newExpiryTimestamp;
+            list[domainIndex].invoice = invoiceData;
+        } else {
+            list.push({ domain: domain, expiry: newExpiryTimestamp, invoice: invoiceData });
+        }
+        localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
+
+        document.getElementById("renewPopup").style.display = "none";
+        
         // Generate Invoice specifically for renewal
         window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true);
 
