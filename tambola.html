@@ -6,6 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tambola Domains & Registration</title>
 
+<!-- Font Awesome for Icons (Trash icon) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <!-- Razorpay & jsPDF CDNs -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -268,7 +271,7 @@ body {
   color: #00ffcc;
 }
 
-.card select, .card input[type="number"], .card input[type="email"] {
+.card select, .card input[type="text"], .card input[type="password"], .card input[type="number"], .card input[type="email"] {
   width: 100%;
   margin-top: 10px;
   padding: 10px;
@@ -295,6 +298,24 @@ body {
 }
 
 .btn-primary:hover {
+  transform: scale(1.03);
+}
+
+.btn-danger {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #fff;
+  transition: transform 0.2s;
+}
+
+.btn-danger:hover {
   transform: scale(1.03);
 }
 
@@ -426,12 +447,45 @@ body {
   border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 8px;
 }
 .btn-submit-modal:hover { background: #00e6b8; }
+
+/* Super Admin Dashboard Styles */
+.sa-setting-group { margin-bottom: 15px; }
+.sa-setting-group label { display: block; font-size: 0.85rem; color: #ffd166; margin-bottom: 5px; text-align: left;}
+.sa-domain-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00ffcc; text-align: left; }
+.sa-domain-card h4 { color: #00ffcc; margin-bottom: 8px; font-size: 1.1rem;}
+.sa-domain-card p { font-size: 0.85rem; color: #eee; margin-bottom: 5px; }
+.sa-domain-card .sa-timer { color: #ff416c; font-weight: bold; font-size: 0.9rem; margin-top: 10px; display: block; }
+
+/* Dashboard Stats Grid */
+.sa-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.sa-stat-card {
+    background: rgba(0, 255, 204, 0.1);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+.sa-stat-card h3 {
+    font-size: 0.85rem;
+    color: #eee;
+    margin-bottom: 5px;
+}
+.sa-stat-card p {
+    font-size: 1.3rem;
+    color: #00ffcc;
+    font-weight: bold;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ================= MODIFIED: PURCHASED DOMAIN INFO BAR (TOP SLIDER) ================= -->
+<!-- ================= PURCHASED DOMAIN INFO BAR (TOP SLIDER) ================= -->
 <div id="purchasedDomainInfo" class="purchased-domain-info">
   <div class="slider-track" id="sliderTrack">
       <!-- Slides will be dynamically injected here by JS -->
@@ -453,7 +507,7 @@ body {
           <!-- New Domain / Custom Domain -->
           <div class="card">
             <h2>New Custom Domain</h2>
-            <div class="price">₹4,000 / month</div>
+            <div class="price" id="customDomainPriceDisplay">₹4,000 / month</div>
             <ul>
               <li>Brand new domain</li>
               <li>Custom domain name (.in)</li>
@@ -468,10 +522,10 @@ body {
           <div class="card">
             <h2>Ready-Made Domain List</h2>
             <div class="price" id="dynamicPriceDisplay">Select Days for Price</div>
-            <ul>
-              <li>1 to 15 Days = ₹200/day</li>
-              <li>16 to 29 Days = ₹150/day</li>
-              <li>1 Month (30 Days) = ₹3500 fixed</li>
+            <ul id="pricingListUI">
+              <li>1 to 15 Days = ₹--/day</li>
+              <li>16 to 29 Days = ₹--/day</li>
+              <li>1 Month (30 Days) = ₹-- fixed</li>
               <li>Create Your Own Admin Details</li>
             </ul>
 
@@ -519,8 +573,8 @@ body {
         <input id="address" placeholder="Address">
 
         <select id="plan">
-          <option value="4000">Monthly ₹4000</option>
-          <option value="32000">Yearly ₹32000</option>
+          <option value="monthly" id="optMonthly">Monthly ₹4000</option>
+          <option value="yearly" id="optYearly">Yearly ₹32000</option>
         </select>
 
         <button class="btn-pay" onclick="payNow()">Pay Now</button>
@@ -566,6 +620,87 @@ body {
       </div>
   </div>
 
+  <!-- ================= PAGE 5: SUPER ADMIN ================= -->
+  <div id="page-superadmin" class="page-section">
+    <div id="sa-auth-section">
+        <div class="card">
+            <h2>Super Admin Login</h2>
+            <input type="email" id="saLoginEmail" placeholder="Super Admin Email">
+            <input type="password" id="saLoginPassword" placeholder="Super Admin Password">
+            <button class="btn-primary" onclick="loginSuperAdmin()">Login</button>
+        </div>
+    </div>
+
+    <div id="sa-dashboard-section" style="display:none;">
+        
+        <!-- NEW SALES DASHBOARD & DISTRIBUTION AREA -->
+        <div class="info-box">
+            <h2>Sales Dashboard</h2>
+            <div class="sa-stats-grid">
+                <div class="sa-stat-card">
+                    <h3>Today</h3>
+                    <p id="saToday">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Weekly</h3>
+                    <p id="saWeekly">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Monthly</h3>
+                    <p id="saMonthly">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Total Pending</h3>
+                    <p id="saPending" style="color:#ffd166;">₹0</p>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="distributeFunds()" style="background: linear-gradient(135deg, #11998e, #38ef7d); margin-bottom: 10px;">Distribute Amount</button>
+            
+            <div id="distributionResult" class="sa-domain-card" style="display:none; position:relative; background: rgba(0, 255, 204, 0.1);">
+                <i class="fas fa-trash" style="position:absolute; top:15px; right:15px; cursor:pointer; color:#ff416c; font-size:1.2rem;" onclick="closeDistribution()"></i>
+                <h3 style="color:#00ffcc; margin-bottom:10px; font-size:1.1rem;">Distribution Info</h3>
+                <div id="distList"></div>
+            </div>
+        </div>
+
+           <div class="info-box">
+            <h2>Sold Domains Dashboard</h2>
+            <div id="saSoldDomainsList">
+                <p style="text-align:center; color:#ccc;">Loading domains...</p>
+            </div>
+        </div>
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>Pricing Management</h2>
+            <div class="sa-setting-group">
+                <label>Ready Domain: 1 to 15 Days (per day)</label>
+                <input type="number" id="saPriceTier1">
+            </div>
+            <div class="sa-setting-group">
+                <label>Ready Domain: 16 to 29 Days (per day)</label>
+                <input type="number" id="saPriceTier2">
+            </div>
+            <div class="sa-setting-group">
+                <label>Ready Domain: 1 Month (30 Days) Fixed Price</label>
+                <input type="number" id="saPriceTier3">
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(0, 255, 204, 0.3); margin: 15px 0;">
+            <div class="sa-setting-group">
+                <label>Custom Domain: Monthly Price</label>
+                <input type="number" id="saCustomPriceMonthly">
+            </div>
+            <div class="sa-setting-group">
+                <label>Custom Domain: Yearly Price</label>
+                <input type="number" id="saCustomPriceYearly">
+            </div>
+            <button class="btn-primary" onclick="savePricingSettings()">Save Pricing</button>
+            <button class="btn-danger" onclick="logoutSuperAdmin()">Logout</button>
+        </div>
+
+     
+    </div>
+  </div>
+
 </div>
 
 <!-- ================= BOTTOM NAVIGATION MENU ================= -->
@@ -581,6 +716,9 @@ body {
   </div>
   <div class="nav-item" id="nav-refund" onclick="switchPage('page-refund')">
       <i>💸</i> Refund
+  </div>
+  <div class="nav-item" id="nav-superadmin" onclick="switchPage('page-superadmin')">
+      <i>👑</i> Admin
   </div>
 </div>
 
@@ -623,8 +761,8 @@ body {
 <script type="module">
   // Import Firebase modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getDatabase, ref, set, get, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   // =================================================================
   // Your Firebase project configurations
@@ -713,12 +851,51 @@ body {
   }
   
   const centralDB = dbs['manipurhousietambola.in'];
+  const centralAuth = auths['manipurhousietambola.in'];
+
+  let isDashboardLoaded = false;
+
+  // Listen to Auth State to automatically log in the Super Admin
+  onAuthStateChanged(centralAuth, async (user) => {
+      if (user) {
+          try {
+              const roleSnap = await get(ref(centralDB, `superAdmins/${user.uid}`));
+              if (roleSnap.exists() && roleSnap.val().role === 'superadmin') {
+                  document.getElementById('sa-auth-section').style.display = 'none';
+                  document.getElementById('sa-dashboard-section').style.display = 'block';
+                  if (!isDashboardLoaded) {
+                      loadSuperAdminDashboard();
+                      isDashboardLoaded = true;
+                  }
+              } else {
+                  await signOut(centralAuth);
+                  document.getElementById('sa-auth-section').style.display = 'block';
+                  document.getElementById('sa-dashboard-section').style.display = 'none';
+                  isDashboardLoaded = false;
+              }
+          } catch(e) {
+              console.error("Auth check error: ", e);
+          }
+      } else {
+          document.getElementById('sa-auth-section').style.display = 'block';
+          document.getElementById('sa-dashboard-section').style.display = 'none';
+          isDashboardLoaded = false;
+      }
+  });
+  
+  // Custom Prices Variables
+  window.priceTier1 = 200;
+  window.priceTier2 = 150;
+  window.priceTier3 = 3500;
+  window.customPriceMonthly = 4000;
+  window.customPriceYearly = 32000;
   
   // ================= Slider & Multiple Domains State =================
   let countdownInterval = null;
   let sliderInterval = null;
   let currentSlideIndex = 0;
   window.renewingDomain = null; // Temp holder for renewal
+  let saCountdownInterval = null;
 
   function migrateOldData() {
       // Moves single domain logic to the new array standard without breaking old users
@@ -871,14 +1048,12 @@ body {
       }
   }
 
-  // --- NEW INVOICE DOWNLOADER FOR MULTIPLE DOMAINS ---
   window.downloadSpecificInvoice = function(domainName) {
       const list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
       const domainData = list.find(d => d.domain === domainName);
       
       if (domainData && domainData.invoice) {
           const data = domainData.invoice;
-          // Passing data.days (validity) to invoice generator
           window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false, data.days || "N/A");
       } else {
           alert("Invoice details not found for this domain on this device.");
@@ -895,7 +1070,6 @@ body {
     const now = new Date().getTime();
 
     allConfiguredDomains.forEach(domain => {
-      // Firebase keys cannot contain '.', so we replace it with '_'
       const domainKey = domain.replace(/\./g, '_');
       const expiryTimestamp = soldDomains[domainKey];
       
@@ -912,19 +1086,43 @@ body {
         selectBox.innerHTML = '<option value="">No domains currently available</option>';
     }
   }
+  
+  function updatePricingUI() {
+      // Ready-made Domains UI
+      document.getElementById('pricingListUI').innerHTML = `
+        <li>1 to 15 Days = ₹${window.priceTier1}/day</li>
+        <li>16 to 29 Days = ₹${window.priceTier2}/day</li>
+        <li>1 Month (30 Days) = ₹${window.priceTier3} fixed</li>
+        <li>Create Your Own Admin Details</li>
+      `;
+      // Custom Domain UI
+      document.getElementById('customDomainPriceDisplay').innerText = `₹${window.customPriceMonthly} / month`;
+      document.getElementById('optMonthly').innerText = `Monthly ₹${window.customPriceMonthly}`;
+      document.getElementById('optYearly').innerText = `Yearly ₹${window.customPriceYearly}`;
+  }
 
   window.onload = async () => {
       checkAndDisplayPurchasedDomain();
 
       try {
+        // Fetch custom Pricing Settings from Super Admin
+        const pricingRef = ref(centralDB, 'pricingSettings');
+        const priceSnap = await get(pricingRef);
+        if(priceSnap.exists()) {
+            const prices = priceSnap.val();
+            window.priceTier1 = prices.tier1 || 200;
+            window.priceTier2 = prices.tier2 || 150;
+            window.priceTier3 = prices.tier3 || 3500;
+            window.customPriceMonthly = prices.customMonthly || 4000;
+            window.customPriceYearly = prices.customYearly || 32000;
+        }
+        updatePricingUI();
+
         const soldDomainsRef = ref(centralDB, 'soldDomains');
         const snapshot = await get(soldDomainsRef);
         const soldDomains = snapshot.val() || {}; 
 
-        // ==============================================================================
-        // AUTOMATED CLEANUP: This revokes Admin access in the DB if their validity has expired
-        // ensuring the admin login automatically stops working!
-        // ==============================================================================
+        // AUTOMATED CLEANUP
         const now = new Date().getTime();
         for (let domain in allDomainScripts) {
             const domainKey = domain.replace(/\./g, '_');
@@ -939,7 +1137,6 @@ body {
                         if (usersSnap.exists()) {
                             const usersData = usersSnap.val();
                             for (let uid in usersData) {
-                                // If validity is over, change the role from "admin" to "expired"
                                 if (usersData[uid].role === 'admin') {
                                     await set(ref(targetDb, `users/${uid}/role`), 'expired');
                                 }
@@ -949,11 +1146,10 @@ body {
                 } catch(e) { console.error("Access revoke failed for", domain, e); }
             }
         }
-        // ==============================================================================
 
         loadAvailableDomains(soldDomains);
       } catch (error) {
-        console.error("Could not fetch sold domains list:", error);
+        console.error("Could not fetch data:", error);
         loadAvailableDomains(); 
       }
   };
@@ -972,9 +1168,9 @@ body {
         document.getElementById("validityDays").value = 30;
     }
 
-    if (days >= 1 && days <= 15) { amount = days * 200; } 
-    else if (days >= 16 && days <= 29) { amount = days * 150; } 
-    else if (days >= 30) { amount = 3500; }
+    if (days >= 1 && days <= 15) { amount = days * window.priceTier1; } 
+    else if (days >= 16 && days <= 29) { amount = days * window.priceTier2; } 
+    else if (days >= 30) { amount = window.priceTier3; }
 
     priceDisplay.innerText = "Total: ₹" + amount;
     return amount;
@@ -1007,7 +1203,6 @@ body {
           buyerEmail: buyerEmail,
           paymentId: response.razorpay_payment_id
         };
-        // Use user entered email instead of admin@domain.in
         document.getElementById("adminEmailInput").value = buyerEmail;
         document.getElementById("adminPopup").style.display = "flex";
       },
@@ -1043,7 +1238,6 @@ body {
       return alert("Password must be at least 6 characters long.");
     }
 
-    // Automatically prepend +91 for the database if not present
     if (!phone.startsWith("+91")) {
         if (phone.startsWith("91") && phone.length >= 10) {
             phone = "+91 " + phone.substring(2).trim();
@@ -1053,7 +1247,6 @@ body {
     }
 
     const { domain, days, amount, paymentId } = window.tempPaymentData;
-    
     const db = dbs[domain];
     const auth = auths[domain];
 
@@ -1078,36 +1271,41 @@ body {
       });
       
       const domainKey = domain.replace(/\./g, '_'); 
-      const soldDomainRef = ref(centralDB, 'soldDomains/' + domainKey);
-      await set(soldDomainRef, expiryTimestamp);
+      await set(ref(centralDB, 'soldDomains/' + domainKey), expiryTimestamp);
+      
+      // Save details for Super Admin Dashboard
+      await set(ref(centralDB, 'soldDomainsDetails/' + domainKey), {
+          domain: domain,
+          name: name,
+          email: email,
+          phone: phone,
+          password: pass, 
+          expiryTimestamp: expiryTimestamp
+      });
+
+      // Save Transaction for Accounting & Distribution logic
+      const txRef = push(ref(centralDB, 'transactions'));
+      await set(txRef, {
+          domain: domain,
+          amount: amount,
+          date: new Date().getTime(),
+          type: "purchase",
+          isDistributed: false
+      });
 
       document.getElementById("adminPopup").style.display = "none";
       let credBox = document.getElementById("credentialsBox");
       credBox.style.display = "block";
       credBox.innerHTML = `<h3>✅ Admin Account Created!</h3><p><strong>Domain:</strong> ${domain}</p><p><strong>Login:</strong> ${email}</p><p><strong>Password:</strong> ${pass}</p><p><strong>Valid Till:</strong> ${expiryDate.toLocaleString()}</p>`;
       
-      // Create invoice data saving 'days' too
       const invoiceData = {
-          name: name,
-          domain: domain,
-          amount: amount,
-          paymentId: paymentId,
-          phone: phone,
-          email: email,
-          password: pass,
-          isRenewal: false,
-          days: days
+          name: name, domain: domain, amount: amount, paymentId: paymentId,
+          phone: phone, email: email, password: pass, isRenewal: false, days: days
       };
 
-      // Add to array of purchased domains
       let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-      // Filter out any older entry for this specific domain just in case
       list = list.filter(d => d.domain !== domain); 
-      list.push({
-          domain: domain,
-          expiry: expiryTimestamp,
-          invoice: invoiceData
-      });
+      list.push({ domain: domain, expiry: expiryTimestamp, invoice: invoiceData });
       localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
       
       alert("Domain purchased successfully! The page will now reload.");
@@ -1157,9 +1355,9 @@ body {
         document.getElementById("renewValidityDays").value = 30;
     }
 
-    if (days >= 1 && days <= 15) { amount = days * 200; } 
-    else if (days >= 16 && days <= 29) { amount = days * 150; } 
-    else if (days >= 30) { amount = 3500; }
+    if (days >= 1 && days <= 15) { amount = days * window.priceTier1; } 
+    else if (days >= 16 && days <= 29) { amount = days * window.priceTier2; } 
+    else if (days >= 30) { amount = window.priceTier3; }
 
     priceDisplay.innerText = "Total: ₹" + amount;
     return amount;
@@ -1195,10 +1393,7 @@ body {
 
   window.processRenewal = async function(domain, days, amount, paymentId, email) {
     const db = dbs[domain];
-    if (!db) {
-        alert(`Error: Firebase is not configured correctly for '${domain}'.`);
-        return;
-    }
+    if (!db) return alert(`Error: Firebase is not configured correctly for '${domain}'.`);
 
     try {
         let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
@@ -1207,9 +1402,7 @@ body {
         let currentExpiry = domainIndex !== -1 ? list[domainIndex].expiry : new Date().getTime();
         let now = new Date().getTime();
         let baseTime = currentExpiry > now ? currentExpiry : now;
-        
-        let addedMs = days * 24 * 60 * 60 * 1000;
-        let newExpiryTimestamp = baseTime + addedMs;
+        let newExpiryTimestamp = baseTime + (days * 24 * 60 * 60 * 1000);
 
         const usersRef = ref(db, 'users');
         const snapshot = await get(usersRef);
@@ -1222,25 +1415,28 @@ body {
                 await set(ref(db, `users/${userUid}/expiryDate`), newExpiryTimestamp);
                 await set(ref(db, `users/${userUid}/paymentId`), paymentId);
                 await set(ref(db, `users/${userUid}/email`), email);
-                // IF User was blocked due to expiry, restore their "admin" role upon successful renewal
                 await set(ref(db, `users/${userUid}/role`), "admin");
             }
         }
         
         const domainKey = domain.replace(/\./g, '_');
         await set(ref(centralDB, 'soldDomains/' + domainKey), newExpiryTimestamp);
+        await set(ref(centralDB, `soldDomainsDetails/${domainKey}/expiryTimestamp`), newExpiryTimestamp);
+        await set(ref(centralDB, `soldDomainsDetails/${domainKey}/email`), email);
 
-        // Update expiry and invoice in LocalStorage Array
-        const invoiceData = {
-            name: "Valued Customer",
+        // Save Transaction for Accounting & Distribution logic
+        const txRef = push(ref(centralDB, 'transactions'));
+        await set(txRef, {
             domain: domain,
             amount: amount,
-            paymentId: paymentId,
-            phone: "N/A",
-            email: email,
-            password: null,
-            isRenewal: true,
-            days: days
+            date: new Date().getTime(),
+            type: "renewal",
+            isDistributed: false
+        });
+
+        const invoiceData = {
+            name: "Valued Customer", domain: domain, amount: amount, paymentId: paymentId,
+            phone: "N/A", email: email, password: null, isRenewal: true, days: days
         };
 
         if(domainIndex !== -1) {
@@ -1252,8 +1448,6 @@ body {
         localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
 
         document.getElementById("renewPopup").style.display = "none";
-        
-        // Generate Invoice specifically for renewal with valid days passed
         window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true, days);
 
         alert("Domain renewed successfully! The page will now reload.");
@@ -1265,6 +1459,231 @@ body {
     }
   };
 
+  // ================= SUPER ADMIN LOGIC =================
+  window.createSuperAdmin = async function() {
+      const email = document.getElementById('saCreateEmail').value.trim();
+      const pass = document.getElementById('saCreatePassword').value.trim();
+      if(!email || pass.length < 6) return alert("Valid Email and min 6 char password required.");
+      
+      try {
+          const userCred = await createUserWithEmailAndPassword(centralAuth, email, pass);
+          await set(ref(centralDB, `superAdmins/${userCred.user.uid}`), { email: email, role: 'superadmin' });
+          alert("Super Admin created successfully! You can now login.");
+      } catch(e) {
+          alert("Error creating Super Admin: " + e.message);
+      }
+  };
+
+  window.loginSuperAdmin = async function() {
+      const email = document.getElementById('saLoginEmail').value.trim();
+      const pass = document.getElementById('saLoginPassword').value.trim();
+      if(!email || !pass) return alert("Enter email and password");
+
+      try {
+          const userCred = await signInWithEmailAndPassword(centralAuth, email, pass);
+          // verify role
+          const roleSnap = await get(ref(centralDB, `superAdmins/${userCred.user.uid}`));
+          if(roleSnap.exists() && roleSnap.val().role === 'superadmin') {
+              document.getElementById('sa-auth-section').style.display = 'none';
+              document.getElementById('sa-dashboard-section').style.display = 'block';
+              if (!isDashboardLoaded) {
+                  loadSuperAdminDashboard();
+                  isDashboardLoaded = true;
+              }
+          } else {
+              await signOut(centralAuth);
+              alert("You are not authorized as a Super Admin.");
+          }
+      } catch(e) {
+          alert("Login Failed: " + e.message);
+      }
+  };
+
+  window.logoutSuperAdmin = async function() {
+      await signOut(centralAuth);
+      document.getElementById('sa-dashboard-section').style.display = 'none';
+      document.getElementById('sa-auth-section').style.display = 'block';
+      if(saCountdownInterval) clearInterval(saCountdownInterval);
+      isDashboardLoaded = false;
+  };
+
+  window.savePricingSettings = async function() {
+      let t1 = parseInt(document.getElementById('saPriceTier1').value);
+      let t2 = parseInt(document.getElementById('saPriceTier2').value);
+      let t3 = parseInt(document.getElementById('saPriceTier3').value);
+      let cM = parseInt(document.getElementById('saCustomPriceMonthly').value);
+      let cY = parseInt(document.getElementById('saCustomPriceYearly').value);
+
+      if(!t1 || !t2 || !t3 || !cM || !cY) return alert("Please fill all tier prices correctly.");
+      
+      try {
+          await set(ref(centralDB, 'pricingSettings'), { 
+              tier1: t1, tier2: t2, tier3: t3,
+              customMonthly: cM, customYearly: cY 
+          });
+          window.priceTier1 = t1; window.priceTier2 = t2; window.priceTier3 = t3;
+          window.customPriceMonthly = cM; window.customPriceYearly = cY;
+          updatePricingUI();
+          alert("Pricing updated successfully!");
+      } catch(e) {
+          alert("Error saving pricing: " + e.message);
+      }
+  };
+
+  // DISTRIBUTION LOGIC
+  window.distributeFunds = async function() {
+      try {
+          // Get Transactions
+          const txSnap = await get(ref(centralDB, 'transactions'));
+          let pendingAmount = 0;
+          let keysToUpdate = [];
+          
+          if(txSnap.exists()) {
+              const data = txSnap.val();
+              for(let key in data) {
+                  if(!data[key].isDistributed) {
+                      pendingAmount += data[key].amount;
+                      keysToUpdate.push(key);
+                  }
+              }
+          }
+          
+          if(pendingAmount === 0) return alert("No pending amount to distribute.");
+
+          // Get all Super Admins
+          const saSnap = await get(ref(centralDB, 'superAdmins'));
+          if(!saSnap.exists()) return alert("No super admins found in database.");
+          
+          const saData = saSnap.val();
+          const admins = Object.values(saData);
+          const adminCount = admins.length;
+          
+          if(adminCount === 0) return alert("No valid super admins to distribute to.");
+          
+          // Split Amount
+          const splitAmount = (pendingAmount / adminCount).toFixed(2);
+          
+          // Update DB (Mark as distributed)
+          const updates = {};
+          keysToUpdate.forEach(key => {
+              updates[`transactions/${key}/isDistributed`] = true;
+          });
+          await update(ref(centralDB), updates);
+          
+          // Show Results UI
+          const distList = document.getElementById("distList");
+          distList.innerHTML = `<p style="color:#eee; font-size:0.9rem; margin-bottom:10px;">Total Distributed: <strong>₹${pendingAmount}</strong></p>`;
+          
+          admins.forEach(admin => {
+              distList.innerHTML += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,255,204,0.3); padding:8px 0; font-size:0.9rem;">
+                  <span style="color:#fff;">${admin.email}</span>
+                  <span style="color:#38ef7d; font-weight:bold;">₹${splitAmount}</span>
+              </div>`;
+          });
+          
+          document.getElementById("distributionResult").style.display = "block";
+          
+      } catch (e) {
+          alert("Error during distribution: " + e.message);
+      }
+  };
+
+  window.closeDistribution = function() {
+      document.getElementById("distributionResult").style.display = "none";
+  };
+
+  function loadSuperAdminDashboard() {
+      document.getElementById('saPriceTier1').value = window.priceTier1;
+      document.getElementById('saPriceTier2').value = window.priceTier2;
+      document.getElementById('saPriceTier3').value = window.priceTier3;
+      document.getElementById('saCustomPriceMonthly').value = window.customPriceMonthly;
+      document.getElementById('saCustomPriceYearly').value = window.customPriceYearly;
+
+      // Listen for Transactions to update Stats
+      onValue(ref(centralDB, 'transactions'), (snapshot) => {
+          let totalToday = 0, totalWeekly = 0, totalMonthly = 0, totalPending = 0;
+          const now = new Date();
+          
+          // Time calculations
+          const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+          const day = now.getDay() || 7; 
+          const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + 1).getTime();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+          if(snapshot.exists()) {
+              const data = snapshot.val();
+              for(let key in data) {
+                  let tx = data[key];
+                  if(!tx.isDistributed) {
+                      totalPending += tx.amount;
+                      if(tx.date >= startOfDay) totalToday += tx.amount;
+                      if(tx.date >= startOfWeek) totalWeekly += tx.amount;
+                      if(tx.date >= startOfMonth) totalMonthly += tx.amount;
+                  }
+              }
+          }
+          
+          document.getElementById('saToday').innerText = `₹${totalToday}`;
+          document.getElementById('saWeekly').innerText = `₹${totalWeekly}`;
+          document.getElementById('saMonthly').innerText = `₹${totalMonthly}`;
+          document.getElementById('saPending').innerText = `₹${totalPending}`;
+      });
+
+      // Listen for Sold Domains details
+      const saListDiv = document.getElementById('saSoldDomainsList');
+      onValue(ref(centralDB, 'soldDomainsDetails'), (snapshot) => {
+          if(saCountdownInterval) clearInterval(saCountdownInterval);
+          saListDiv.innerHTML = "";
+          
+          if(!snapshot.exists()) {
+              saListDiv.innerHTML = "<p>No domains sold yet.</p>";
+              return;
+          }
+
+          let data = snapshot.val();
+          let activeTimers = [];
+
+          for(let key in data) {
+              let d = data[key];
+              let card = document.createElement('div');
+              card.className = "sa-domain-card";
+              card.innerHTML = `
+                  <h4>${d.domain}</h4>
+                  <p><strong>Name:</strong> ${d.name}</p>
+                  <p><strong>Email:</strong> ${d.email}</p>
+                  <p><strong>Phone:</strong> ${d.phone}</p>
+                  <p><strong>Password:</strong> ${d.password || 'N/A (Renewed)'}</p>
+                  <span class="sa-timer" id="sa_timer_${key}">Calculating...</span>
+              `;
+              saListDiv.appendChild(card);
+              activeTimers.push({ id: `sa_timer_${key}`, expiry: d.expiryTimestamp });
+          }
+
+          // Start interval for super admin dashboard countdowns
+          saCountdownInterval = setInterval(() => {
+              let now = new Date().getTime();
+              activeTimers.forEach(t => {
+                  let el = document.getElementById(t.id);
+                  if(el) {
+                      let dist = t.expiry - now;
+                      if(dist < 0) {
+                          el.innerText = "Status: Expired";
+                          el.style.color = "#ff416c";
+                      } else {
+                          let days = Math.floor(dist / (1000 * 60 * 60 * 24));
+                          let hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                          let mins = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                          let secs = Math.floor((dist % (1000 * 60)) / 1000);
+                          el.innerText = `Expires in: ${days}d ${hours}h ${mins}m ${secs}s`;
+                          el.style.color = "#38ef7d";
+                      }
+                  }
+              });
+          }, 1000);
+      });
+  }
+
+  // ================= UI & UTILS =================
   window.showForm = function() {
     document.getElementById("offersSection").style.display = "none";
     document.getElementById("formSection").style.display = "block";
@@ -1312,7 +1731,9 @@ body {
     let email = document.getElementById("email").value.trim();
     let mobile = document.getElementById("mobile").value.trim();
     let address = document.getElementById("address").value.trim();
-    let amount = document.getElementById("plan").value;
+    let planType = document.getElementById("plan").value;
+
+    let amount = planType === 'monthly' ? window.customPriceMonthly : window.customPriceYearly;
 
     if(!name || !title || !baseDomain || !email || !mobile){
       alert("Please fill all required fields");
@@ -1326,13 +1747,9 @@ body {
       name: "Sintha Developer",
       description: "Custom Domain Order",
       handler: function(response){
-        
-        // Pass "30 Days" or "365 Days" for custom domains depending on the selected plan
-        let validityDays = amount == "4000" ? "30 Days" : "365 Days";
+        let validityDays = planType === 'monthly' ? "30 Days" : "365 Days";
         window.generateInvoice(name, domain, amount, response.razorpay_payment_id, mobile, email, null, false, validityDays);
-
         const msg = `New Order:\nName: ${name}\nTitle: ${title}\nDomain: ${domain}\nEmail: ${email}\nMobile: ${mobile}\nAddress: ${address}\nAmount: ₹${amount}\nPaymentID: ${response.razorpay_payment_id}`;
-
         window.location.href = "https://wa.me/919366193440?text=" + encodeURIComponent(msg);
       },
       prefill: { name: name, email: email, contact: mobile },
@@ -1342,7 +1759,6 @@ body {
     new Razorpay(options).open();
   };
 
-  // Modified GenerateInvoice function to include Validity
   window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, adminPassword = null, isRenewal = false, validityDays = "N/A") {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -1394,8 +1810,6 @@ body {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
       doc.text("DESCRIPTION", 18, tableStartY + 7);
-      
-      // Added VALIDITY Header 
       doc.text("VALIDITY", 130, tableStartY + 7);
       doc.text("AMOUNT", 180, tableStartY + 7, { align: 'right' });
 
@@ -1409,7 +1823,6 @@ body {
       doc.setFont('helvetica', 'normal');
       doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 100 });
       
-      // Print the valid amount of days
       let validityStr = validityDays;
       if (!isNaN(validityDays)) validityStr = `${validityDays} Days`;
       doc.text(validityStr, 130, tableStartY + 17);
@@ -1462,31 +1875,26 @@ body {
 
 <!-- ================= NAVIGATION & SWIPE SCRIPT ================= -->
 <script>
-  // Page Array mapping to HTML elements
-  const pages = ['page-home', 'page-contact', 'page-privacy', 'page-refund'];
+  // Page Array mapping to HTML elements (Added SuperAdmin)
+  const pages = ['page-home', 'page-contact', 'page-privacy', 'page-refund', 'page-superadmin'];
   let currentPageIndex = 0;
 
-  // Switch function for Navigation Bar
   window.switchPage = function(pageId) {
-      // Hide all pages & remove active class from navs
       pages.forEach((p, idx) => {
           document.getElementById(p).classList.remove('active');
           document.getElementById('nav-' + p.split('-')[1]).classList.remove('active');
           if (p === pageId) currentPageIndex = idx;
       });
       
-      // Show Target Page
       document.getElementById(pageId).classList.add('active');
       document.getElementById('nav-' + pageId.split('-')[1]).classList.add('active');
 
-      // Special rule: If navigating away from Home, reset the form view to offers view
       if(pageId !== 'page-home') {
           document.getElementById("formSection").style.display = "none";
           document.getElementById("offersSection").style.display = "block";
       }
   };
 
-  // ================= ENHANCED SWIPE GESTURES LOGIC =================
   let touchstartX = 0;
   let touchendX = 0;
   let touchstartY = 0;
@@ -1494,30 +1902,20 @@ body {
 
   function handleSwipe() {
       const minSwipeDistance = 50; 
-      // maxVerticalRatio ensures we don't change pages if the user is scrolling up/down
       const maxVerticalRatio = 0.6; 
 
       let diffX = touchstartX - touchendX;
       let diffY = touchstartY - touchendY;
 
-      // Check if it's a valid horizontal swipe (ignores vertical scrolls)
       if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffY) < Math.abs(diffX) * maxVerticalRatio) {
-          
           if (diffX > 0) {
-              // Swiped Left -> Go to Next Page
-              if (currentPageIndex < pages.length - 1) {
-                  window.switchPage(pages[currentPageIndex + 1]);
-              }
+              if (currentPageIndex < pages.length - 1) window.switchPage(pages[currentPageIndex + 1]);
           } else {
-              // Swiped Right -> Go to Previous Page
-              if (currentPageIndex > 0) {
-                  window.switchPage(pages[currentPageIndex - 1]);
-              }
+              if (currentPageIndex > 0) window.switchPage(pages[currentPageIndex - 1]);
           }
       }
   }
 
-  // Bind the event listener to the whole document so it works anywhere on the screen
   document.addEventListener('touchstart', e => {
       touchstartX = e.changedTouches[0].screenX;
       touchstartY = e.changedTouches[0].screenY;
