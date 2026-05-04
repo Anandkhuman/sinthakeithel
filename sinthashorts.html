@@ -24,10 +24,11 @@
             --border-color: #2f2f2f;
             --menu-bg-color: rgba(20, 20, 20, 0.85);
             --font-main: 'Inter', system-ui, sans-serif;
-            --media-container-height: 220px;
-            --app-header-height: 60px;
-            --search-bar-height: 50px;
-            --top-menu-height: 48px;
+            /* DECREASED VARIABLES */
+            --media-container-height: 200px;
+            --app-header-height: 55px;
+            --search-bar-height: 45px;
+            --top-menu-height: 40px;
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
@@ -54,13 +55,13 @@
             animation: splashFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         .splash-logo {
-            font-size: 4rem;
+            font-size: 3.5rem;
             color: #60a5fa;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             animation: splashFloat 3s ease-in-out infinite;
         }
         .splash-title {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: white;
             margin-bottom: 5px;
@@ -70,16 +71,16 @@
             -webkit-text-fill-color: transparent;
         }
         .splash-subtitle {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #b0b0b0;
             font-weight: 500;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .splash-loader {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid var(--accent-color-1);
+            width: 35px;
+            height: 35px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--accent-color-1);
             border-radius: 50%;
             margin: 0 auto;
             animation: splashSpin 1s linear infinite;
@@ -99,244 +100,244 @@
         .splash-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
         /* AUTHENTICATION UI */
-        .welcome-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1a1a1d 0%, #121212 100%); padding: 20px; position: fixed; top: 0; left: 0; z-index: 500; overflow-y: auto; }
-        .welcome-brand { font-size: 2.2rem; font-weight: 700; color: #60a5fa; margin-bottom: 5px; }
-        .welcome-subtitle { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 25px; }
-        .auth-container { width: 100%; max-width: 380px; background: #1f2937; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
+        .welcome-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1a1a1d 0%, #121212 100%); padding: 15px; position: fixed; top: 0; left: 0; z-index: 500; overflow-y: auto; }
+        .welcome-brand { font-size: 1.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 5px; }
+        .welcome-subtitle { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 20px; }
+        .auth-container { width: 100%; max-width: 350px; background: #1f2937; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
         
         .auth-view { display: none; }
         .auth-view.active { display: block; }
-        .auth-title { font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 15px; text-align: left; }
+        .auth-title { font-size: 1.2rem; font-weight: 600; color: white; margin-bottom: 12px; text-align: left; }
         
-        .auth-input { width: 100%; background: #111827; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #4b5563; outline: none; font-size: 1rem; }
+        .auth-input { width: 100%; background: #111827; color: white; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #4b5563; outline: none; font-size: 0.95rem; }
         .auth-input:focus { border-color: #3b82f6; }
         
-        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 12px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; transition: 0.2s; }
+        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 10px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 10px; font-size: 0.95rem; transition: 0.2s; }
         .auth-btn:hover { background: #2563eb; }
         .auth-btn.admin-btn { background: #eab308; color: #111827; }
         .auth-btn.admin-btn:hover { background: #ca8a04; }
         
-        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: block; text-align: center; margin-top: 15px; background: none; border: none; width: 100%; }
+        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: block; text-align: center; margin-top: 12px; background: none; border: none; width: 100%; }
         .auth-link:hover { text-decoration: underline; }
-        .auth-close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+        .auth-close-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; }
         
-        .auth-error { color: #f87171; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+        .auth-error { color: #f87171; font-size: 0.8rem; margin-top: 8px; text-align: center; }
 
         /* MAIN APP UI */
         .app-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
         
-        .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header-title { font-size: 1.2em; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
+        .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-title { font-size: 1.1em; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 20px; font-size: 0.9em; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 6px; }
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.25em; transition: 0.2s; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 5px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.15em; transition: 0.2s; }
         .icon-btn.logout { color: #f87171; } .icon-btn.logout:hover { color: #fca5a5; }
         
-        .admin-nav-btn { background: #eab308; color: #111827; padding: 6px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .admin-nav-btn { background: #eab308; color: #111827; padding: 5px 10px; border-radius: 6px; font-size: 0.8em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .admin-nav-btn:hover { background: #facc15; }
-        .profile-nav-btn { background: #3b82f6; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .profile-nav-btn { background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 0.8em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 
         /* SEARCH BAR ROW */
-        .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 15px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
-        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 8px 15px; outline: none; transition: 0.3s; font-size: 0.95em; }
+        .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 12px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
+        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 15px; padding: 6px 12px; outline: none; transition: 0.3s; font-size: 0.9em; }
         .search-input:focus { background: rgba(255,255,255,0.2); border-color: var(--accent-color-1); }
 
         /* TOP MENU ROW */
         .top-menu { position: fixed; top: calc(var(--app-header-height) + var(--search-bar-height)); left: 0; width: 100%; height: var(--top-menu-height); background-color: var(--menu-bg-color); backdrop-filter: blur(10px); display: flex; align-items: center; overflow-x: auto; white-space: nowrap; z-index: 150; scrollbar-width: none; border-bottom: 1px solid var(--border-color); scroll-behavior: smooth;}
         .top-menu::-webkit-scrollbar { display: none; }
-        .top-menu ul { list-style: none; padding: 0 15px; }
-        .top-menu li { display: inline-block; margin-right: 5px; }
-        .top-menu li a { display: block; padding: 8px 15px; color: var(--primary-text-color); text-decoration: none; font-size: 0.95em; border-radius: 18px; transition: 0.2s ease; text-transform: capitalize; }
+        .top-menu ul { list-style: none; padding: 0 12px; }
+        .top-menu li { display: inline-block; margin-right: 4px; }
+        .top-menu li a { display: block; padding: 6px 12px; color: var(--primary-text-color); text-decoration: none; font-size: 0.85em; border-radius: 15px; transition: 0.2s ease; text-transform: capitalize; }
         .top-menu li a.active { background-color: var(--accent-color-1); color: #fff; }
         
         /* UPDATED FOR SMOOTH SWIPE */
         .news-stream { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; will-change: transform; }
         .news-card { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: var(--card-bg-color); overflow: hidden; position: relative; z-index: 1; flex-shrink: 0; }
-        .news-card::before { content: ''; position: absolute; top: 30%; left: -15%; width: 300px; height: 300px; background: var(--accent-color-1); border-radius: 50%; filter: blur(130px); opacity: 0.15; z-index: -1; pointer-events: none; }
+        .news-card::before { content: ''; position: absolute; top: 30%; left: -15%; width: 250px; height: 250px; background: var(--accent-color-1); border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: -1; pointer-events: none; }
         
         /* Adjust padding to account for header + search + menu */
-        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + 15px) 15px 15px 15px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; }
-        .card-media { width: 100%; height: var(--media-container-height); border-radius: 12px; overflow: hidden; margin-bottom: 15px; background: #000; flex-shrink: 0; position: relative; }
+        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + 12px) 12px 12px 12px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; }
+        .card-media { width: 100%; height: var(--media-container-height); border-radius: 10px; overflow: hidden; margin-bottom: 12px; background: #000; flex-shrink: 0; position: relative; }
         .card-media img, .card-media video { width: 100%; height: 100%; object-fit: cover; }
         
-        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
-        .card-title { font-size: 1.4em; font-weight: 700; line-height: 1.3; margin-bottom: 8px; flex-shrink: 0; }
-        .card-meta { font-size: 0.85em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 10px; margin-bottom: 12px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
-        .cat-badge { background: #374151; padding: 4px 8px; border-radius: 4px; color: #e5e7eb; }
-        .live-badge { position: absolute; top: -10px; left: -10px; background: #dc2626; color: white; font-size: 0.75em; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; margin-bottom: 12px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.2em; font-weight: 700; line-height: 1.3; margin-bottom: 6px; flex-shrink: 0; }
+        .card-meta { font-size: 0.8em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
+        .cat-badge { background: #374151; padding: 3px 6px; border-radius: 4px; color: #e5e7eb; }
+        .live-badge { position: absolute; top: -10px; left: -10px; background: #dc2626; color: white; font-size: 0.7em; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         
         /* FULL TEXT CSS SUPPORT */
-        .card-snippet { font-size: 0.95em; line-height: 1.5; color: #ddd; white-space: pre-line; text-align: justify; } 
+        .card-snippet { font-size: 0.9em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
         .text-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .text-expanded { display: block !important; overflow-y: auto; max-height: 60vh; padding-right: 5px; }
         .text-expanded::-webkit-scrollbar { width: 4px; }
         .text-expanded::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
-        .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.9em; cursor: pointer; padding: 0; text-align: left; }
+        .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.85em; cursor: pointer; padding: 0; text-align: left; }
 
-        .card-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; width: 100%; flex-shrink: 0; }
-        .timer-badge { text-align: center; font-weight: bold; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 10px; color: #ffeb3b; }
-        .btn-predict { background: var(--accent-color-1); color: #fff; padding: 12px; text-align: center; border-radius: 25px; font-weight: bold; font-size: 1.1em; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 174, 255, 0.4); cursor: pointer; border: none; }
-        .btn-predict.btn-yellow { background: #eab308; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); color: black;}
-        .btn-predict.btn-purple { background: #9333ea; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); }
+        .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; width: 100%; flex-shrink: 0; }
+        .timer-badge { text-align: center; font-weight: bold; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 8px; color: #ffeb3b; font-size: 0.9em;}
+        .btn-predict { background: var(--accent-color-1); color: #fff; padding: 10px; text-align: center; border-radius: 20px; font-weight: bold; font-size: 1rem; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 174, 255, 0.4); cursor: pointer; border: none; }
+        .btn-predict.btn-yellow { background: #eab308; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4); color: black;}
+        .btn-predict.btn-purple { background: #9333ea; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4); }
         .btn-predict.btn-closed { background: #555; color: #ccc; box-shadow: none; cursor: not-allowed; }
         
         /* SOCIAL ACTION BUTTONS INSIDE TEXT CONTAINER */
-        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; padding-bottom: 5px; flex-shrink: 0; margin-top: auto; }
-        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; font-size: 1.1rem; cursor: pointer; transition: 0.2s; font-weight: 600;}
+        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; padding-bottom: 5px; flex-shrink: 0; margin-top: auto; }
+        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 6px; font-size: 1rem; cursor: pointer; transition: 0.2s; font-weight: 600;}
         .inline-action-btn:hover { color: #fff; }
         .inline-action-btn.liked i { color: #ef4444; }
 
-        .swipe-indicator { position: fixed; bottom: 44%; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.9em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
+        .swipe-indicator { position: fixed; bottom: 44%; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.8em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
         .animate-bounce { animation: bounce 1s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
 
         /* MODALS */
-        .overlay-modal { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 500px; max-height: 90vh; border-radius: 16px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .overlay-modal { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 12px; }
+        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 450px; max-height: 90vh; border-radius: 12px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
-        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 16px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
-        .modal-title { font-weight: bold; font-size: 1.1em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.8em; cursor: pointer; line-height: 1; }
-        .modal-body { padding: 20px; flex-grow: 1; }
+        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 12px 16px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
+        .modal-title { font-weight: bold; font-size: 1.05em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.6em; cursor: pointer; line-height: 1; }
+        .modal-body { padding: 15px; flex-grow: 1; }
         
-        .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 16px; background: rgba(113, 63, 18, 0.3); padding: 8px; border-radius: 4px; }
-        .public-stats { background: rgba(30, 58, 138, 0.3); border: 1px solid rgba(59, 130, 246, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 24px; }
-        .public-stats h3 { color: #5eead4; font-weight: bold; margin-bottom: 4px; font-size: 1rem; }
+        .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 12px; background: rgba(113, 63, 18, 0.3); padding: 6px; border-radius: 4px; font-size: 0.9rem;}
+        .public-stats { background: rgba(30, 58, 138, 0.3); border: 1px solid rgba(59, 130, 246, 0.3); padding: 12px; border-radius: 10px; margin-bottom: 20px; }
+        .public-stats h3 { color: #5eead4; font-weight: bold; margin-bottom: 4px; font-size: 0.95rem; }
         
-        .question-card { background: rgba(55, 65, 81, 0.5); padding: 16px; border-radius: 12px; border: 1px solid #4b5563; margin-bottom: 24px; }
-        .question-title { font-weight: bold; color: #e5e7eb; margin-bottom: 12px; font-size: 1.05rem; }
+        .question-card { background: rgba(55, 65, 81, 0.5); padding: 12px; border-radius: 10px; border: 1px solid #4b5563; margin-bottom: 16px; }
+        .question-title { font-weight: bold; color: #e5e7eb; margin-bottom: 8px; font-size: 0.95rem; }
         
-        .option-label { display: block; padding: 12px; border: 1px solid #4b5563; border-radius: 8px; cursor: pointer; background: #1f2937; margin-bottom: 8px; transition: 0.2s; }
+        .option-label { display: block; padding: 10px; border: 1px solid #4b5563; border-radius: 8px; cursor: pointer; background: #1f2937; margin-bottom: 6px; transition: 0.2s; font-size: 0.9rem;}
         .option-label:hover { background: #374151; }
         .option-label.checked { background: rgba(30, 58, 138, 0.4); border-color: #60a5fa; }
         .option-flex { display: flex; align-items: center; color: #e5e7eb; }
-        .option-flex input { margin-right: 12px; width: 16px; height: 16px; accent-color: #3b82f6; }
+        .option-flex input { margin-right: 10px; width: 14px; height: 14px; accent-color: #3b82f6; }
         
-        .progress-bg { background: #4b5563; border-radius: 999px; height: 4px; margin-top: 8px; overflow: hidden; width: 100%; }
+        .progress-bg { background: #4b5563; border-radius: 999px; height: 4px; margin-top: 6px; overflow: hidden; width: 100%; }
         .progress-fill { background: #2dd4bf; height: 100%; transition: width 0.5s ease-in-out; }
-        .progress-text { font-size: 0.75rem; color: #9ca3af; float: right; margin-top: 4px; }
+        .progress-text { font-size: 0.7rem; color: #9ca3af; float: right; margin-top: 3px; }
         
-        .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 14px; border-radius: 25px; border: none; font-weight: bold; margin-top: 24px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        .lb-header { background: linear-gradient(to right, #9333ea, #ec4899); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; }
-        .lb-header h3 { font-weight: bold; font-size: 1.25rem; }
-        .lb-header p { font-size: 1.5rem; font-weight: 900; margin-top: 4px; }
-        .lb-table-wrap { background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151; }
-        .lb-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        .lb-table th { background: #111827; padding: 12px; border-bottom: 1px solid #374151; color: #d1d5db; }
-        .lb-table td { padding: 12px; border-bottom: 1px solid rgba(55, 65, 81, 0.5); color: #e5e7eb; }
+        .lb-header { background: linear-gradient(to right, #9333ea, #ec4899); color: white; padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: center; }
+        .lb-header h3 { font-weight: bold; font-size: 1.1rem; }
+        .lb-header p { font-size: 1.3rem; font-weight: 900; margin-top: 4px; }
+        .lb-table-wrap { background: #1f2937; border-radius: 10px; overflow: hidden; border: 1px solid #374151; }
+        .lb-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .lb-table th { background: #111827; padding: 10px; border-bottom: 1px solid #374151; color: #d1d5db; }
+        .lb-table td { padding: 10px; border-bottom: 1px solid rgba(55, 65, 81, 0.5); color: #e5e7eb; }
 
         /* COMMENTS CSS */
-        .comment-item { background: #1f2937; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-        .comment-header { display: flex; justify-content: space-between; font-size: 0.85em; color: #9ca3af; margin-bottom: 5px; }
-        .comment-body { font-size: 0.95em; color: #e5e7eb; margin-bottom: 8px; line-height: 1.4; word-break: break-word; }
-        .comment-actions { display: flex; gap: 15px; font-size: 0.85em; color: #6b7280; }
-        .comment-action-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold;}
+        .comment-item { background: #1f2937; padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+        .comment-header { display: flex; justify-content: space-between; font-size: 0.8em; color: #9ca3af; margin-bottom: 4px; }
+        .comment-body { font-size: 0.9em; color: #e5e7eb; margin-bottom: 6px; line-height: 1.4; word-break: break-word; }
+        .comment-actions { display: flex; gap: 12px; font-size: 0.8em; color: #6b7280; }
+        .comment-action-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold;}
         .comment-action-btn:hover { color: #3b82f6; }
         .comment-action-btn.liked { color: #ef4444; }
-        .reply-list { margin-left: 20px; border-left: 2px solid #374151; padding-left: 10px; margin-top: 10px; }
+        .reply-list { margin-left: 15px; border-left: 2px solid #374151; padding-left: 8px; margin-top: 8px; }
         
         /* Comment Modal Post Preview */
-        .comment-post-preview { display: flex; flex-direction: column; background: #1f2937; border-radius: 12px; overflow: hidden; margin-bottom: 15px; border: 1px solid #374151; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
-        .comment-preview-media { width: 100%; height: 180px; position: relative; overflow: hidden; background: #000; }
+        .comment-post-preview { display: flex; flex-direction: column; background: #1f2937; border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid #374151; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);}
+        .comment-preview-media { width: 100%; height: 150px; position: relative; overflow: hidden; background: #000; }
         .comment-preview-media img, .comment-preview-media video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: transform 0.5s ease-in-out; }
-        .comment-preview-text-wrap { padding: 12px; height: 80px; overflow: hidden; position: relative; background: #111827; }
-        .comment-preview-text { font-size: 0.85em; color: #d1d5db; line-height: 1.5; position: absolute; width: calc(100% - 24px); transition: transform 0.1s linear; }
+        .comment-preview-text-wrap { padding: 10px; height: 70px; overflow: hidden; position: relative; background: #111827; }
+        .comment-preview-text { font-size: 0.8em; color: #d1d5db; line-height: 1.4; position: absolute; width: calc(100% - 20px); transition: transform 0.1s linear; }
 
         /* DASHBOARDS (ADMIN & PROFILE) */
         .admin-layout { position: absolute; inset: 0; background: #f3f4f6; overflow-y: auto; z-index: 400; color: #1f2937; }
-        .admin-topbar { background: #3b82f6; padding: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
-        .admin-topbar.yellow { background: #111827; color: white; border-bottom: 4px solid #eab308; }
-        .admin-topbar h1 { font-size: 1.4em; font-weight: bold; color: #eab308;}
-        .admin-back-btn { background: #374151; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s;}
+        .admin-topbar { background: #3b82f6; padding: 12px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
+        .admin-topbar.yellow { background: #111827; color: white; border-bottom: 3px solid #eab308; }
+        .admin-topbar h1 { font-size: 1.2em; font-weight: bold; color: #eab308;}
+        .admin-back-btn { background: #374151; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; font-size: 0.85em;}
         .admin-back-btn:hover { background: #4b5563; }
         
         .admin-in-nav { display: flex; background: #1f2937; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 500; box-shadow: 0 -4px 10px rgba(0,0,0,0.2); overflow-x: auto; white-space: nowrap; padding-bottom: env(safe-area-inset-bottom); }
-        .admin-in-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 10px; background: none; border: none; color: #9ca3af; font-weight: bold; font-size: 0.85rem; cursor: pointer; border-top: 3px solid transparent; transition: 0.2s; gap: 6px; }
-        .admin-in-nav button i { font-size: 1.25rem; }
+        .admin-in-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 5px; background: none; border: none; color: #9ca3af; font-weight: bold; font-size: 0.75rem; cursor: pointer; border-top: 3px solid transparent; transition: 0.2s; gap: 4px; }
+        .admin-in-nav button i { font-size: 1.1rem; }
         .admin-in-nav button:hover { color: white; }
         .admin-in-nav button.active { color: #eab308; border-top-color: #eab308; }
 
-        .admin-content { max-width: 900px; margin: 24px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 90px; }
+        .admin-content { max-width: 900px; margin: 16px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 16px; padding-bottom: 75px; }
         
         .admin-tab { display: none; }
-        .admin-tab.active { display: flex; flex-direction: column; gap: 24px; }
+        .admin-tab.active { display: flex; flex-direction: column; gap: 16px; }
         
-        .admin-panel-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; }
+        .admin-panel-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 3px solid #3b82f6; }
         .admin-panel-card.green { border-left-color: #22c55e; }
         .admin-panel-card.red { border-left-color: #ef4444; }
         .admin-panel-card.purple { border-left-color: #9333ea; }
         .admin-panel-card.orange { border-left-color: #f97316; }
         .admin-panel-card.yellow { border-left-color: #eab308; }
-        .admin-card-title { font-size: 1.25em; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .admin-card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
         
-        .admin-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
-        .admin-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .admin-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .admin-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .admin-input-col-2 { grid-column: span 2; }
-        .admin-input { flex: 1; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 12px; font-family: inherit; font-size: 1rem; }
-        .admin-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; font-family: inherit; resize: vertical; }
+        .admin-input { flex: 1; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; font-family: inherit; font-size: 0.9rem; }
+        .admin-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; margin-bottom: 10px; font-family: inherit; resize: vertical; font-size: 0.9rem;}
         
-        .modern-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 1.05rem; margin-bottom: 12px; outline: none; transition: border-color 0.2s; }
+        .modern-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 0.95rem; margin-bottom: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #3b82f6; background: white; }
-        .btn-pay { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: transform 0.1s; text-align: center; text-decoration: none; display: inline-block; }
+        .btn-pay { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: transform 0.1s; text-align: center; text-decoration: none; display: inline-block; }
         .btn-pay:active { transform: scale(0.98); }
 
-        .list-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .list-link-btn { background: #f3f4f6; color: #374151; padding: 14px; border-radius: 8px; font-weight: 600; text-align: left; border: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .list-btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .list-link-btn { background: #f3f4f6; color: #374151; padding: 12px; border-radius: 8px; font-weight: 600; text-align: left; border: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; font-size: 0.9rem;}
         .list-link-btn:hover { background: #e5e7eb; color: #111827; }
 
-        .admin-btn-blue { background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold;}
-        .admin-btn-green { background: #16a34a; color: white; padding: 14px; border-radius: 4px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 16px; font-size: 1.05rem; }
-        .admin-btn-gray { background: #e5e7eb; color: #1f2937; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; border: none; cursor: pointer; }
-        .admin-btn-danger { background: #dc2626; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
-        .admin-btn-warn { background: #eab308; color: #111827; padding: 8px 16px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        .admin-btn-blue { background: #2563eb; color: white; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem;}
+        .admin-btn-green { background: #16a34a; color: white; padding: 10px; border-radius: 4px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
+        .admin-btn-gray { background: #e5e7eb; color: #1f2937; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8em; border: none; cursor: pointer; }
+        .admin-btn-danger { background: #dc2626; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem;}
+        .admin-btn-warn { background: #eab308; color: #111827; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem;}
         
-        .admin-sm-btn { background: #22c55e; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; border: none; cursor: pointer; margin-left: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;}
+        .admin-sm-btn { background: #22c55e; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.75rem; border: none; cursor: pointer; margin-left: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;}
         .admin-sm-btn:hover { filter: brightness(1.1); }
         
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;}
-        .stat-box { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); text-align: center; border-bottom: 4px solid #3b82f6;}
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;}
+        .stat-box { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); text-align: center; border-bottom: 3px solid #3b82f6;}
         .stat-box.green { border-bottom-color: #10b981; }
         .stat-box.yellow { border-bottom-color: #facc15; }
-        .stat-box h3 { font-size: 0.9rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;}
-        .stat-box .val { font-size: 1.8rem; font-weight: 900; }
+        .stat-box h3 { font-size: 0.8rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;}
+        .stat-box .val { font-size: 1.5rem; font-weight: 900; }
 
         /* USER LIST CONTAINER CLEANUP */
-        .user-manage-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .user-manage-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .user-manage-header { display: flex; justify-content: space-between; align-items: flex-start;}
         .user-manage-info { flex-grow: 1; word-break: break-word; }
-        .user-manage-info h4 { font-size: 1.1rem; color: #111827; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-weight: bold;}
-        .user-manage-info p { font-size: 0.95rem; color: #4b5563; margin-bottom: 4px;}
-        .user-manage-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; padding-top: 12px; border-top: 1px solid #f3f4f6;}
-        .user-manage-actions button { padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .user-manage-info h4 { font-size: 1rem; color: #111827; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-weight: bold;}
+        .user-manage-info p { font-size: 0.85rem; color: #4b5563; margin-bottom: 3px;}
+        .user-manage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; padding-top: 10px; border-top: 1px solid #f3f4f6;}
+        .user-manage-actions button { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; flex: 1; display: flex; justify-content: center; align-items: center; gap: 4px; }
         
-        .admin-manage-card { background: #f9fafb; padding: 16px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 12px; }
-        .admin-manage-card h3 { font-weight: bold; margin-bottom: 4px; }
-        .admin-manage-card p { font-size: 0.8em; color: #6b7280; margin-bottom: 8px; }
-        .admin-resolve-box { background: #fef2f2; padding: 12px; border: 1px solid #fecaca; border-radius: 4px; margin-top: 8px; }
-        .admin-resolve-box h4 { color: #dc2626; font-size: 0.9em; font-weight: bold; margin-bottom: 8px; }
-        .admin-resolve-row { margin-bottom: 6px; font-size: 0.9em; }
-        .admin-resolve-select { border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; margin-top: 4px; width: 100%; font-family: inherit; }
+        .admin-manage-card { background: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 10px; }
+        .admin-manage-card h3 { font-weight: bold; margin-bottom: 4px; font-size: 1rem;}
+        .admin-manage-card p { font-size: 0.8em; color: #6b7280; margin-bottom: 6px; }
+        .admin-resolve-box { background: #fef2f2; padding: 10px; border: 1px solid #fecaca; border-radius: 4px; margin-top: 8px; }
+        .admin-resolve-box h4 { color: #dc2626; font-size: 0.85em; font-weight: bold; margin-bottom: 6px; }
+        .admin-resolve-row { margin-bottom: 4px; font-size: 0.85em; }
+        .admin-resolve-select { border: 1px solid #d1d5db; border-radius: 4px; padding: 5px 8px; margin-top: 3px; width: 100%; font-family: inherit; font-size: 0.85rem;}
         
-        .withdrawal-req-card { background: white; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px;}
-        .withdrawal-info h4 { margin-bottom: 4px; color: #111827; font-size: 1.1rem;}
-        .withdrawal-info p { font-size: 0.9rem; color: #4b5563; margin-bottom: 4px;}
-        .withdrawal-actions { display: flex; gap: 8px; flex-direction: column; }
+        .withdrawal-req-card { background: white; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;}
+        .withdrawal-info h4 { margin-bottom: 3px; color: #111827; font-size: 1rem;}
+        .withdrawal-info p { font-size: 0.85rem; color: #4b5563; margin-bottom: 3px;}
+        .withdrawal-actions { display: flex; gap: 6px; flex-direction: column; }
         
-        .mcq-builder-area { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .mcq-q-box { background: white; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 12px; }
+        .mcq-builder-area { background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .mcq-q-box { background: white; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px; }
 
         /* Modern Notifications CSS */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .modern-toast { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(-20px); animation: slideDownFade 0.3s forwards; pointer-events: auto; }
-        .toast-success { border-left: 4px solid #10b981; }
+        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .modern-toast { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 10px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(-20px); animation: slideDownFade 0.3s forwards; pointer-events: auto; }
+        .toast-success { border-left: 3px solid #10b981; }
         .toast-success i { color: #10b981; }
-        .toast-error { border-left: 4px solid #ef4444; }
+        .toast-error { border-left: 3px solid #ef4444; }
         .toast-error i { color: #ef4444; }
-        .toast-warning { border-left: 4px solid #f59e0b; }
+        .toast-warning { border-left: 3px solid #f59e0b; }
         .toast-warning i { color: #f59e0b; }
-        .toast-info { border-left: 4px solid #3b82f6; }
+        .toast-info { border-left: 3px solid #3b82f6; }
         .toast-info i { color: #3b82f6; }
         @keyframes slideDownFade { to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUpFade { to { opacity: 0; transform: translateY(-20px); } }
@@ -408,7 +409,7 @@
         <div class="header-actions hidden-panel" id="header-actions-user">
             <div class="wallet-badge">
                 <i class="fas fa-coins" style="color: #facc15;"></i> <span id="user-wallet">0</span>
-                <button onclick="openTopUpModal()" style="margin-left: 8px; background: none; border: none; color: #10b981; font-size: 1.1em; cursor: pointer;" title="Top Up Balance">
+                <button onclick="openTopUpModal()" style="margin-left: 6px; background: none; border: none; color: #10b981; font-size: 1.1em; cursor: pointer;" title="Top Up Balance">
                     <i class="fas fa-plus-circle"></i>
                 </button>
             </div>
@@ -430,9 +431,9 @@
     <div class="news-stream" id="newsStream"></div>
 
     <div class="swipe-indicator" id="swipeIndicator">
-        <i class="fas fa-chevron-up animate-bounce" style="font-size: 1.25em; margin-bottom: 4px;"></i>
+        <i class="fas fa-chevron-up animate-bounce" style="font-size: 1.1em; margin-bottom: 3px;"></i>
         <span>Swipe</span>
-        <i class="fas fa-chevron-down" style="font-size: 1.25em; margin-top: 4px;"></i>
+        <i class="fas fa-chevron-down" style="font-size: 1.1em; margin-top: 3px;"></i>
     </div>
 </div>
 
@@ -446,10 +447,10 @@
         
         <div class="modal-body">
             <div id="modal-countdown" class="modal-countdown"></div>
-            <div style="font-size: 0.85rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="font-size: 0.8rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; margin-bottom: 12px;">
                 <i class="fas fa-info-circle"></i> <strong>Rules:</strong> You will get points for correct answers and <strong style="color:#f87171;">Negative Points</strong> for wrong answers. Leave unattempted for 0 points.
             </div>
-            <div id="modal-prizes" style="display: none; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;"></div>
+            <div id="modal-prizes" style="display: none; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 10px; border-radius: 8px; margin-bottom: 14px; text-align: center;"></div>
             <div id="public-stats-container" class="public-stats hidden-panel"></div>
 
             <form id="prediction-form" onsubmit="submitPrediction(event)">
@@ -471,20 +472,20 @@
             <h2 class="modal-title">Comments</h2>
             <button onclick="closeModal('comment-modal')" class="modal-close">&times;</button>
         </div>
-        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 15px; background: #111827;">
+        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 12px; background: #111827;">
             <div id="comment-post-preview-container"></div>
             <div id="comment-list" style="flex-grow: 1;">
                 <!-- Comments list dynamically injected here -->
             </div>
         </div>
-        <div style="padding: 10px 15px; background: #1f2937; border-top: 1px solid #374151;">
-            <div id="comment-reply-preview" class="hidden-panel" style="font-size: 0.8em; color: #9ca3af; margin-bottom: 5px; display:flex; justify-content:space-between;"></div>
+        <div style="padding: 8px 12px; background: #1f2937; border-top: 1px solid #374151;">
+            <div id="comment-reply-preview" class="hidden-panel" style="font-size: 0.75em; color: #9ca3af; margin-bottom: 4px; display:flex; justify-content:space-between;"></div>
             <input type="hidden" id="comment-news-id">
             <input type="hidden" id="comment-reply-id">
             <input type="hidden" id="comment-edit-id">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:10px;">
-                <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 15px; border-radius:12px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:8px 12px;">
+                <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 12px; border-radius:10px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -508,7 +509,7 @@
             <h2 class="modal-title" id="info-modal-title">Info</h2>
             <button onclick="closeModal('info-modal')" class="modal-close">&times;</button>
         </div>
-        <div class="modal-body" id="info-modal-body" style="line-height: 1.6; color: #e5e7eb;"></div>
+        <div class="modal-body" id="info-modal-body" style="line-height: 1.5; color: #e5e7eb; font-size: 0.9rem;"></div>
     </div>
 </div>
 
@@ -523,12 +524,12 @@
         <!-- Profile Info & Settings -->
         <div class="admin-panel-card">
             <h2 class="admin-card-title"><i class="fas fa-id-badge"></i> Account Details</h2>
-            <p style="margin-bottom: 15px; color: #4b5563;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
-            <p style="margin-bottom: 15px; color: #4b5563;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+            <p style="margin-bottom: 10px; color: #4b5563; font-size: 0.9rem;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+            <p style="margin-bottom: 10px; color: #4b5563; font-size: 0.9rem;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
             
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 15px 0;">
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 12px 0;">
             
-            <h3 style="font-size: 1rem; margin-bottom: 10px;">Change Password</h3>
+            <h3 style="font-size: 0.95rem; margin-bottom: 8px;">Change Password</h3>
             <input type="password" id="profile-new-pass" placeholder="Enter new password" class="modern-input">
             <button onclick="changeUserPassword()" class="admin-btn-blue">Update Password</button>
         </div>
@@ -536,12 +537,12 @@
         <!-- Withdrawal Section -->
         <div class="admin-panel-card green">
             <h2 class="admin-card-title" style="color: #059669;"><i class="fas fa-money-bill-wave"></i> Withdraw Winnings</h2>
-            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 15px;">Available Balance: <strong id="profile-withdraw-bal">0</strong> Coins</p>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 12px;">Available Balance: <strong id="profile-withdraw-bal">0</strong> Coins</p>
             
-            <label style="font-weight: bold; font-size: 0.9rem;">UPI ID</label>
+            <label style="font-weight: bold; font-size: 0.85rem;">UPI ID</label>
             <input type="text" id="withdraw-upi" placeholder="e.g., yourname@upi" class="modern-input">
             
-            <label style="font-weight: bold; font-size: 0.9rem;">Amount (Coins)</label>
+            <label style="font-weight: bold; font-size: 0.85rem;">Amount (Coins)</label>
             <input type="number" id="withdraw-amt" placeholder="Enter amount to withdraw" class="modern-input">
             
             <button onclick="requestWithdrawal()" class="btn-pay"><i class="fas fa-paper-plane"></i> Request Payout</button>
@@ -576,7 +577,7 @@
         <button id="nav-btn-dashboard" onclick="switchAdminTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
     </div>
 
-    <div class="admin-content" style="margin-top: 15px;">
+    <div class="admin-content" style="margin-top: 12px;">
         
         <!-- MENU 1: POST TAB -->
         <div id="admin-tab-post" class="admin-tab active">
@@ -584,26 +585,26 @@
             <!-- AUTO RSS FEED SECTION -->
             <div class="admin-panel-card orange">
                 <h2 class="admin-card-title"><i class="fas fa-rss"></i> Auto RSS Feeds</h2>
-                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 10px;">Add RSS URLs here. The system automatically checks and posts new articles periodically while you're online.</p>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Add RSS URLs here. The system automatically checks and posts new articles periodically while you're online.</p>
                 <input type="hidden" id="admin-rss-edit-id">
                 <div class="admin-input-grid">
                     <input type="url" id="admin-rss-url" placeholder="Enter RSS Feed URL" class="admin-input admin-input-col-2">
                     <select id="admin-rss-cat" class="admin-input"></select>
                     <input type="number" id="admin-rss-interval" placeholder="Check Interval (Mins)" value="30" class="admin-input">
                 </div>
-                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <div style="display: flex; gap: 6px; margin-top: 6px;">
                     <button onclick="addAutoRssFeed()" id="btn-add-rss" class="admin-btn-blue" style="flex: 1;">Add Auto Feed</button>
-                    <button onclick="cancelEditRssFeed()" id="btn-cancel-rss" class="admin-btn-gray hidden-panel" style="padding: 12px;">Cancel Edit</button>
+                    <button onclick="cancelEditRssFeed()" id="btn-cancel-rss" class="admin-btn-gray hidden-panel" style="padding: 8px;">Cancel Edit</button>
                 </div>
                 
-                <div id="admin-rss-list" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
+                <div id="admin-rss-list" style="margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 8px;">
                     <!-- Active feeds list -->
                 </div>
             </div>
 
             <div class="admin-panel-card green">
                 <h2 class="admin-card-title" id="admin-post-form-title">Create / Upload Post</h2>
-                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 10px;">Configure mode, marks logic, and details.</p>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Configure mode, marks logic, and details.</p>
                 
                 <input type="hidden" id="edit-post-id">
 
@@ -611,11 +612,11 @@
                     <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
                     <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
                     
-                    <div style="display:flex; gap:8px;">
+                    <div style="display:flex; gap:6px;">
                         <select id="admin-cat" class="admin-input" style="flex:1;">
                         </select>
-                        <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 10px;">Add Cat</button>
-                        <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 12px; font-size: 1rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
+                        <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 8px;">Add Cat</button>
+                        <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.9rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
                     </div>
                     
                     <input type="datetime-local" id="admin-deadline" class="admin-input" title="Deadline">
@@ -625,60 +626,60 @@
                 
                 <div class="admin-input-grid" style="align-items: flex-start;">
                     <div>
-                        <label style="font-size: 0.85em; font-weight: bold;">Post Mode:</label>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 4px;">Normal Posts hide Prediction buttons.</p>
+                        <label style="font-size: 0.8em; font-weight: bold;">Post Mode:</label>
+                        <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Normal Posts hide Prediction buttons.</p>
                         <select id="admin-pred-mode" class="admin-input">
                             <option value="true">ON (With Prediction)</option>
                             <option value="false">OFF (Normal Post)</option>
                         </select>
                     </div>
                     <div>
-                        <label style="font-size: 0.85em; font-weight: bold;">Expected Participants:</label>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 4px;">Used to auto-calculate the prize pool below.</p>
+                        <label style="font-size: 0.8em; font-weight: bold;">Expected Participants:</label>
+                        <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Used to auto-calculate the prize pool below.</p>
                         <input type="number" id="admin-participants" value="100" oninput="calcPrizes()" class="admin-input">
                     </div>
                 </div>
 
                 <div class="admin-input-grid" style="align-items: flex-start;">
                     <div>
-                        <label style="font-size: 0.85em; font-weight: bold;">Marks for Correct Ans:</label>
+                        <label style="font-size: 0.8em; font-weight: bold;">Marks for Correct Ans:</label>
                         <input type="number" id="admin-mark-correct" value="10" class="admin-input">
                     </div>
                     <div>
-                        <label style="font-size: 0.85em; font-weight: bold;">Negative Marks for Wrong:</label>
+                        <label style="font-size: 0.8em; font-weight: bold;">Negative Marks for Wrong:</label>
                         <input type="number" id="admin-mark-wrong" value="5" class="admin-input">
                     </div>
                 </div>
 
                 <div class="admin-input-grid" style="align-items: flex-start;">
                     <div>
-                        <label style="font-size: 0.85em; font-weight: bold;">Entry Fee (Coins):</label>
+                        <label style="font-size: 0.8em; font-weight: bold;">Entry Fee (Coins):</label>
                         <input type="number" id="admin-fee" value="50" oninput="calcPrizes()" class="admin-input">
                     </div>
                 </div>
 
-                <p style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
-                <div class="admin-input-grid" style="align-items: center; margin-bottom: 12px; background: #d1fae5; padding: 10px; border-radius: 8px;">
+                <p style="font-size: 0.8em; font-weight: bold; margin-top: 8px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
+                <div class="admin-input-grid" style="align-items: center; margin-bottom: 10px; background: #d1fae5; padding: 8px; border-radius: 6px;">
                     <div>
-                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">Admin (10%):</label>
-                        <input type="number" id="admin-comm" class="admin-input" style="margin-top: 4px;">
+                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">Admin (10%):</label>
+                        <input type="number" id="admin-comm" class="admin-input" style="margin-top: 3px;">
                     </div>
                     <div>
-                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">1st Prize:</label>
-                        <input type="number" id="admin-1st" class="admin-input" style="margin-top: 4px;">
+                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">1st Prize:</label>
+                        <input type="number" id="admin-1st" class="admin-input" style="margin-top: 3px;">
                     </div>
                     <div>
-                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">2nd Prize:</label>
-                        <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 4px;">
+                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">2nd Prize:</label>
+                        <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 3px;">
                     </div>
                     <div>
-                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">3rd Prize:</label>
-                        <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 4px;">
+                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">3rd Prize:</label>
+                        <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 3px;">
                     </div>
                 </div>
 
                 <button onclick="saveNewsToDB()" id="btn-save-post" class="admin-btn-green">Publish Post</button>
-                <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 8px; padding: 12px;">Cancel Edit</button>
+                <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 6px; padding: 8px;">Cancel Edit</button>
             </div>
 
             <!-- ALL POSTS LIST -->
@@ -693,7 +694,7 @@
         <div id="admin-tab-mcq" class="admin-tab">
             <div class="admin-panel-card purple">
                 <h2 class="admin-card-title"><i class="fas fa-tasks"></i> Manage MCQs & Resolve</h2>
-                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 15px;">Select a post below to set questions or resolve matches that have ended.</p>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 12px;">Select a post below to set questions or resolve matches that have ended.</p>
                 <div id="admin-mcq-post-list"></div>
             </div>
         </div>
@@ -703,7 +704,7 @@
             <div class="admin-panel-card green">
                 <h2 class="admin-card-title"><i class="fas fa-hand-holding-usd"></i> Withdrawal Requests</h2>
                 <div id="admin-withdrawals-list">
-                    <p style="color: #6b7280; font-size: 0.9rem;">No pending requests.</p>
+                    <p style="color: #6b7280; font-size: 0.85rem;">No pending requests.</p>
                 </div>
             </div>
         </div>
@@ -741,7 +742,7 @@
 
 <!-- MCQ EDITOR MODAL -->
 <div id="mcq-editor-modal" class="overlay-modal hidden-panel" style="z-index: 700;">
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-content" style="max-width: 550px;">
         <div class="modal-header">
             <h2 class="modal-title" id="mcq-editor-title">Set Questions</h2>
             <button onclick="closeModal('mcq-editor-modal')" class="modal-close">&times;</button>
@@ -752,8 +753,8 @@
             <div id="mcq-builder-container" class="mcq-builder-area">
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button type="button" onclick="addMCQEditorQuestion()" class="admin-btn-gray" style="flex: 1; padding: 12px;">+ Add Question</button>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button type="button" onclick="addMCQEditorQuestion()" class="admin-btn-gray" style="flex: 1; padding: 10px;">+ Add Question</button>
                 <button type="button" onclick="saveMCQsToDB()" class="admin-btn-green" style="flex: 2; margin-top: 0;">Save All Questions</button>
             </div>
         </div>
@@ -762,16 +763,16 @@
 
 <!-- MODERN DIALOG MODAL (For Confirm/Prompt) -->
 <div id="modern-dialog" class="overlay-modal hidden-panel" style="z-index: 10000;">
-    <div class="modal-content" style="max-width: 400px; border: 1px solid #374151;">
+    <div class="modal-content" style="max-width: 350px; border: 1px solid #374151;">
         <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
             <h2 class="modal-title" id="dialog-title">Confirm</h2>
         </div>
         <div class="modal-body">
-            <p id="dialog-msg" style="margin-bottom: 15px; color: #e5e7eb; font-size: 1rem; line-height: 1.5;"></p>
+            <p id="dialog-msg" style="margin-bottom: 12px; color: #e5e7eb; font-size: 0.95rem; line-height: 1.4;"></p>
             <input type="text" id="dialog-input" class="modern-input hidden-panel" style="margin-bottom: 0;">
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button id="dialog-btn-cancel" class="admin-btn-gray" style="padding: 10px 20px;">Cancel</button>
-                <button id="dialog-btn-confirm" class="admin-btn-blue" style="padding: 10px 20px;">OK</button>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px;">
+                <button id="dialog-btn-cancel" class="admin-btn-gray" style="padding: 8px 16px;">Cancel</button>
+                <button id="dialog-btn-confirm" class="admin-btn-blue" style="padding: 8px 16px;">OK</button>
             </div>
         </div>
     </div>
@@ -2436,7 +2437,7 @@
                         <div class="admin-resolve-row">
                             <label style="color:#4b5563; font-size:0.85rem;"><i class="fas fa-info-circle"></i> Ties are automatically resolved by submission time (Earlier predictions win).</label>
                         </div>
-                        <button onclick="resolveNews('${id}')" class="admin-btn-danger" style="width:100%; margin-top:5px; padding:12px;">Calculate & Distribute Prizes</button>
+                        <button onclick="resolveNews('${id}')" class="admin-btn-danger" style="width:100%; margin-top:5px; padding:10px;">Calculate & Distribute Prizes</button>
                     </div>
                 `;
             }
@@ -2619,7 +2620,7 @@
                     </div>`;
                 }
             });
-            if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.9rem;">No pending requests.</p>';
+            if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.85rem;">No pending requests.</p>';
         });
     }
 
