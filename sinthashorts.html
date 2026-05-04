@@ -952,6 +952,9 @@
     let isFetchingRealtime = false; 
     let DEFAULT_NEWS_IMAGE = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
 
+    // Store URL Post ID to handle sharing behavior directly on Load
+    let initialPostId = new URLSearchParams(window.location.search).get('post');
+
     // Helper for relative time "Today ago" implementation
     function timeAgo(timestamp) {
         if (!timestamp) return '';
@@ -1353,7 +1356,7 @@
 
     function setupCategories() {
         DOM.catList.innerHTML = '';
-        const allMenuCats =["All", "Trending", ...dynamicCategories];
+        const allMenuCats =["All", "Trending", "Predictions", ...dynamicCategories];
         allMenuCats.forEach((cat, index) => {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -1440,11 +1443,26 @@
                 let bScore = (allLikes[b.id] ? Object.keys(allLikes[b.id]).length : 0) + (allComments[b.id] ? Object.keys(allComments[b.id]).length : 0);
                 return (bScore - aScore) || (b.createdAt - a.createdAt);
             });
+        } else if (category === 'predictions') {
+            activeNewsArray = activeNewsArray.filter(n => n.isPredictionMode === true || n.isPredictionMode === "true");
+            activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
         } else {
             activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
             if(category !== 'all') {
                 activeNewsArray = activeNewsArray.filter(n => n.category && n.category.toLowerCase() === category);
             }
+        }
+
+        // Feature: Automatically push externally shared POST id to the top index so it's directly visible
+        if (initialPostId) {
+            const targetIdx = activeNewsArray.findIndex(n => n.id === initialPostId);
+            if (targetIdx > -1) {
+                const targetPost = activeNewsArray.splice(targetIdx, 1)[0];
+                activeNewsArray.unshift(targetPost);
+            }
+            // Clear from URL state without refreshing so regular swiping resumes smoothly after
+            window.history.replaceState({}, document.title, window.location.pathname);
+            initialPostId = null;
         }
         
         currentNewsIndex = 0; 
@@ -1672,38 +1690,63 @@
         if(snap.exists()) await ref.remove(); else await ref.set(true);
     }
 
-    function sharePost(newsId) {
+    async function sharePost(newsId) {
         const news = allNewsData[newsId];
-        if (navigator.share) {
-            const isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
-            const hasDeadline = news.deadline && news.deadline !== "";
-            const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
-            
-            let shareText = `📰 ${news.title}\n\n`;
-            
-            if (news.desc) {
-                // some news text (limiting to ~150 chars for better share formatting)
-                let shortDesc = news.desc.length > 150 ? news.desc.substring(0, 150) + '...' : news.desc;
-                shareText += `${shortDesc}\n\n`;
-            }
-            
-            if (news.mediaUrls && news.mediaUrls.length > 0) {
-                shareText += `🖼️ Post Image: ${news.mediaUrls[0]}\n\n`;
-            }
-            
-            if (isPredictionMode && !isClosed) {
-                shareText += `⚡ 🔥 EXCITING PREDICTION LIVE! 🔥 ⚡\nJoin the match now, test your knowledge, predict the right answers, and win massive Coin Prizes! 🏆💸 Don't miss out on the action!\n\n`;
-            }
-            
-            shareText += `📖 Read more please visit website: `;
+        if (!navigator.share) {
+            return showNotification("Share feature is not supported on this browser.", "warning");
+        }
+        
+        const isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
+        const hasDeadline = news.deadline && news.deadline !== "";
+        const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
+        
+        let shareText = `📰 ${news.title}\n\n`;
+        
+        if (news.desc) {
+            let shortDesc = news.desc.length > 150 ? news.desc.substring(0, 150) + '...' : news.desc;
+            shareText += `${shortDesc}\n\n`;
+        }
+        
+        if (isPredictionMode && !isClosed) {
+            shareText += `⚡ 🔥 EXCITING PREDICTION LIVE! 🔥 ⚡\nJoin the match now, test your knowledge, predict the right answers, and win massive Coin Prizes! 🏆💸 Don't miss out on the action!\n\n`;
+        }
+        
+        shareText += `📖 Read more please visit website: `;
 
-            navigator.share({ 
-                title: news.title, 
-                text: shareText, 
-                url: window.location.href 
-            }).catch(err => console.log('Share failed:', err));
-        } else { 
-            showNotification("Share feature is not supported on this browser.", "warning"); 
+        // Appending exactly which post to jump to on the URL
+        const shareUrl = window.location.origin + window.location.pathname + "?post=" + newsId;
+        
+        let shareData = { 
+            title: news.title, 
+            text: shareText, 
+            url: shareUrl 
+        };
+
+        // Try dynamically converting the image into a Shareable File natively so we don't display it as a boring text URL link
+        if (news.mediaUrls && news.mediaUrls.length > 0) {
+            try {
+                const response = await fetch(news.mediaUrls[0]);
+                const blob = await response.blob();
+                
+                let ext = 'jpg';
+                if(blob.type === 'image/png') ext = 'png';
+                else if(blob.type === 'image/gif') ext = 'gif';
+                else if(blob.type === 'video/mp4') ext = 'mp4';
+
+                const file = new File([blob], `media.${ext}`, { type: blob.type || 'image/jpeg' });
+                
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    shareData.files = [file];
+                }
+            } catch (e) {
+                console.log('Error attaching media file to share (falling back to standard link share):', e);
+            }
+        }
+
+        try {
+            await navigator.share(shareData);
+        } catch(err) {
+            console.log('Share failed:', err);
         }
     }
     
@@ -1949,7 +1992,7 @@
 
         // Check for Horizontal Swipe (Category change)
         if (Math.abs(finalDragDeltaX) > thresholdX && Math.abs(finalDragDeltaX) > Math.abs(finalDragDeltaY)) {
-            let cats =["all", "trending", ...dynamicCategories.map(c=>c.toLowerCase())];
+            let cats =["all", "trending", "predictions", ...dynamicCategories.map(c=>c.toLowerCase())];
             let cIdx = cats.indexOf(currentCategory);
             
             if(finalDragDeltaX < 0 && cIdx < cats.length - 1) { 
