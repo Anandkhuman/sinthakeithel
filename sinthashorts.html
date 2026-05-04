@@ -608,78 +608,99 @@
                 
                 <input type="hidden" id="edit-post-id">
 
-                <div class="admin-input-grid" style="align-items: center;">
-                    <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
-                    <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
+                <!-- MODIFIED: File Upload & Mode Selection functionality -->
+                <div style="margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px;">
+                    <label style="font-size: 0.8em; font-weight: bold;">Upload Mode:</label>
+                    <select id="admin-upload-mode" class="admin-input" onchange="toggleUploadMode()">
+                        <option value="manual">Manual Entry</option>
+                        <option value="json">Upload JSON File</option>
+                        <option value="csv">Upload CSV File</option>
+                    </select>
+                </div>
+
+                <!-- Manual Upload Section -->
+                <div id="upload-manual-section">
+                    <div class="admin-input-grid" style="align-items: center;">
+                        <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
+                        <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
+                        
+                        <div style="display:flex; gap:6px;">
+                            <select id="admin-cat" class="admin-input" style="flex:1;">
+                            </select>
+                            <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 8px;">Add Cat</button>
+                            <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.9rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
+                        </div>
+                        
+                        <input type="datetime-local" id="admin-deadline" class="admin-input" title="Deadline">
+                    </div>
                     
-                    <div style="display:flex; gap:6px;">
-                        <select id="admin-cat" class="admin-input" style="flex:1;">
-                        </select>
-                        <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 8px;">Add Cat</button>
-                        <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.9rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
-                    </div>
+                    <textarea id="admin-desc" placeholder="News Snippet/Description" class="admin-textarea" rows="3"></textarea>
                     
-                    <input type="datetime-local" id="admin-deadline" class="admin-input" title="Deadline">
-                </div>
-                
-                <textarea id="admin-desc" placeholder="News Snippet/Description" class="admin-textarea" rows="3"></textarea>
-                
-                <div class="admin-input-grid" style="align-items: flex-start;">
-                    <div>
-                        <label style="font-size: 0.8em; font-weight: bold;">Post Mode:</label>
-                        <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Normal Posts hide Prediction buttons.</p>
-                        <select id="admin-pred-mode" class="admin-input">
-                            <option value="true">ON (With Prediction)</option>
-                            <option value="false">OFF (Normal Post)</option>
-                        </select>
+                    <div class="admin-input-grid" style="align-items: flex-start;">
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Post Mode:</label>
+                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Normal Posts hide Prediction buttons.</p>
+                            <select id="admin-pred-mode" class="admin-input">
+                                <option value="true">ON (With Prediction)</option>
+                                <option value="false">OFF (Normal Post)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Expected Participants:</label>
+                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Used to auto-calculate the prize pool below.</p>
+                            <input type="number" id="admin-participants" value="100" oninput="calcPrizes()" class="admin-input">
+                        </div>
                     </div>
-                    <div>
-                        <label style="font-size: 0.8em; font-weight: bold;">Expected Participants:</label>
-                        <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Used to auto-calculate the prize pool below.</p>
-                        <input type="number" id="admin-participants" value="100" oninput="calcPrizes()" class="admin-input">
+
+                    <div class="admin-input-grid" style="align-items: flex-start;">
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Marks for Correct Ans:</label>
+                            <input type="number" id="admin-mark-correct" value="10" class="admin-input">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Negative Marks for Wrong:</label>
+                            <input type="number" id="admin-mark-wrong" value="5" class="admin-input">
+                        </div>
                     </div>
+
+                    <div class="admin-input-grid" style="align-items: flex-start;">
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Entry Fee (Coins):</label>
+                            <input type="number" id="admin-fee" value="50" oninput="calcPrizes()" class="admin-input">
+                        </div>
+                    </div>
+
+                    <p style="font-size: 0.8em; font-weight: bold; margin-top: 8px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
+                    <div class="admin-input-grid" style="align-items: center; margin-bottom: 10px; background: #d1fae5; padding: 8px; border-radius: 6px;">
+                        <div>
+                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">Admin (10%):</label>
+                            <input type="number" id="admin-comm" class="admin-input" style="margin-top: 3px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">1st Prize:</label>
+                            <input type="number" id="admin-1st" class="admin-input" style="margin-top: 3px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">2nd Prize:</label>
+                            <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 3px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">3rd Prize:</label>
+                            <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 3px;">
+                        </div>
+                    </div>
+
+                    <button onclick="saveNewsToDB()" id="btn-save-post" class="admin-btn-green">Publish Post</button>
+                    <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 6px; padding: 8px;">Cancel Edit</button>
                 </div>
 
-                <div class="admin-input-grid" style="align-items: flex-start;">
-                    <div>
-                        <label style="font-size: 0.8em; font-weight: bold;">Marks for Correct Ans:</label>
-                        <input type="number" id="admin-mark-correct" value="10" class="admin-input">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8em; font-weight: bold;">Negative Marks for Wrong:</label>
-                        <input type="number" id="admin-mark-wrong" value="5" class="admin-input">
-                    </div>
+                <!-- File Bulk Upload Section -->
+                <div id="upload-file-section" class="hidden-panel">
+                    <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Upload a file containing multiple posts. Valid keys/headers: <strong>title, desc, media, category, deadline, isPredictionMode, fee</strong></p>
+                    <input type="file" id="admin-bulk-file" accept=".json,.csv" class="modern-input">
+                    <button onclick="processBulkFile()" class="admin-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fas fa-upload"></i> Upload & Process</button>
+                    <a href="#" onclick="downloadSampleFile()" style="font-size: 0.85rem; color: #3b82f6; display: inline-block; margin-top: 10px; text-decoration: none; font-weight: bold;"><i class="fas fa-download"></i> Download Sample Format</a>
                 </div>
-
-                <div class="admin-input-grid" style="align-items: flex-start;">
-                    <div>
-                        <label style="font-size: 0.8em; font-weight: bold;">Entry Fee (Coins):</label>
-                        <input type="number" id="admin-fee" value="50" oninput="calcPrizes()" class="admin-input">
-                    </div>
-                </div>
-
-                <p style="font-size: 0.8em; font-weight: bold; margin-top: 8px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
-                <div class="admin-input-grid" style="align-items: center; margin-bottom: 10px; background: #d1fae5; padding: 8px; border-radius: 6px;">
-                    <div>
-                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">Admin (10%):</label>
-                        <input type="number" id="admin-comm" class="admin-input" style="margin-top: 3px;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">1st Prize:</label>
-                        <input type="number" id="admin-1st" class="admin-input" style="margin-top: 3px;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">2nd Prize:</label>
-                        <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 3px;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">3rd Prize:</label>
-                        <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 3px;">
-                    </div>
-                </div>
-
-                <button onclick="saveNewsToDB()" id="btn-save-post" class="admin-btn-green">Publish Post</button>
-                <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 6px; padding: 8px;">Cancel Edit</button>
             </div>
 
             <!-- ALL POSTS LIST -->
@@ -1569,8 +1590,34 @@
     function sharePost(newsId) {
         const news = allNewsData[newsId];
         if (navigator.share) {
-            navigator.share({ title: news.title, text: news.desc, url: window.location.href });
-        } else { showNotification("Share feature is not supported on this browser.", "warning"); }
+            const isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
+            const hasDeadline = news.deadline && news.deadline !== "";
+            const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
+            const hasQuestions = news.questions && news.questions.length > 0;
+            
+            let shareText = `${news.title}\n\n`;
+            if (news.desc) {
+                shareText += `${news.desc}\n\n`;
+            }
+            
+            if (news.mediaUrls && news.mediaUrls.length > 0) {
+                shareText += `🖼️ Image/Media: ${news.mediaUrls[0]}\n\n`;
+            }
+            
+            if (isPredictionMode && !isClosed && hasQuestions) {
+                shareText += `🎯 Active MCQ / Prediction available!\nJoin the match, predict answers and win exciting Coin Prizes! 🏆\n\n`;
+            }
+            
+            shareText += `Check it out here: `;
+
+            navigator.share({ 
+                title: news.title, 
+                text: shareText, 
+                url: window.location.href 
+            }).catch(err => console.log('Share failed:', err));
+        } else { 
+            showNotification("Share feature is not supported on this browser.", "warning"); 
+        }
     }
     
     // CUSTOM TIME FORMATTER FOR COMMENTS
@@ -2087,7 +2134,6 @@
         });
     }
 
-    // New optimized text extraction avoiding browser detached DOM layout limitations
     function extractTextFromHTML(htmlString) {
         if(!htmlString) return "";
         let text = htmlString.replace(/<br\s*[\/]?>/gi, "\n");
@@ -2109,7 +2155,6 @@
             if(data.status === 'ok') {
                 let count = 0;
                 for(let item of data.items) {
-                    // Check against title OR original RSS unique link
                     let exists = Object.values(allNewsData).some(n => 
                         (n.rssLink && n.rssLink === item.link) || 
                         n.title === item.title
@@ -2119,13 +2164,9 @@
                         let descText = extractTextFromHTML(item.description);
                         let contentText = extractTextFromHTML(item.content);
 
-                        // Use whichever is longer to ensure full content is retrieved
                         let cleanText = contentText.length > descText.length ? contentText : descText;
-
-                        // Try to find an image in standard API fields
                         let imgUrl = item.thumbnail || (item.enclosure && item.enclosure.link);
                         
-                        // Fallback image scrape from HTML body
                         if (!imgUrl) {
                             let tmp = document.createElement("DIV");
                             tmp.innerHTML = item.content || item.description || "";
@@ -2133,10 +2174,8 @@
                             if (img && img.src) imgUrl = img.src;
                         }
                         
-                        // Ultimate Fallback - Use Category-specific default image
                         if (!imgUrl) imgUrl = getDefaultImageForCategory(feed.category);
 
-                        // Increased length limit significantly so full posts can be read via 'Read more'
                         if(cleanText.length > 50000) cleanText = cleanText.substring(0, 50000) + "...";
 
                         let postData = {
@@ -2265,6 +2304,142 @@
         return { type: 'image', urls };
     }
 
+    // BULK UPLOAD FEATURES (MANUAL, JSON, CSV)
+    function toggleUploadMode() {
+        const mode = document.getElementById('admin-upload-mode').value;
+        if (mode === 'manual') {
+            document.getElementById('upload-manual-section').classList.remove('hidden-panel');
+            document.getElementById('upload-file-section').classList.add('hidden-panel');
+        } else {
+            document.getElementById('upload-manual-section').classList.add('hidden-panel');
+            document.getElementById('upload-file-section').classList.remove('hidden-panel');
+            const fileInput = document.getElementById('admin-bulk-file');
+            fileInput.accept = mode === 'json' ? '.json' : '.csv';
+        }
+    }
+
+    function downloadSampleFile() {
+        const mode = document.getElementById('admin-upload-mode').value;
+        let content = "";
+        let filename = "";
+        if (mode === 'json') {
+            content = JSON.stringify([{
+                "title": "Sample Bulk Post 1",
+                "desc": "This is a sample description.",
+                "media": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80",
+                "category": "sports",
+                "deadline": "2026-12-31T23:59",
+                "isPredictionMode": "true",
+                "fee": 50
+            }], null, 4);
+            filename = "sample_posts.json";
+            downloadFile(content, filename, "application/json");
+        } else if (mode === 'csv') {
+            content = 'title,desc,media,category,deadline,isPredictionMode,fee\n"Sample Bulk Post 1","This is a sample description.","https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80","sports","2026-12-31T23:59","true",50';
+            filename = "sample_posts.csv";
+            downloadFile(content, filename, "text/csv");
+        }
+    }
+
+    function downloadFile(content, fileName, contentType) {
+        const a = document.createElement("a");
+        const file = new Blob([content], { type: contentType });
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
+
+    function parseCSV(str) {
+        let arr =[];
+        let quote = false;
+        let row = 0, col = 0;
+        for (let c = 0; c < str.length; c++) {
+            let cc = str[c], nc = str[c+1];
+            arr[row] = arr[row] || [];
+            arr[row][col] = arr[row][col] || '';
+            if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+            if (cc == '"') { quote = !quote; continue; }
+            if (cc == ',' && !quote) { ++col; continue; }
+            if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+            if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+            if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+            arr[row][col] += cc;
+        }
+        
+        let result = [];
+        let headers = arr[0].map(h => h.trim());
+        for (let i = 1; i < arr.length; i++) {
+            if (arr[i].length === 1 && !arr[i][0]) continue; 
+            let obj = {};
+            for (let j = 0; j < headers.length; j++) {
+                if(headers[j]) obj[headers[j]] = arr[i][j] ? arr[i][j].trim() : "";
+            }
+            result.push(obj);
+        }
+        return result;
+    }
+
+    async function processBulkFile() {
+        const fileInput = document.getElementById('admin-bulk-file');
+        const mode = document.getElementById('admin-upload-mode').value;
+        if (!fileInput.files.length) return showNotification("Please select a file.", "error");
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const content = e.target.result;
+            let items =[];
+            try {
+                if (mode === 'json') {
+                    items = JSON.parse(content);
+                } else if (mode === 'csv') {
+                    items = parseCSV(content);
+                }
+                
+                if (!Array.isArray(items)) items = [items];
+                
+                let count = 0;
+                for (let item of items) {
+                    if (!item.title) continue;
+                    
+                    const cat = item.category || 'headlines';
+                    const detectedMedia = detectMedia(item.media || '', cat);
+                    const isPred = item.isPredictionMode === 'true' || item.isPredictionMode === true;
+                    const fee = parseInt(item.fee) || 0;
+                    
+                    const data = {
+                        title: item.title,
+                        mediaType: detectedMedia.type,
+                        mediaUrls: detectedMedia.urls,
+                        category: cat.toLowerCase(),
+                        desc: item.desc || '',
+                        deadline: item.deadline || "", 
+                        isPredictionMode: isPred,
+                        markCorrect: parseInt(item.markCorrect) || 10,
+                        markWrong: parseInt(item.markWrong) || 5,
+                        expectedParticipants: parseInt(item.expectedParticipants) || 100,
+                        fee: fee,
+                        adminComm: Math.round((fee * (parseInt(item.expectedParticipants) || 100)) * 0.10) || 0,
+                        prize1: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.50) || 0,
+                        prize2: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.30) || 0,
+                        prize3: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.20) || 0,
+                        status: 'active',
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        questions:[]
+                    };
+                    await db.ref('news').push(data);
+                    count++;
+                }
+                showNotification(`Successfully uploaded ${count} posts!`, "success");
+                fileInput.value = "";
+            } catch (err) {
+                console.error(err);
+                showNotification("Error processing file. Please check format.", "error");
+            }
+        };
+        reader.readAsText(file);
+    }
+
     async function saveNewsToDB() {
         const editId = document.getElementById('edit-post-id').value;
         const mediaInput = document.getElementById('admin-media').value.trim();
@@ -2308,6 +2483,8 @@
     }
 
     function resetPostForm() {
+        document.getElementById('admin-upload-mode').value = 'manual';
+        toggleUploadMode();
         document.getElementById('edit-post-id').value = '';
         document.getElementById('admin-title').value = '';
         document.getElementById('admin-desc').value = '';
@@ -2358,6 +2535,10 @@
     function editPost(id) {
         const n = allNewsData[id];
         if(!n) return;
+        
+        document.getElementById('admin-upload-mode').value = 'manual';
+        toggleUploadMode();
+
         document.getElementById('edit-post-id').value = id;
         document.getElementById('admin-title').value = n.title || '';
         document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
