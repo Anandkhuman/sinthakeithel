@@ -1,0 +1,2745 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sintha Shorts</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- STANDARD CUSTOM CSS -->
+    <style>
+        :root {
+            --bg-color: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --card-bg-color: #1e1e1e;
+            --primary-text-color: #f0f0f0;
+            --secondary-text-color: #b0b0b0;
+            --accent-color-1: #00aeff; 
+            --accent-color-2: #00e0c4; 
+            --header-bg-color: rgba(24, 24, 24, 0.95);
+            --border-color: #2f2f2f;
+            --menu-bg-color: rgba(20, 20, 20, 0.85);
+            --font-main: 'Inter', system-ui, sans-serif;
+            --media-container-height: 220px;
+            --app-header-height: 60px;
+            --search-bar-height: 50px;
+            --top-menu-height: 48px;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-color); color: var(--primary-text-color); }
+        
+        .hidden-panel { display: none !important; }
+        .live-pulse { animation: pulseRed 2s infinite; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* SPLASH / WELCOME SCREEN */
+        .splash-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+        .splash-content {
+            text-align: center;
+            animation: splashFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .splash-logo {
+            font-size: 4rem;
+            color: #60a5fa;
+            margin-bottom: 15px;
+            animation: splashFloat 3s ease-in-out infinite;
+        }
+        .splash-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .splash-subtitle {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+        .splash-loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent-color-1);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: splashSpin 1s linear infinite;
+        }
+        @keyframes splashFadeUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes splashFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes splashSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .splash-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* AUTHENTICATION UI */
+        .welcome-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1a1a1d 0%, #121212 100%); padding: 20px; position: fixed; top: 0; left: 0; z-index: 500; overflow-y: auto; }
+        .welcome-brand { font-size: 2.2rem; font-weight: 700; color: #60a5fa; margin-bottom: 5px; }
+        .welcome-subtitle { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 25px; }
+        .auth-container { width: 100%; max-width: 380px; background: #1f2937; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
+        
+        .auth-view { display: none; }
+        .auth-view.active { display: block; }
+        .auth-title { font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 15px; text-align: left; }
+        
+        .auth-input { width: 100%; background: #111827; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #4b5563; outline: none; font-size: 1rem; }
+        .auth-input:focus { border-color: #3b82f6; }
+        
+        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 12px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; transition: 0.2s; }
+        .auth-btn:hover { background: #2563eb; }
+        .auth-btn.admin-btn { background: #eab308; color: #111827; }
+        .auth-btn.admin-btn:hover { background: #ca8a04; }
+        
+        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: block; text-align: center; margin-top: 15px; background: none; border: none; width: 100%; }
+        .auth-link:hover { text-decoration: underline; }
+        .auth-close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+        
+        .auth-error { color: #f87171; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+
+        /* MAIN APP UI */
+        .app-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
+        
+        .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-title { font-size: 1.2em; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
+        
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 20px; font-size: 0.9em; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 6px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.25em; transition: 0.2s; }
+        .icon-btn.logout { color: #f87171; } .icon-btn.logout:hover { color: #fca5a5; }
+        
+        .admin-nav-btn { background: #eab308; color: #111827; padding: 6px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .admin-nav-btn:hover { background: #facc15; }
+        .profile-nav-btn { background: #3b82f6; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        /* SEARCH BAR ROW */
+        .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 15px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
+        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 8px 15px; outline: none; transition: 0.3s; font-size: 0.95em; }
+        .search-input:focus { background: rgba(255,255,255,0.2); border-color: var(--accent-color-1); }
+
+        /* TOP MENU ROW */
+        .top-menu { position: fixed; top: calc(var(--app-header-height) + var(--search-bar-height)); left: 0; width: 100%; height: var(--top-menu-height); background-color: var(--menu-bg-color); backdrop-filter: blur(10px); display: flex; align-items: center; overflow-x: auto; white-space: nowrap; z-index: 150; scrollbar-width: none; border-bottom: 1px solid var(--border-color); scroll-behavior: smooth;}
+        .top-menu::-webkit-scrollbar { display: none; }
+        .top-menu ul { list-style: none; padding: 0 15px; }
+        .top-menu li { display: inline-block; margin-right: 5px; }
+        .top-menu li a { display: block; padding: 8px 15px; color: var(--primary-text-color); text-decoration: none; font-size: 0.95em; border-radius: 18px; transition: 0.2s ease; text-transform: capitalize; }
+        .top-menu li a.active { background-color: var(--accent-color-1); color: #fff; }
+        
+        /* UPDATED FOR SMOOTH SWIPE */
+        .news-stream { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; will-change: transform; }
+        .news-card { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: var(--card-bg-color); overflow: hidden; position: relative; z-index: 1; flex-shrink: 0; }
+        .news-card::before { content: ''; position: absolute; top: 30%; left: -15%; width: 300px; height: 300px; background: var(--accent-color-1); border-radius: 50%; filter: blur(130px); opacity: 0.15; z-index: -1; pointer-events: none; }
+        
+        /* Adjust padding to account for header + search + menu */
+        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + 15px) 15px 15px 15px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; }
+        .card-media { width: 100%; height: var(--media-container-height); border-radius: 12px; overflow: hidden; margin-bottom: 15px; background: #000; flex-shrink: 0; position: relative; }
+        .card-media img, .card-media video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.4em; font-weight: 700; line-height: 1.3; margin-bottom: 8px; flex-shrink: 0; }
+        .card-meta { font-size: 0.85em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 10px; margin-bottom: 12px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
+        .cat-badge { background: #374151; padding: 4px 8px; border-radius: 4px; color: #e5e7eb; }
+        .live-badge { position: absolute; top: -10px; left: -10px; background: #dc2626; color: white; font-size: 0.75em; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        
+        /* FULL TEXT CSS SUPPORT */
+        .card-snippet { font-size: 0.95em; line-height: 1.5; color: #ddd; white-space: pre-line; text-align: justify; } 
+        .text-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .text-expanded { display: block !important; overflow-y: auto; max-height: 60vh; padding-right: 5px; }
+        .text-expanded::-webkit-scrollbar { width: 4px; }
+        .text-expanded::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+        .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.9em; cursor: pointer; padding: 0; text-align: left; }
+
+        .card-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; width: 100%; flex-shrink: 0; }
+        .timer-badge { text-align: center; font-weight: bold; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 10px; color: #ffeb3b; }
+        .btn-predict { background: var(--accent-color-1); color: #fff; padding: 12px; text-align: center; border-radius: 25px; font-weight: bold; font-size: 1.1em; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 174, 255, 0.4); cursor: pointer; border: none; }
+        .btn-predict.btn-yellow { background: #eab308; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); color: black;}
+        .btn-predict.btn-purple { background: #9333ea; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); }
+        .btn-predict.btn-closed { background: #555; color: #ccc; box-shadow: none; cursor: not-allowed; }
+        
+        /* SOCIAL ACTION BUTTONS INSIDE TEXT CONTAINER */
+        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; padding-bottom: 5px; flex-shrink: 0; margin-top: auto; }
+        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; font-size: 1.1rem; cursor: pointer; transition: 0.2s; font-weight: 600;}
+        .inline-action-btn:hover { color: #fff; }
+        .inline-action-btn.liked i { color: #ef4444; }
+
+        .swipe-indicator { position: fixed; bottom: 44%; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.9em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
+        .animate-bounce { animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
+
+        /* MODALS */
+        .overlay-modal { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 500px; max-height: 90vh; border-radius: 16px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        
+        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 16px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
+        .modal-title { font-weight: bold; font-size: 1.1em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.8em; cursor: pointer; line-height: 1; }
+        .modal-body { padding: 20px; flex-grow: 1; }
+        
+        .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 16px; background: rgba(113, 63, 18, 0.3); padding: 8px; border-radius: 4px; }
+        .public-stats { background: rgba(30, 58, 138, 0.3); border: 1px solid rgba(59, 130, 246, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 24px; }
+        .public-stats h3 { color: #5eead4; font-weight: bold; margin-bottom: 4px; font-size: 1rem; }
+        
+        .question-card { background: rgba(55, 65, 81, 0.5); padding: 16px; border-radius: 12px; border: 1px solid #4b5563; margin-bottom: 24px; }
+        .question-title { font-weight: bold; color: #e5e7eb; margin-bottom: 12px; font-size: 1.05rem; }
+        
+        .option-label { display: block; padding: 12px; border: 1px solid #4b5563; border-radius: 8px; cursor: pointer; background: #1f2937; margin-bottom: 8px; transition: 0.2s; }
+        .option-label:hover { background: #374151; }
+        .option-label.checked { background: rgba(30, 58, 138, 0.4); border-color: #60a5fa; }
+        .option-flex { display: flex; align-items: center; color: #e5e7eb; }
+        .option-flex input { margin-right: 12px; width: 16px; height: 16px; accent-color: #3b82f6; }
+        
+        .progress-bg { background: #4b5563; border-radius: 999px; height: 4px; margin-top: 8px; overflow: hidden; width: 100%; }
+        .progress-fill { background: #2dd4bf; height: 100%; transition: width 0.5s ease-in-out; }
+        .progress-text { font-size: 0.75rem; color: #9ca3af; float: right; margin-top: 4px; }
+        
+        .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 14px; border-radius: 25px; border: none; font-weight: bold; margin-top: 24px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .lb-header { background: linear-gradient(to right, #9333ea, #ec4899); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; }
+        .lb-header h3 { font-weight: bold; font-size: 1.25rem; }
+        .lb-header p { font-size: 1.5rem; font-weight: 900; margin-top: 4px; }
+        .lb-table-wrap { background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151; }
+        .lb-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .lb-table th { background: #111827; padding: 12px; border-bottom: 1px solid #374151; color: #d1d5db; }
+        .lb-table td { padding: 12px; border-bottom: 1px solid rgba(55, 65, 81, 0.5); color: #e5e7eb; }
+
+        /* COMMENTS CSS */
+        .comment-item { background: #1f2937; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .comment-header { display: flex; justify-content: space-between; font-size: 0.85em; color: #9ca3af; margin-bottom: 5px; }
+        .comment-body { font-size: 0.95em; color: #e5e7eb; margin-bottom: 8px; line-height: 1.4; word-break: break-word; }
+        .comment-actions { display: flex; gap: 15px; font-size: 0.85em; color: #6b7280; }
+        .comment-action-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold;}
+        .comment-action-btn:hover { color: #3b82f6; }
+        .comment-action-btn.liked { color: #ef4444; }
+        .reply-list { margin-left: 20px; border-left: 2px solid #374151; padding-left: 10px; margin-top: 10px; }
+        
+        /* Comment Modal Post Preview */
+        .comment-post-preview { display: flex; flex-direction: column; background: #1f2937; border-radius: 12px; overflow: hidden; margin-bottom: 15px; border: 1px solid #374151; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
+        .comment-preview-media { width: 100%; height: 180px; position: relative; overflow: hidden; background: #000; }
+        .comment-preview-media img, .comment-preview-media video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: transform 0.5s ease-in-out; }
+        .comment-preview-text-wrap { padding: 12px; height: 80px; overflow: hidden; position: relative; background: #111827; }
+        .comment-preview-text { font-size: 0.85em; color: #d1d5db; line-height: 1.5; position: absolute; width: calc(100% - 24px); transition: transform 0.1s linear; }
+
+        /* DASHBOARDS (ADMIN & PROFILE) */
+        .admin-layout { position: absolute; inset: 0; background: #f3f4f6; overflow-y: auto; z-index: 400; color: #1f2937; }
+        .admin-topbar { background: #3b82f6; padding: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
+        .admin-topbar.yellow { background: #111827; color: white; border-bottom: 4px solid #eab308; }
+        .admin-topbar h1 { font-size: 1.4em; font-weight: bold; color: #eab308;}
+        .admin-back-btn { background: #374151; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s;}
+        .admin-back-btn:hover { background: #4b5563; }
+        
+        .admin-in-nav { display: flex; background: #1f2937; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 500; box-shadow: 0 -4px 10px rgba(0,0,0,0.2); overflow-x: auto; white-space: nowrap; padding-bottom: env(safe-area-inset-bottom); }
+        .admin-in-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 10px; background: none; border: none; color: #9ca3af; font-weight: bold; font-size: 0.85rem; cursor: pointer; border-top: 3px solid transparent; transition: 0.2s; gap: 6px; }
+        .admin-in-nav button i { font-size: 1.25rem; }
+        .admin-in-nav button:hover { color: white; }
+        .admin-in-nav button.active { color: #eab308; border-top-color: #eab308; }
+
+        .admin-content { max-width: 900px; margin: 24px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 90px; }
+        
+        .admin-tab { display: none; }
+        .admin-tab.active { display: flex; flex-direction: column; gap: 24px; }
+        
+        .admin-panel-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; }
+        .admin-panel-card.green { border-left-color: #22c55e; }
+        .admin-panel-card.red { border-left-color: #ef4444; }
+        .admin-panel-card.purple { border-left-color: #9333ea; }
+        .admin-panel-card.orange { border-left-color: #f97316; }
+        .admin-panel-card.yellow { border-left-color: #eab308; }
+        .admin-card-title { font-size: 1.25em; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        
+        .admin-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .admin-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .admin-input-col-2 { grid-column: span 2; }
+        .admin-input { flex: 1; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 12px; font-family: inherit; font-size: 1rem; }
+        .admin-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; font-family: inherit; resize: vertical; }
+        
+        .modern-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 1.05rem; margin-bottom: 12px; outline: none; transition: border-color 0.2s; }
+        .modern-input:focus { border-color: #3b82f6; background: white; }
+        .btn-pay { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: transform 0.1s; text-align: center; text-decoration: none; display: inline-block; }
+        .btn-pay:active { transform: scale(0.98); }
+
+        .list-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .list-link-btn { background: #f3f4f6; color: #374151; padding: 14px; border-radius: 8px; font-weight: 600; text-align: left; border: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .list-link-btn:hover { background: #e5e7eb; color: #111827; }
+
+        .admin-btn-blue { background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold;}
+        .admin-btn-green { background: #16a34a; color: white; padding: 14px; border-radius: 4px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 16px; font-size: 1.05rem; }
+        .admin-btn-gray { background: #e5e7eb; color: #1f2937; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; border: none; cursor: pointer; }
+        .admin-btn-danger { background: #dc2626; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        .admin-btn-warn { background: #eab308; color: #111827; padding: 8px 16px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        
+        .admin-sm-btn { background: #22c55e; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; border: none; cursor: pointer; margin-left: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;}
+        .admin-sm-btn:hover { filter: brightness(1.1); }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;}
+        .stat-box { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); text-align: center; border-bottom: 4px solid #3b82f6;}
+        .stat-box.green { border-bottom-color: #10b981; }
+        .stat-box.yellow { border-bottom-color: #facc15; }
+        .stat-box h3 { font-size: 0.9rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;}
+        .stat-box .val { font-size: 1.8rem; font-weight: 900; }
+
+        /* USER LIST CONTAINER CLEANUP */
+        .user-manage-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .user-manage-header { display: flex; justify-content: space-between; align-items: flex-start;}
+        .user-manage-info { flex-grow: 1; word-break: break-word; }
+        .user-manage-info h4 { font-size: 1.1rem; color: #111827; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-weight: bold;}
+        .user-manage-info p { font-size: 0.95rem; color: #4b5563; margin-bottom: 4px;}
+        .user-manage-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; padding-top: 12px; border-top: 1px solid #f3f4f6;}
+        .user-manage-actions button { padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        
+        .admin-manage-card { background: #f9fafb; padding: 16px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 12px; }
+        .admin-manage-card h3 { font-weight: bold; margin-bottom: 4px; }
+        .admin-manage-card p { font-size: 0.8em; color: #6b7280; margin-bottom: 8px; }
+        .admin-resolve-box { background: #fef2f2; padding: 12px; border: 1px solid #fecaca; border-radius: 4px; margin-top: 8px; }
+        .admin-resolve-box h4 { color: #dc2626; font-size: 0.9em; font-weight: bold; margin-bottom: 8px; }
+        .admin-resolve-row { margin-bottom: 6px; font-size: 0.9em; }
+        .admin-resolve-select { border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; margin-top: 4px; width: 100%; font-family: inherit; }
+        
+        .withdrawal-req-card { background: white; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px;}
+        .withdrawal-info h4 { margin-bottom: 4px; color: #111827; font-size: 1.1rem;}
+        .withdrawal-info p { font-size: 0.9rem; color: #4b5563; margin-bottom: 4px;}
+        .withdrawal-actions { display: flex; gap: 8px; flex-direction: column; }
+        
+        .mcq-builder-area { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .mcq-q-box { background: white; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 12px; }
+
+        /* Modern Notifications CSS */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .modern-toast { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(-20px); animation: slideDownFade 0.3s forwards; pointer-events: auto; }
+        .toast-success { border-left: 4px solid #10b981; }
+        .toast-success i { color: #10b981; }
+        .toast-error { border-left: 4px solid #ef4444; }
+        .toast-error i { color: #ef4444; }
+        .toast-warning { border-left: 4px solid #f59e0b; }
+        .toast-warning i { color: #f59e0b; }
+        .toast-info { border-left: 4px solid #3b82f6; }
+        .toast-info i { color: #3b82f6; }
+        @keyframes slideDownFade { to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { to { opacity: 0; transform: translateY(-20px); } }
+
+    </style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+        <div class="splash-logo">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <h1 class="splash-title">Sintha Shorts</h1>
+        <p class="splash-subtitle">Swipe, Predict & Earn</p>
+        <div class="splash-loader"></div>
+    </div>
+</div>
+
+<!-- AUTHENTICATION PAGE -->
+<div class="welcome-page hidden-panel" id="auth-panel">
+    <button onclick="closeAuthPanel()" class="auth-close-btn">&times;</button>
+    <div class="welcome-brand"><i class="fas fa-bolt"></i> Sintha Shorts</div>
+    <h1 class="welcome-subtitle">Prediction Platform</h1>
+    
+    <div class="auth-container">
+        <!-- LOGIN -->
+        <div id="login-view" class="auth-view active">
+            <h2 class="auth-title">Login to Start</h2>
+            <input type="email" id="login-email" placeholder="Email" class="auth-input">
+            <input type="password" id="login-password" placeholder="Password" class="auth-input">
+            <button onclick="handleLogin()" class="auth-btn">Login</button>
+            <button onclick="switchAuthView('signup-view')" class="auth-link">Create a new account</button>
+            <button onclick="switchAuthView('forgot-pass-view')" class="auth-link">Forgot Password?</button>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="signup-view" class="auth-view">
+            <h2 class="auth-title">Create Account</h2>
+            <input type="text" id="signup-name" placeholder="Full Name" class="auth-input">
+            <input type="tel" id="signup-phone" placeholder="Mobile Number" class="auth-input">
+            <input type="email" id="signup-email" placeholder="Email" class="auth-input">
+            <input type="password" id="signup-password" placeholder="Password (Min 6 chars)" class="auth-input">
+            <button onclick="handleSignup()" class="auth-btn">Sign Up</button>
+            <button onclick="switchAuthView('login-view')" class="auth-link">Back to Login</button>
+        </div>
+
+        <!-- FORGOT PASSWORD -->
+        <div id="forgot-pass-view" class="auth-view">
+            <h2 class="auth-title">Reset Password</h2>
+            <input type="email" id="forgot-email" placeholder="Enter your registered email" class="auth-input">
+            <button onclick="handleForgotPassword()" class="auth-btn">Send Reset Link</button>
+            <button onclick="switchAuthView('login-view')" class="auth-link">Back to Login</button>
+        </div>
+
+        <p id="auth-error" class="auth-error hidden-panel"></p>
+    </div>
+</div>
+
+<!-- MAIN USER UI -->
+<div class="app-container" id="user-panel">
+    <header class="app-header">
+        <div class="header-title"><i class="fas fa-bolt" style="color: var(--accent-color-1);"></i> Sintha Shorts</div>
+        
+        <div class="header-actions" id="header-actions-guest">
+            <button onclick="showPanel('auth')" class="admin-nav-btn" style="background: #3b82f6; color: white;">Login / Sign Up</button>
+        </div>
+        <div class="header-actions hidden-panel" id="header-actions-user">
+            <div class="wallet-badge">
+                <i class="fas fa-coins" style="color: #facc15;"></i> <span id="user-wallet">0</span>
+                <button onclick="openTopUpModal()" style="margin-left: 8px; background: none; border: none; color: #10b981; font-size: 1.1em; cursor: pointer;" title="Top Up Balance">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            </div>
+            <button id="btn-admin-nav" class="admin-nav-btn hidden-panel" onclick="showPanel('admin')"><i class="fas fa-user-shield"></i> Admin Panel</button>
+            <button id="btn-profile-nav" class="profile-nav-btn hidden-panel" onclick="showPanel('profile')"><i class="fas fa-user"></i> Profile</button>
+            <button onclick="auth.signOut()" class="icon-btn logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </header>
+
+    <!-- SEARCH CONTAINER MOVED BELOW HEADER -->
+    <div class="search-container">
+        <input type="text" id="news-search" placeholder="Search news..." class="search-input">
+    </div>
+
+    <nav class="top-menu" id="topMenu">
+        <ul id="category-list"></ul>
+    </nav>
+
+    <div class="news-stream" id="newsStream"></div>
+
+    <div class="swipe-indicator" id="swipeIndicator">
+        <i class="fas fa-chevron-up animate-bounce" style="font-size: 1.25em; margin-bottom: 4px;"></i>
+        <span>Swipe</span>
+        <i class="fas fa-chevron-down" style="font-size: 1.25em; margin-top: 4px;"></i>
+    </div>
+</div>
+
+<!-- PREDICTION MODAL -->
+<div id="prediction-modal" class="overlay-modal hidden-panel">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-title">Predict</h2>
+            <button onclick="closeModal('prediction-modal')" class="modal-close">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="modal-countdown" class="modal-countdown"></div>
+            <div style="font-size: 0.85rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <i class="fas fa-info-circle"></i> <strong>Rules:</strong> You will get points for correct answers and <strong style="color:#f87171;">Negative Points</strong> for wrong answers. Leave unattempted for 0 points.
+            </div>
+            <div id="modal-prizes" style="display: none; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;"></div>
+            <div id="public-stats-container" class="public-stats hidden-panel"></div>
+
+            <form id="prediction-form" onsubmit="submitPrediction(event)">
+                <div id="modal-questions"></div>
+                
+                <input type="hidden" id="modal-news-id">
+                <button type="submit" id="btn-submit-prediction" class="submit-pred-btn">Loading...</button>
+            </form>
+
+            <div id="modal-other-users"></div>
+        </div>
+    </div>
+</div>
+
+<!-- COMMENT MODAL FULL PAGE -->
+<div id="comment-modal" class="overlay-modal hidden-panel" style="z-index: 650; padding:0;">
+    <div class="modal-content" style="max-height: 100vh; height: 100vh; border-radius: 0; width: 100%; max-width: 100%;">
+        <div class="modal-header">
+            <h2 class="modal-title">Comments</h2>
+            <button onclick="closeModal('comment-modal')" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 15px; background: #111827;">
+            <div id="comment-post-preview-container"></div>
+            <div id="comment-list" style="flex-grow: 1;">
+                <!-- Comments list dynamically injected here -->
+            </div>
+        </div>
+        <div style="padding: 10px 15px; background: #1f2937; border-top: 1px solid #374151;">
+            <div id="comment-reply-preview" class="hidden-panel" style="font-size: 0.8em; color: #9ca3af; margin-bottom: 5px; display:flex; justify-content:space-between;"></div>
+            <input type="hidden" id="comment-news-id">
+            <input type="hidden" id="comment-reply-id">
+            <input type="hidden" id="comment-edit-id">
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:10px;">
+                <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 15px; border-radius:12px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LEADERBOARD MODAL -->
+<div id="leaderboard-modal" class="overlay-modal hidden-panel">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Match Results & Leaderboard</h2>
+            <button onclick="closeModal('leaderboard-modal')" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="leaderboard-content"></div>
+    </div>
+</div>
+
+<!-- INFO / STATIC TEXT MODAL -->
+<div id="info-modal" class="overlay-modal hidden-panel">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="info-modal-title">Info</h2>
+            <button onclick="closeModal('info-modal')" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="info-modal-body" style="line-height: 1.6; color: #e5e7eb;"></div>
+    </div>
+</div>
+
+<!-- USER PROFILE DASHBOARD -->
+<div id="profile-panel" class="admin-layout hidden-panel">
+    <div class="admin-topbar">
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <button onclick="showPanel('user')" class="admin-back-btn">Back to App</button>
+    </div>
+
+    <div class="admin-content">
+        <!-- Profile Info & Settings -->
+        <div class="admin-panel-card">
+            <h2 class="admin-card-title"><i class="fas fa-id-badge"></i> Account Details</h2>
+            <p style="margin-bottom: 15px; color: #4b5563;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+            <p style="margin-bottom: 15px; color: #4b5563;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+            
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 15px 0;">
+            
+            <h3 style="font-size: 1rem; margin-bottom: 10px;">Change Password</h3>
+            <input type="password" id="profile-new-pass" placeholder="Enter new password" class="modern-input">
+            <button onclick="changeUserPassword()" class="admin-btn-blue">Update Password</button>
+        </div>
+
+        <!-- Withdrawal Section -->
+        <div class="admin-panel-card green">
+            <h2 class="admin-card-title" style="color: #059669;"><i class="fas fa-money-bill-wave"></i> Withdraw Winnings</h2>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 15px;">Available Balance: <strong id="profile-withdraw-bal">0</strong> Coins</p>
+            
+            <label style="font-weight: bold; font-size: 0.9rem;">UPI ID</label>
+            <input type="text" id="withdraw-upi" placeholder="e.g., yourname@upi" class="modern-input">
+            
+            <label style="font-weight: bold; font-size: 0.9rem;">Amount (Coins)</label>
+            <input type="number" id="withdraw-amt" placeholder="Enter amount to withdraw" class="modern-input">
+            
+            <button onclick="requestWithdrawal()" class="btn-pay"><i class="fas fa-paper-plane"></i> Request Payout</button>
+        </div>
+
+        <!-- Links Section -->
+        <div class="admin-panel-card purple">
+            <h2 class="admin-card-title"><i class="fas fa-link"></i> More Info</h2>
+            <div class="list-btn-group">
+                <button class="list-link-btn" onclick="showStaticInfo('privacy')">Privacy Policy <i class="fas fa-chevron-right"></i></button>
+                <button class="list-link-btn" onclick="showStaticInfo('terms')">Terms & Conditions <i class="fas fa-chevron-right"></i></button>
+                <button class="list-link-btn" onclick="showStaticInfo('refund')">Refund Policy <i class="fas fa-chevron-right"></i></button>
+                <button class="list-link-btn" onclick="showStaticInfo('contact')">Contact Us <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-panel" class="admin-layout hidden-panel">
+    <div class="admin-topbar yellow">
+        <h1><i class="fas fa-tools"></i> Admin Console</h1>
+        <button onclick="showPanel('user')" class="admin-back-btn">Back to App</button>
+    </div>
+    
+    <!-- Bottom Nav Bar -->
+    <div class="admin-in-nav">
+        <button id="nav-btn-post" class="active" onclick="switchAdminTab('post')"><i class="fas fa-edit"></i> Post</button>
+        <button id="nav-btn-mcq" onclick="switchAdminTab('mcq')"><i class="fas fa-question-circle"></i> MCQ</button>
+        <button id="nav-btn-request" onclick="switchAdminTab('request')"><i class="fas fa-hand-holding-usd"></i> Request</button>
+        <button id="nav-btn-dashboard" onclick="switchAdminTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+    </div>
+
+    <div class="admin-content" style="margin-top: 15px;">
+        
+        <!-- MENU 1: POST TAB -->
+        <div id="admin-tab-post" class="admin-tab active">
+            
+            <!-- AUTO RSS FEED SECTION -->
+            <div class="admin-panel-card orange">
+                <h2 class="admin-card-title"><i class="fas fa-rss"></i> Auto RSS Feeds</h2>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 10px;">Add RSS URLs here. The system automatically checks and posts new articles periodically while you're online.</p>
+                <input type="hidden" id="admin-rss-edit-id">
+                <div class="admin-input-grid">
+                    <input type="url" id="admin-rss-url" placeholder="Enter RSS Feed URL" class="admin-input admin-input-col-2">
+                    <select id="admin-rss-cat" class="admin-input"></select>
+                    <input type="number" id="admin-rss-interval" placeholder="Check Interval (Mins)" value="30" class="admin-input">
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button onclick="addAutoRssFeed()" id="btn-add-rss" class="admin-btn-blue" style="flex: 1;">Add Auto Feed</button>
+                    <button onclick="cancelEditRssFeed()" id="btn-cancel-rss" class="admin-btn-gray hidden-panel" style="padding: 12px;">Cancel Edit</button>
+                </div>
+                
+                <div id="admin-rss-list" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
+                    <!-- Active feeds list -->
+                </div>
+            </div>
+
+            <div class="admin-panel-card green">
+                <h2 class="admin-card-title" id="admin-post-form-title">Create / Upload Post</h2>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 10px;">Configure mode, marks logic, and details.</p>
+                
+                <input type="hidden" id="edit-post-id">
+
+                <div class="admin-input-grid" style="align-items: center;">
+                    <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
+                    <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
+                    
+                    <div style="display:flex; gap:8px;">
+                        <select id="admin-cat" class="admin-input" style="flex:1;">
+                        </select>
+                        <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 10px;">Add Cat</button>
+                        <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 12px; font-size: 1rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
+                    </div>
+                    
+                    <input type="datetime-local" id="admin-deadline" class="admin-input" title="Deadline">
+                </div>
+                
+                <textarea id="admin-desc" placeholder="News Snippet/Description" class="admin-textarea" rows="3"></textarea>
+                
+                <div class="admin-input-grid" style="align-items: flex-start;">
+                    <div>
+                        <label style="font-size: 0.85em; font-weight: bold;">Post Mode:</label>
+                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 4px;">Normal Posts hide Prediction buttons.</p>
+                        <select id="admin-pred-mode" class="admin-input">
+                            <option value="true">ON (With Prediction)</option>
+                            <option value="false">OFF (Normal Post)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85em; font-weight: bold;">Expected Participants:</label>
+                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 4px;">Used to auto-calculate the prize pool below.</p>
+                        <input type="number" id="admin-participants" value="100" oninput="calcPrizes()" class="admin-input">
+                    </div>
+                </div>
+
+                <div class="admin-input-grid" style="align-items: flex-start;">
+                    <div>
+                        <label style="font-size: 0.85em; font-weight: bold;">Marks for Correct Ans:</label>
+                        <input type="number" id="admin-mark-correct" value="10" class="admin-input">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85em; font-weight: bold;">Negative Marks for Wrong:</label>
+                        <input type="number" id="admin-mark-wrong" value="5" class="admin-input">
+                    </div>
+                </div>
+
+                <div class="admin-input-grid" style="align-items: flex-start;">
+                    <div>
+                        <label style="font-size: 0.85em; font-weight: bold;">Entry Fee (Coins):</label>
+                        <input type="number" id="admin-fee" value="50" oninput="calcPrizes()" class="admin-input">
+                    </div>
+                </div>
+
+                <p style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
+                <div class="admin-input-grid" style="align-items: center; margin-bottom: 12px; background: #d1fae5; padding: 10px; border-radius: 8px;">
+                    <div>
+                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">Admin (10%):</label>
+                        <input type="number" id="admin-comm" class="admin-input" style="margin-top: 4px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">1st Prize:</label>
+                        <input type="number" id="admin-1st" class="admin-input" style="margin-top: 4px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">2nd Prize:</label>
+                        <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 4px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; font-weight: bold; color: #065f46;">3rd Prize:</label>
+                        <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 4px;">
+                    </div>
+                </div>
+
+                <button onclick="saveNewsToDB()" id="btn-save-post" class="admin-btn-green">Publish Post</button>
+                <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 8px; padding: 12px;">Cancel Edit</button>
+            </div>
+
+            <!-- ALL POSTS LIST -->
+            <div class="admin-panel-card yellow">
+                <h2 class="admin-card-title"><i class="fas fa-list"></i> All Uploaded Posts</h2>
+                <div id="admin-all-posts-list"></div>
+            </div>
+
+        </div>
+
+        <!-- MENU 2: MCQ TAB -->
+        <div id="admin-tab-mcq" class="admin-tab">
+            <div class="admin-panel-card purple">
+                <h2 class="admin-card-title"><i class="fas fa-tasks"></i> Manage MCQs & Resolve</h2>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 15px;">Select a post below to set questions or resolve matches that have ended.</p>
+                <div id="admin-mcq-post-list"></div>
+            </div>
+        </div>
+
+        <!-- MENU 3: REQUEST TAB -->
+        <div id="admin-tab-request" class="admin-tab">
+            <div class="admin-panel-card green">
+                <h2 class="admin-card-title"><i class="fas fa-hand-holding-usd"></i> Withdrawal Requests</h2>
+                <div id="admin-withdrawals-list">
+                    <p style="color: #6b7280; font-size: 0.9rem;">No pending requests.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU 4: DASHBOARD TAB -->
+        <div id="admin-tab-dashboard" class="admin-tab">
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <h3>Total Paid Out</h3>
+                    <div class="val" id="stat-paid">0</div>
+                </div>
+                <div class="stat-box green">
+                    <h3>Total Profit</h3>
+                    <div class="val" id="stat-profit">0</div>
+                </div>
+                <div class="stat-box yellow">
+                    <h3>Users Wallet Bal</h3>
+                    <div class="val" id="stat-wallets">0</div>
+                </div>
+            </div>
+
+            <div class="admin-panel-card red">
+                <h2 class="admin-card-title" style="color: #dc2626;"><i class="fas fa-user-shield"></i> Admin Users</h2>
+                <div id="list-admin-users"></div>
+            </div>
+
+            <div class="admin-panel-card">
+                <h2 class="admin-card-title"><i class="fas fa-users"></i> Normal Users</h2>
+                <div id="list-normal-users"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MCQ EDITOR MODAL -->
+<div id="mcq-editor-modal" class="overlay-modal hidden-panel" style="z-index: 700;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2 class="modal-title" id="mcq-editor-title">Set Questions</h2>
+            <button onclick="closeModal('mcq-editor-modal')" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="mcq-target-news-id">
+            
+            <div id="mcq-builder-container" class="mcq-builder-area">
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" onclick="addMCQEditorQuestion()" class="admin-btn-gray" style="flex: 1; padding: 12px;">+ Add Question</button>
+                <button type="button" onclick="saveMCQsToDB()" class="admin-btn-green" style="flex: 2; margin-top: 0;">Save All Questions</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODERN DIALOG MODAL (For Confirm/Prompt) -->
+<div id="modern-dialog" class="overlay-modal hidden-panel" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 400px; border: 1px solid #374151;">
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+            <h2 class="modal-title" id="dialog-title">Confirm</h2>
+        </div>
+        <div class="modal-body">
+            <p id="dialog-msg" style="margin-bottom: 15px; color: #e5e7eb; font-size: 1rem; line-height: 1.5;"></p>
+            <input type="text" id="dialog-input" class="modern-input hidden-panel" style="margin-bottom: 0;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button id="dialog-btn-cancel" class="admin-btn-gray" style="padding: 10px 20px;">Cancel</button>
+                <button id="dialog-btn-confirm" class="admin-btn-blue" style="padding: 10px 20px;">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- FIREBASE SDK & JS LOGIC -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+    // MODERN ALERT & DIALOG FUNCTIONS
+    function showNotification(msg, type = 'info') {
+        let container = document.getElementById('toast-container');
+        if(!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `modern-toast toast-${type}`;
+        let icon = 'fa-info-circle';
+        if(type === 'success') icon = 'fa-check-circle';
+        if(type === 'error') icon = 'fa-exclamation-circle';
+        if(type === 'warning') icon = 'fa-exclamation-triangle';
+        
+        toast.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideUpFade 0.3s forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Override native alert just in case
+    window.alert = function(msg) { showNotification(msg, 'info'); };
+
+    function customConfirm(msg) {
+        return new Promise((resolve) => {
+            const dialog = document.getElementById('modern-dialog');
+            document.getElementById('dialog-title').innerText = 'Confirm Action';
+            document.getElementById('dialog-msg').innerText = msg;
+            document.getElementById('dialog-input').classList.add('hidden-panel');
+            dialog.classList.remove('hidden-panel');
+            
+            document.getElementById('dialog-btn-confirm').onclick = () => {
+                dialog.classList.add('hidden-panel');
+                resolve(true);
+            };
+            document.getElementById('dialog-btn-cancel').onclick = () => {
+                dialog.classList.add('hidden-panel');
+                resolve(false);
+            };
+        });
+    }
+
+    function customPrompt(msg, defaultVal = '') {
+        return new Promise((resolve) => {
+            const dialog = document.getElementById('modern-dialog');
+            document.getElementById('dialog-title').innerText = 'Input Required';
+            document.getElementById('dialog-msg').innerText = msg;
+            const input = document.getElementById('dialog-input');
+            input.value = defaultVal;
+            input.classList.remove('hidden-panel');
+            dialog.classList.remove('hidden-panel');
+            input.focus();
+            
+            document.getElementById('dialog-btn-confirm').onclick = () => {
+                dialog.classList.add('hidden-panel');
+                resolve(input.value);
+            };
+            document.getElementById('dialog-btn-cancel').onclick = () => {
+                dialog.classList.add('hidden-panel');
+                resolve(null);
+            };
+        });
+    }
+
+
+    const firebaseConfig = {
+            apiKey: "AIzaSyB2imEIvh_bWbYD_yPB7p3af7bV9OWdA5A",
+            authDomain: "sinthahousie-1dd3b.firebaseapp.com",
+            databaseURL: "https://sinthahousie-1dd3b-default-rtdb.firebaseio.com",
+            projectId: "sinthahousie-1dd3b",
+            storageBucket: "sinthahousie-1dd3b.firebasestorage.app",
+            messagingSenderId: "76567991256",
+            appId: "1:76567991256:web:c58b127b8d86d8a1c598ad",
+            measurementId: "G-MGW406NKBY"
+        };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    let currentUser = null;
+    let isAdmin = false; 
+    
+    let allNewsData = {}; 
+    let activeNewsArray =[]; 
+    let userPredictions = {}; 
+    let allLikes = {};
+    let allComments = {};
+    let allRssFeeds = {}; 
+    let currentCommentsNewsId = null;
+    
+    let isSwipeDisabled = false; // FLAG FOR SWIPE CONTROL
+    
+    // UPDATED EXPANDED CATEGORIES LIST
+    let dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
+    let currentCategory = "all";
+    
+    let currentNewsIndex = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isDragging = false;
+    let basePixelTransformY = 0;
+    let activeCountdownIntervals =[];
+    let activeCarouselIntervals =[]; 
+    
+    let commentCarouselInterval = null;
+    let commentTextScrollInterval = null;
+
+    let isAppInitialized = false;
+    let isFetchingRealtime = false; 
+    let DEFAULT_NEWS_IMAGE = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
+
+    // Helper for relative time "Today ago" implementation
+    function timeAgo(timestamp) {
+        if (!timestamp) return '';
+        const now = new Date();
+        const past = new Date(timestamp);
+        const diffMs = now - past;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} mins ago`;
+        
+        const isToday = now.getDate() === past.getDate() && now.getMonth() === past.getMonth() && now.getFullYear() === past.getFullYear();
+        
+        if (isToday) {
+            return `${diffHours} hours ago`;
+        }
+        
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        const isYesterday = yesterday.getDate() === past.getDate() && yesterday.getMonth() === past.getMonth() && yesterday.getFullYear() === past.getFullYear();
+        
+        if (isYesterday) {
+            return `Yesterday at ${past.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        }
+
+        if (diffDays < 7) return `${diffDays} days ago`;
+        
+        return past.toLocaleDateString();
+    }
+
+    // DYNAMIC CATEGORY DEFAULT IMAGE ALLOCATOR
+    function getDefaultImageForCategory(cat) {
+        if(!cat) return DEFAULT_NEWS_IMAGE;
+        const c = cat.toLowerCase();
+        if(c.includes('headline')) return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('sport')) return 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('job') || c.includes('career')) return 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('editorial')) return 'https://images.unsplash.com/photo-1455390582262-044cdead27d8?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('announcement')) return 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('education')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('snippet')) return 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('press')) return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('tech')) return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('politic')) return 'https://images.unsplash.com/photo-1541872516559-2513f5c8f8b8?auto=format&fit=crop&w=600&q=80';
+        if(c.includes('crypto')) return 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=600&q=80';
+        return DEFAULT_NEWS_IMAGE;
+    }
+
+    const DOM = {
+        authPanel: document.getElementById('auth-panel'),
+        userPanel: document.getElementById('user-panel'),
+        adminPanel: document.getElementById('admin-panel'),
+        profilePanel: document.getElementById('profile-panel'),
+        btnAdminNav: document.getElementById('btn-admin-nav'),
+        btnProfileNav: document.getElementById('btn-profile-nav'),
+        headerGuest: document.getElementById('header-actions-guest'),
+        headerUser: document.getElementById('header-actions-user'),
+        newsStream: document.getElementById('newsStream'),
+        wallet: document.getElementById('user-wallet'),
+        catList: document.getElementById('category-list'),
+        search: document.getElementById('news-search')
+    };
+
+    DOM.search.addEventListener('input', () => {
+        filterFeed(currentCategory);
+    });
+
+    function calcPrizes() {
+        let fee = parseInt(document.getElementById('admin-fee').value) || 0;
+        let parts = parseInt(document.getElementById('admin-participants').value) || 0;
+        let pool = fee * parts;
+        let admin = pool * 0.10;
+        let rem = pool - admin;
+        document.getElementById('admin-comm').value = Math.round(admin);
+        document.getElementById('admin-1st').value = Math.round(rem * 0.50); 
+        document.getElementById('admin-2nd').value = Math.round(rem * 0.30); 
+        document.getElementById('admin-3rd').value = Math.round(rem * 0.20); 
+    }
+
+    function closeAuthPanel() { DOM.authPanel.classList.add('hidden-panel'); }
+
+    function switchAuthView(viewId) {
+        document.querySelectorAll('.auth-view').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        document.getElementById('auth-error').classList.add('hidden-panel');
+    }
+
+    function showAuthError(msg) {
+        const err = document.getElementById('auth-error');
+        err.innerText = msg;
+        err.classList.remove('hidden-panel');
+    }
+
+    function updateHeaderUI(isLoggedIn, adminFlag) {
+        if (isLoggedIn) {
+            DOM.headerGuest.classList.add('hidden-panel');
+            DOM.headerUser.classList.remove('hidden-panel');
+            
+            if (adminFlag) {
+                DOM.btnAdminNav.classList.remove('hidden-panel');
+                DOM.btnProfileNav.classList.add('hidden-panel');
+            } else {
+                DOM.btnAdminNav.classList.add('hidden-panel');
+                DOM.btnProfileNav.classList.remove('hidden-panel');
+            }
+        } else {
+            DOM.headerGuest.classList.remove('hidden-panel');
+            DOM.headerUser.classList.add('hidden-panel');
+        }
+    }
+
+    fetchRealtimeData();
+
+    auth.onAuthStateChanged(user => {
+        const handleAuthChange = () => {
+            if (user) {
+                currentUser = user;
+                DOM.authPanel.classList.add('hidden-panel');
+                
+                db.ref(`users/${user.uid}`).once('value', snap => {
+                    const data = snap.val();
+                    if(!data) {
+                        db.ref(`users/${user.uid}`).set({ wallet: 0, name: user.email.split('@')[0], email: user.email, role: 'user', banned: false });
+                        DOM.wallet.innerText = 1000;
+                        isAdmin = false;
+                    } else {
+                        if(data.banned) {
+                            showNotification("Your account has been banned by the Administrator.", "error");
+                            auth.signOut();
+                            return;
+                        }
+                        DOM.wallet.innerText = data.wallet || 0;
+                        isAdmin = (data.role === 'admin');
+                    }
+                    updateHeaderUI(true, isAdmin);
+                    document.getElementById('profile-name').innerText = data?.name || user.email.split('@')[0];
+                    document.getElementById('profile-email').innerText = user.email;
+                    document.getElementById('profile-withdraw-bal').innerText = data?.wallet || 0;
+
+                    if(isAdmin) {
+                        fetchAdminWithdrawals();
+                        fetchAdminDashboardStats();
+                        manageAutoRssService();
+                    } else {
+                        if (window.rssIntervals) {
+                            Object.values(window.rssIntervals).forEach(clearInterval);
+                            window.rssIntervals = {};
+                        }
+                    }
+                });
+                
+                showPanel('user');
+                db.ref(`users/${user.uid}/wallet`).on('value', s => { 
+                    let bal = s.val() || 0;
+                    DOM.wallet.innerText = bal; 
+                    document.getElementById('profile-withdraw-bal').innerText = bal;
+                });
+                
+                db.ref('predictions').on('value', snap => {
+                    const allPreds = snap.val() || {};
+                    userPredictions = {};
+                    for(let newsId in allPreds){
+                        if(allPreds[newsId][currentUser.uid]) {
+                            let p = allPreds[newsId][currentUser.uid];
+                            if (p.answers && !Array.isArray(p.answers)) {
+                                p.answers = Object.values(p.answers);
+                            }
+                            userPredictions[newsId] = p;
+                        }
+                    }
+                    renderStream(); 
+                });
+            } else {
+                currentUser = null;
+                isAdmin = false;
+                userPredictions = {};
+                updateHeaderUI(false, false);
+                renderStream(); 
+                if (window.rssIntervals) {
+                    Object.values(window.rssIntervals).forEach(clearInterval);
+                    window.rssIntervals = {};
+                }
+            }
+        };
+
+        if (!isAppInitialized) {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('splash-hidden');
+                setTimeout(() => splash.style.display = 'none', 600); 
+                handleAuthChange();
+                isAppInitialized = true;
+                calcPrizes(); 
+            }, 2500); 
+        } else {
+            handleAuthChange();
+        }
+    });
+
+    async function handleLogin() {
+        const e = document.getElementById('login-email').value, p = document.getElementById('login-password').value;
+        if(!e || !p) return showAuthError("Enter email and password.");
+        try { await auth.signInWithEmailAndPassword(e, p); } 
+        catch (err) { showAuthError(err.message); }
+    }
+
+    async function handleSignup() {
+        const n = document.getElementById('signup-name').value;
+        const phone = document.getElementById('signup-phone').value;
+        const e = document.getElementById('signup-email').value;
+        const p = document.getElementById('signup-password').value;
+        if(!e || !p || !n || !phone) return showAuthError("Enter Full Name, Mobile Number, Email and Password.");
+        try { 
+            const cred = await auth.createUserWithEmailAndPassword(e, p); 
+            await db.ref(`users/${cred.user.uid}`).set({ wallet: 0, name: n, phone: phone, email: e, role: 'user', banned: false });
+        } 
+        catch (err) { showAuthError(err.message); }
+    }
+
+    async function handleForgotPassword() {
+        const e = document.getElementById('forgot-email').value;
+        if(!e) return showAuthError("Please enter your email.");
+        try {
+            await auth.sendPasswordResetEmail(e);
+            showNotification("Password reset email sent! Check your inbox.", "success");
+            switchAuthView('login-view');
+        } catch (err) { showAuthError(err.message); }
+    }
+
+    async function changeUserPassword() {
+        const p = document.getElementById('profile-new-pass').value;
+        if(!p || p.length < 6) return showNotification("Password must be at least 6 characters.", "error");
+        try {
+            await currentUser.updatePassword(p);
+            showNotification("Password updated successfully.", "success");
+            document.getElementById('profile-new-pass').value = '';
+        } catch(e) { showNotification("Error: " + e.message, "error"); }
+    }
+
+    function showPanel(type) {
+        DOM.userPanel.classList.add('hidden-panel');
+        DOM.adminPanel.classList.add('hidden-panel');
+        DOM.profilePanel.classList.add('hidden-panel');
+        DOM.authPanel.classList.add('hidden-panel');
+        
+        if(type === 'user') DOM.userPanel.classList.remove('hidden-panel');
+        else if(type === 'admin') DOM.adminPanel.classList.remove('hidden-panel');
+        else if(type === 'profile') DOM.profilePanel.classList.remove('hidden-panel');
+        else { DOM.authPanel.classList.remove('hidden-panel'); switchAuthView('login-view'); }
+    }
+
+    async function requestWithdrawal() {
+        const upi = document.getElementById('withdraw-upi').value.trim();
+        const amt = parseInt(document.getElementById('withdraw-amt').value);
+        if(!upi || !amt || amt <= 0) return showNotification("Please enter a valid UPI ID and positive amount.", "error");
+        const snap = await db.ref(`users/${currentUser.uid}/wallet`).once('value');
+        let bal = snap.val() || 0;
+        if(bal < amt) return showNotification("Insufficient balance.", "error");
+
+        await db.ref(`users/${currentUser.uid}`).update({ wallet: bal - amt });
+        await db.ref('withdrawals').push({
+            uid: currentUser.uid, name: document.getElementById('profile-name').innerText,
+            email: currentUser.email, upi: upi, amount: amt, status: 'pending',
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+        showNotification("Withdrawal request sent!", "success");
+        document.getElementById('withdraw-upi').value = ''; document.getElementById('withdraw-amt').value = '';
+    }
+
+    function showStaticInfo(type) {
+        const titleEl = document.getElementById('info-modal-title');
+        const bodyEl = document.getElementById('info-modal-body');
+        let title = "", content = "";
+        if(type === 'privacy') { title = "Privacy Policy"; content = "<p>Your privacy is important to us. Data collected is used solely for the functionality of Sintha Shorts.</p>"; }
+        else if(type === 'terms') { title = "Terms & Conditions"; content = "<p>Decisions regarding correct answers are final and made by the platform admins.</p>"; }
+        else if(type === 'refund') { title = "Refund Policy"; content = "<p>Predictions are non-refundable unless a match is cancelled.</p>"; }
+        else if(type === 'contact') { title = "Contact Us"; content = "<p>Email support at: <strong>support@sinthashorts.com</strong></p>"; }
+        titleEl.innerText = title; bodyEl.innerHTML = content;
+        document.getElementById('info-modal').classList.remove('hidden-panel');
+    }
+
+    async function openTopUpModal() {
+        const amt = await customPrompt("Enter amount to top up (in INR) to get equal Coins:");
+        if(!amt || isNaN(amt) || amt <= 0) return;
+        const options = {
+            "key": "rzp_live_SUarhYm5IfBTar", "amount": amt * 100, "currency": "INR", "name": "Sintha Shorts", "description": "Wallet Top Up",
+            "handler": async function (response) {
+                const snap = await db.ref(`users/${currentUser.uid}/wallet`).once('value');
+                await db.ref(`users/${currentUser.uid}`).update({ wallet: (snap.val()||0) + parseInt(amt) });
+                showNotification("Top up successful!", "success");
+            },
+            "prefill": { "email": currentUser.email }, "theme": { "color": "#3b82f6" }
+        };
+        try { const rzp1 = new window.Razorpay(options); rzp1.open(); } 
+        catch (e) { showNotification("Razorpay script error.", "error"); }
+    }
+
+    async function addNewCategory() {
+        const newCat = await customPrompt("Enter new category name:");
+        if(newCat && newCat.trim()) await db.ref('categories').push(newCat.trim());
+    }
+
+    async function removeSelectedCategory() {
+        const catToRemove = document.getElementById('admin-cat').value;
+        if(!catToRemove) return showNotification("Please select a category to remove.", "warning");
+        
+        // Cannot remove default categories safely to maintain system stability
+        const defaultCats =["headlines", "sports", "jobs", "editorial", "announcement", "education", "snippets", "press", "tech", "politics", "crypto"];
+        if(defaultCats.includes(catToRemove.toLowerCase())) {
+            return showNotification("Cannot delete default categories.", "error");
+        }
+
+        if(await customConfirm(`Are you sure you want to remove the category "${catToRemove}"?`)) {
+            const snap = await db.ref('categories').once('value');
+            const cats = snap.val();
+            if(cats) {
+                for(let key in cats) {
+                    if(cats[key].toLowerCase() === catToRemove.toLowerCase()) {
+                        await db.ref('categories/' + key).remove();
+                        
+                        // Remove from the dynamic array locally
+                        const index = dynamicCategories.findIndex(c => c.toLowerCase() === catToRemove.toLowerCase());
+                        if(index > -1) dynamicCategories.splice(index, 1);
+                        
+                        // Reset App view
+                        currentCategory = "all";
+                        setupCategories();
+                        populateAdminCategories();
+                        filterFeed(currentCategory);
+                        
+                        showNotification("Category removed successfully.", "success");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    function populateAdminCategories() {
+        const catSelect = document.getElementById('admin-cat');
+        const rssCatSelect = document.getElementById('admin-rss-cat');
+        if(catSelect) catSelect.innerHTML = '';
+        if(rssCatSelect) rssCatSelect.innerHTML = '';
+        
+        dynamicCategories.forEach(c => { 
+            let html = `<option value="${c.toLowerCase()}">${c}</option>`;
+            if(catSelect) catSelect.innerHTML += html; 
+            if(rssCatSelect) rssCatSelect.innerHTML += html;
+        });
+    }
+
+    function switchCategory(catStr) {
+        currentCategory = catStr;
+        document.querySelectorAll('#category-list a').forEach(a => {
+            a.classList.remove('active');
+            if(a.dataset.cat === catStr) {
+                a.classList.add('active');
+                a.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+            }
+        });
+        filterFeed(catStr);
+    }
+
+    function setupCategories() {
+        DOM.catList.innerHTML = '';
+        const allMenuCats =["All", "Trending", ...dynamicCategories];
+        allMenuCats.forEach((cat, index) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            let catValue = cat.toLowerCase();
+            a.href = "#"; a.innerText = cat;
+            a.dataset.cat = catValue;
+            if(catValue === currentCategory) a.classList.add('active');
+            a.onclick = (e) => { 
+                e.preventDefault();
+                switchCategory(catValue);
+            };
+            li.appendChild(a); DOM.catList.appendChild(li);
+        });
+    }
+
+    function fetchRealtimeData() {
+        if(isFetchingRealtime) return; 
+        isFetchingRealtime = true;
+
+        db.ref('categories').on('value', snap => {
+            const cats = snap.val();
+            // Reset to default on fetch, then merge custom additions
+            dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
+            if(cats) {
+                let customCats = Object.values(cats);
+                customCats.forEach(c => { if(!dynamicCategories.includes(c)) dynamicCategories.push(c); });
+            }
+            setupCategories(); populateAdminCategories();
+        });
+
+        db.ref('likes').on('value', snap => {
+            allLikes = snap.val() || {};
+            renderStreamDecorations();
+        });
+
+        db.ref('comments').on('value', snap => {
+            allComments = snap.val() || {};
+            renderStreamDecorations();
+            if(!document.getElementById('comment-modal').classList.contains('hidden-panel') && currentCommentsNewsId) {
+                renderCommentsModal();
+            }
+        });
+
+        db.ref('rss_feeds').on('value', snap => {
+            allRssFeeds = snap.val() || {};
+            renderAdminRssList();
+            if(isAdmin) {
+                manageAutoRssService();
+            }
+        });
+
+        db.ref('news').on('value', snap => {
+            const rawData = snap.val() || {};
+            for(let key in rawData) {
+                if (rawData[key].questions) {
+                    if (!Array.isArray(rawData[key].questions)) rawData[key].questions = Object.values(rawData[key].questions);
+                    rawData[key].questions.forEach(q => {
+                        if (q.options && !Array.isArray(q.options)) q.options = Object.values(q.options);
+                        else if (!q.options) q.options =["Opt A", "Opt B", "Opt C", "Opt D"];
+                    });
+                } else rawData[key].questions =[];
+            }
+            allNewsData = rawData;
+            filterFeed(currentCategory); 
+            renderAdminPostList(); 
+            renderAdminMCQList();
+        });
+    }
+
+    function filterFeed(category) {
+        activeNewsArray = Object.keys(allNewsData).map(id => ({ id, ...allNewsData[id] }));
+        const searchQ = DOM.search.value.toLowerCase().trim();
+
+        if (searchQ) {
+            activeNewsArray = activeNewsArray.filter(n => 
+                (n.title && n.title.toLowerCase().includes(searchQ)) || 
+                (n.desc && n.desc.toLowerCase().includes(searchQ))
+            );
+        }
+
+        if(category === 'trending') {
+            activeNewsArray.sort((a,b) => {
+                let aScore = (allLikes[a.id] ? Object.keys(allLikes[a.id]).length : 0) + (allComments[a.id] ? Object.keys(allComments[a.id]).length : 0);
+                let bScore = (allLikes[b.id] ? Object.keys(allLikes[b.id]).length : 0) + (allComments[b.id] ? Object.keys(allComments[b.id]).length : 0);
+                return (bScore - aScore) || (b.createdAt - a.createdAt);
+            });
+        } else {
+            activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
+            if(category !== 'all') {
+                activeNewsArray = activeNewsArray.filter(n => n.category && n.category.toLowerCase() === category);
+            }
+        }
+        
+        currentNewsIndex = 0; 
+        renderStream();
+        updateStreamPosition(false);
+    }
+
+    function renderStreamDecorations() {
+        activeNewsArray.forEach(news => {
+            let lCount = allLikes[news.id] ? Object.keys(allLikes[news.id]).length : 0;
+            let cCount = allComments[news.id] ? Object.keys(allComments[news.id]).length : 0;
+            let btnL = document.getElementById(`like-count-${news.id}`);
+            let btnC = document.getElementById(`comment-count-${news.id}`);
+            let iconL = document.getElementById(`btn-like-${news.id}`);
+            if(btnL) btnL.innerText = lCount;
+            if(btnC) btnC.innerText = cCount;
+            if(iconL) {
+                if(currentUser && allLikes[news.id] && allLikes[news.id][currentUser.uid]) iconL.classList.add('liked');
+                else iconL.classList.remove('liked');
+            }
+        });
+    }
+
+    window.toggleReadMore = function(e, id) {
+        e.stopPropagation(); // prevent swipe conflicts
+        const snippet = document.getElementById(`snippet-${id}`);
+        const btn = document.getElementById(`rm-btn-${id}`);
+        const fullBtn = document.getElementById(`full-btn-${id}`);
+        
+        if(snippet.classList.contains('text-clamped')) {
+            snippet.classList.remove('text-clamped');
+            snippet.classList.add('text-expanded');
+            btn.innerText = 'Read less';
+            if (fullBtn) fullBtn.classList.remove('hidden-panel');
+            isSwipeDisabled = true; // Disable vertical swipe navigation on Read More
+        } else {
+            snippet.classList.remove('text-expanded');
+            snippet.classList.add('text-clamped');
+            snippet.scrollTop = 0;
+            btn.innerText = 'Read more';
+            if (fullBtn) fullBtn.classList.add('hidden-panel');
+            isSwipeDisabled = false; // Enable vertical swipe navigation when closed
+        }
+    };
+
+    function renderStream() {
+        isSwipeDisabled = false; // Reset whenever stream updates
+        DOM.newsStream.innerHTML = '';
+        
+        activeCountdownIntervals.forEach(clearInterval); activeCountdownIntervals =[];
+        activeCarouselIntervals.forEach(clearInterval); activeCarouselIntervals =[];
+
+        if(activeNewsArray.length === 0) {
+            DOM.newsStream.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#6b7280;">No content found.</div>`;
+            return;
+        }
+
+        const now = new Date().getTime();
+
+        activeNewsArray.forEach((news, idx) => {
+            let isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
+            const hasDeadline = news.deadline && news.deadline !== "";
+            const isClosed = (hasDeadline && now > new Date(news.deadline).getTime()) || news.status === 'resolved';
+            const hasPredicted = !!userPredictions[news.id];
+            const hasQuestions = news.questions && news.questions.length > 0;
+            const isReadyForPrediction = hasDeadline && hasQuestions;
+
+            const card = document.createElement('div');
+            card.className = "news-card";
+
+            let btnHtml = '';
+            let activeBadgeHtml = '';
+            let timerDisplay = '';
+
+            if(isPredictionMode) {
+                timerDisplay = isClosed ? 'Deadline Passed' : (hasDeadline ? 'Loading...' : 'More details coming soon');
+                activeBadgeHtml = (isReadyForPrediction && !isClosed) ? '<span class="live-badge live-pulse">Active Prediction</span>' : '';
+
+                if(news.status === 'resolved') {
+                    btnHtml = `<button onclick="showLeaderboard('${news.id}')" class="btn-predict btn-purple">View Match Results & Winners</button>`;
+                } else if(isClosed && hasDeadline) {
+                    btnHtml = `<button disabled class="btn-predict btn-closed">Predict Closed (Awaiting Results)</button>`;
+                } else if (!isReadyForPrediction) {
+                    btnHtml = ``;
+                } else {
+                    btnHtml = `<button onclick="openPredictionModal('${news.id}')" class="btn-predict ${hasPredicted ? 'btn-yellow' : ''}">
+                                ${hasPredicted ? '<i class="fas fa-edit"></i> Update Prediction' : '<i class="fas fa-bolt"></i> Predict Now (Fee: '+news.fee+')'}
+                               </button>`;
+                }
+            }
+
+            let mediaHtml = '';
+            let mType = news.mediaType || 'image';
+            let mUrls = news.mediaUrls ||[getDefaultImageForCategory(news.category)];
+
+            if(mType === 'video') {
+                mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
+            } else if(mType === 'audio') {
+                mediaHtml = `<div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(45deg, #1f2937, #111827);"><i class="fas fa-music" style="font-size:3.5em; color:#60a5fa; margin-bottom:20px;"></i><audio src="${mUrls[0]}" controls autoplay loop style="width:90%; outline:none; background:#000; border-radius:30px;"></audio></div>`;
+            } else if(mType === 'carousel' && mUrls.length > 1) {
+                let slidesHtml = mUrls.map((url, i) => `<img src="${url}" class="slide-${news.id}" style="position:absolute; width:100%; height:100%; object-fit:cover; transform: translateX(${i===0?'0':'100%'}); ${i===0?'transition: transform 0.5s ease-in-out;':''}">`).join('');
+                mediaHtml = `<div id="car-${news.id}" style="position:relative; width:100%; height:100%; overflow:hidden;">${slidesHtml}</div>`;
+            } else {
+                mediaHtml = `<img src="${mUrls[0]}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+
+            card.innerHTML = `
+                <div class="card-content-wrapper" onscroll="handleCardScroll(event)">
+                    <div class="card-media">${mediaHtml}</div>
+                    
+                    <div class="glass-text-container">
+                        ${activeBadgeHtml}
+                        <h2 class="card-title">${news.title || "No Title"}</h2>
+                        <div class="card-meta">
+                            <span class="cat-badge">#${news.category}</span>
+                            <span style="display: flex; align-items: center; gap: 4px; color: #9ca3af; text-transform: none; font-size: 0.95em;"><i class="far fa-clock"></i> ${timeAgo(news.createdAt)}</span>
+                        </div>
+                        
+                        <div class="card-snippet-container">
+                            <p class="card-snippet text-clamped" id="snippet-${news.id}">${news.desc || ''}</p>
+                            <div style="display: flex; align-items: center; margin-top: 5px;">
+                                ${news.desc && news.desc.length > 100 ? `<button class="read-more-btn" id="rm-btn-${news.id}" onclick="toggleReadMore(event, '${news.id}')" style="margin-top: 0;">Read more</button>` : ''}
+                                ${news.rssLink ? `<a href="${news.rssLink}" target="_blank" class="read-more-btn hidden-panel" id="full-btn-${news.id}" style="color: #10b981; text-decoration: none; margin-top: 0; margin-left: 15px;"><i class="fas fa-external-link-alt"></i> Read full article</a>` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Social Actions Grouped Inside Text Container at the bottom -->
+                        <div class="inline-actions">
+                            <button onclick="toggleLike('${news.id}')" class="inline-action-btn" id="btn-like-${news.id}">
+                                <i class="fas fa-heart"></i><span id="like-count-${news.id}">0</span>
+                            </button>
+                            <button onclick="openComments('${news.id}')" class="inline-action-btn">
+                                <i class="fas fa-comment"></i><span id="comment-count-${news.id}">0</span>
+                            </button>
+                            <button onclick="sharePost('${news.id}')" class="inline-action-btn">
+                                <i class="fas fa-share"></i><span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    ${isPredictionMode ? `
+                    <div class="card-actions">
+                        <div class="timer-badge" id="timer-${news.id}">${timerDisplay}</div>
+                        ${btnHtml}
+                    </div>` : ''}
+                </div>
+            `;
+            DOM.newsStream.appendChild(card);
+
+            if(mType === 'carousel' && mUrls.length > 1) {
+                let cIndex = 0;
+                const cInterval = setInterval(() => {
+                    const slides = document.querySelectorAll(`.slide-${news.id}`);
+                    if(!slides || slides.length === 0) return clearInterval(cInterval);
+                    let nextIndex = (cIndex + 1) % slides.length;
+                    slides[cIndex].style.transition = 'transform 0.5s ease-in-out';
+                    slides[cIndex].style.transform = 'translateX(-100%)';
+                    slides[nextIndex].style.transition = 'transform 0.5s ease-in-out';
+                    slides[nextIndex].style.transform = 'translateX(0)';
+                    let oldIndex = cIndex;
+                    setTimeout(() => { const s = document.querySelectorAll(`.slide-${news.id}`); if(s[oldIndex]) { s[oldIndex].style.transition = 'none'; s[oldIndex].style.transform = 'translateX(100%)'; } }, 500);
+                    cIndex = nextIndex;
+                }, 4000); 
+                activeCarouselIntervals.push(cInterval);
+            }
+
+            if (isPredictionMode && !isClosed && hasDeadline) {
+                const timerEl = card.querySelector(`#timer-${news.id}`);
+                const interval = setInterval(() => {
+                    const dist = new Date(news.deadline).getTime() - new Date().getTime();
+                    if (dist < 0) {
+                        clearInterval(interval); timerEl.innerText = "Deadline Passed"; timerEl.style.color = '#ff4444';
+                        // AUTO SUBMIT TRIGGER
+                        if(!document.getElementById('prediction-modal').classList.contains('hidden-panel') && document.getElementById('modal-news-id').value === news.id) {
+                            if(document.getElementById('btn-submit-prediction') && !document.getElementById('btn-submit-prediction').classList.contains('hidden-panel')) {
+                                submitPrediction(); // programmatically submit
+                            }
+                        }
+                    } else {
+                        const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((dist % (1000 * 60)) / 1000);
+                        timerEl.innerHTML = `<i class="far fa-clock"></i> Closes in: ${d}d ${h}h ${m}m ${s}s`;
+                    }
+                }, 1000);
+                activeCountdownIntervals.push(interval);
+            }
+        });
+        renderStreamDecorations();
+    }
+
+    // SOCIAL FUNCTIONS (LIKE, COMMENT, SHARE)
+    async function toggleLike(newsId) {
+        if(!currentUser) return showPanel('auth');
+        const ref = db.ref(`likes/${newsId}/${currentUser.uid}`);
+        const snap = await ref.once('value');
+        if(snap.exists()) await ref.remove(); else await ref.set(true);
+    }
+    
+    async function toggleCommentLike(newsId, commentId) {
+        if(!currentUser) return showPanel('auth');
+        const ref = db.ref(`comments/${newsId}/${commentId}/likes/${currentUser.uid}`);
+        const snap = await ref.once('value');
+        if(snap.exists()) await ref.remove(); else await ref.set(true);
+    }
+
+    function sharePost(newsId) {
+        const news = allNewsData[newsId];
+        if (navigator.share) {
+            navigator.share({ title: news.title, text: news.desc, url: window.location.href });
+        } else { showNotification("Share feature is not supported on this browser.", "warning"); }
+    }
+    
+    // CUSTOM TIME FORMATTER FOR COMMENTS
+    function formatCommentTime(ts) {
+        if (!ts) return '';
+        const date = new Date(ts);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+
+        const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+        const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        if (isToday) {
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} mins ago`;
+            if (diffHours < 24) return `Today at ${timeStr}`;
+        }
+        
+        return `${date.toLocaleDateString()} at ${timeStr}`;
+    }
+
+    function openComments(newsId) {
+        currentCommentsNewsId = newsId;
+        document.getElementById('comment-news-id').value = newsId;
+        document.getElementById('comment-modal').classList.remove('hidden-panel');
+        
+        // Setup Post Preview Auto-Swipe and Scroll
+        if(commentCarouselInterval) clearInterval(commentCarouselInterval);
+        if(commentTextScrollInterval) clearInterval(commentTextScrollInterval);
+
+        const news = allNewsData[newsId];
+        const previewContainer = document.getElementById('comment-post-preview-container');
+        
+        let mUrls = news.mediaUrls ||[getDefaultImageForCategory(news.category)];
+        let mType = news.mediaType || 'image';
+        let mediaHtml = '';
+        
+        if(mType === 'video') {
+            mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
+        } else if(mType === 'audio') {
+            mediaHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#111;"><i class="fas fa-music" style="color:#60a5fa; font-size:3em;"></i></div>`;
+        } else {
+            mediaHtml = mUrls.map((url, i) => `<img src="${url}" class="comment-slide" style="transform: translateX(${i===0?'0':'100%'});">`).join('');
+        }
+
+        previewContainer.innerHTML = `
+            <div class="comment-post-preview">
+                <div class="comment-preview-media">
+                    ${mediaHtml}
+                </div>
+                <div class="comment-preview-text-wrap" id="cp-text-wrap">
+                    <div class="comment-preview-text" id="cp-text">${news.desc || news.title}</div>
+                </div>
+            </div>
+        `;
+
+        // Start Auto-Swipe Carousel
+        if((mType === 'image' || mType === 'carousel') && mUrls.length > 1) {
+            let cIndex = 0;
+            const slides = previewContainer.querySelectorAll('.comment-slide');
+            commentCarouselInterval = setInterval(() => {
+                if(!slides || slides.length === 0) return clearInterval(commentCarouselInterval);
+                let nextIndex = (cIndex + 1) % slides.length;
+                slides[cIndex].style.transition = 'transform 0.5s ease-in-out';
+                slides[cIndex].style.transform = 'translateX(-100%)';
+                slides[nextIndex].style.transition = 'transform 0.5s ease-in-out';
+                slides[nextIndex].style.transform = 'translateX(0)';
+                let oldIndex = cIndex;
+                setTimeout(() => { if(slides[oldIndex]) { slides[oldIndex].style.transition = 'none'; slides[oldIndex].style.transform = 'translateX(100%)'; } }, 500);
+                cIndex = nextIndex;
+            }, 3000);
+        }
+
+        // Start Auto-Scroll Text
+        const textWrap = document.getElementById('cp-text-wrap');
+        const textEl = document.getElementById('cp-text');
+        
+        setTimeout(() => {
+            const wrapHeight = textWrap.clientHeight;
+            const textHeight = textEl.clientHeight;
+            
+            if(textHeight > wrapHeight) {
+                let currentY = wrapHeight; // start from bottom
+                commentTextScrollInterval = setInterval(() => {
+                    currentY -= 0.5;
+                    if (currentY <= -textHeight) {
+                        currentY = wrapHeight; // reset position
+                    }
+                    textEl.style.transform = `translateY(${currentY}px)`;
+                }, 30);
+            }
+        }, 150);
+
+        renderCommentsModal();
+    }
+
+    function renderCommentsModal() {
+        if(!currentCommentsNewsId) return;
+        const commentsObj = allComments[currentCommentsNewsId] || {};
+        const list = document.getElementById('comment-list');
+        list.innerHTML = '';
+
+        let cArr = Object.keys(commentsObj).map(id => ({ id, ...commentsObj[id] })).sort((a,b) => a.timestamp - b.timestamp);
+        let parents = cArr.filter(c => !c.parentId);
+        let replies = cArr.filter(c => c.parentId);
+
+        if(cArr.length === 0) { list.innerHTML = `<p style="color:#9ca3af; text-align:center; margin-top:20px;">No comments yet. Be the first!</p>`; }
+
+        parents.forEach(p => {
+            let pLikes = p.likes ? Object.keys(p.likes).length : 0;
+            let pLiked = currentUser && p.likes && p.likes[currentUser.uid] ? 'liked' : '';
+            let isMine = currentUser && p.uid === currentUser.uid;
+
+            let html = `<div class="comment-item">
+                <div class="comment-header"><strong>${p.name}</strong> <span>${formatCommentTime(p.timestamp)}</span></div>
+                <div class="comment-body">${p.text}</div>
+                <div class="comment-actions">
+                    <button class="comment-action-btn ${pLiked}" onclick="toggleCommentLike('${currentCommentsNewsId}', '${p.id}')"><i class="fas fa-heart"></i> ${pLikes}</button>
+                    <button class="comment-action-btn" onclick="replyCommentInit('${p.id}', '${p.name.replace(/'/g, "\\'")}')"><i class="fas fa-reply"></i> Reply</button>
+                    ${isMine ? `<button class="comment-action-btn" onclick="editCommentInit('${p.id}', '${p.text.replace(/'/g, "\\'")}')"><i class="fas fa-edit"></i></button>
+                                <button class="comment-action-btn" onclick="deleteComment('${currentCommentsNewsId}', '${p.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+                <div class="reply-list">`;
+
+            let rList = replies.filter(r => r.parentId === p.id);
+            rList.forEach(r => {
+                let rLikes = r.likes ? Object.keys(r.likes).length : 0;
+                let rLiked = currentUser && r.likes && r.likes[currentUser.uid] ? 'liked' : '';
+                let rMine = currentUser && r.uid === currentUser.uid;
+
+                html += `<div class="comment-item" style="background: transparent; padding: 5px 0;">
+                    <div class="comment-header"><strong>${r.name}</strong> <span>${formatCommentTime(r.timestamp)}</span></div>
+                    <div class="comment-body">${r.text}</div>
+                    <div class="comment-actions">
+                        <button class="comment-action-btn ${rLiked}" onclick="toggleCommentLike('${currentCommentsNewsId}', '${r.id}')"><i class="fas fa-heart"></i> ${rLikes}</button>
+                        ${rMine ? `<button class="comment-action-btn" onclick="editCommentInit('${r.id}', '${r.text.replace(/'/g, "\\'")}')"><i class="fas fa-edit"></i></button>
+                                   <button class="comment-action-btn" onclick="deleteComment('${currentCommentsNewsId}', '${r.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>`;
+            });
+            html += `</div></div>`;
+            list.innerHTML += html;
+        });
+    }
+
+    async function postComment() {
+        if(!currentUser) return showPanel('auth');
+        const newsId = document.getElementById('comment-news-id').value;
+        const text = document.getElementById('comment-input').value.trim();
+        const parentId = document.getElementById('comment-reply-id').value || null;
+        if(!text) return;
+        const name = document.getElementById('profile-name').innerText || currentUser.email.split('@')[0];
+
+        let commentRef = db.ref(`comments/${newsId}`);
+        if(document.getElementById('comment-edit-id').value) {
+            let editId = document.getElementById('comment-edit-id').value;
+            await commentRef.child(editId).update({ text });
+            document.getElementById('comment-edit-id').value = '';
+        } else {
+            await commentRef.push({ uid: currentUser.uid, name, text, timestamp: firebase.database.ServerValue.TIMESTAMP, parentId });
+        }
+        document.getElementById('comment-input').value = '';
+        document.getElementById('comment-reply-id').value = '';
+        document.getElementById('comment-reply-preview').classList.add('hidden-panel');
+    }
+
+    async function deleteComment(newsId, commentId) {
+        if(await customConfirm("Delete this comment?")) {
+            await db.ref(`comments/${newsId}/${commentId}`).remove();
+            // Find and delete any replies recursively
+            const cArr = Object.keys(allComments[newsId]||{}).map(id=>({id, ...allComments[newsId][id]}));
+            const replies = cArr.filter(c => c.parentId === commentId);
+            for(let r of replies) await db.ref(`comments/${newsId}/${r.id}`).remove();
+        }
+    }
+
+    function editCommentInit(id, text) {
+        document.getElementById('comment-edit-id').value = id;
+        document.getElementById('comment-input').value = text;
+        document.getElementById('comment-reply-preview').innerHTML = `Editing comment... <button onclick="cancelCommentReplyEdit()" style="background:none; border:none; color:white; cursor:pointer;">x</button>`;
+        document.getElementById('comment-reply-preview').classList.remove('hidden-panel');
+    }
+
+    function replyCommentInit(id, name) {
+        document.getElementById('comment-reply-id').value = id;
+        document.getElementById('comment-input').focus();
+        document.getElementById('comment-reply-preview').innerHTML = `Replying to ${name} <button onclick="cancelCommentReplyEdit()" style="background:none; border:none; color:white; cursor:pointer;">x</button>`;
+        document.getElementById('comment-reply-preview').classList.remove('hidden-panel');
+    }
+
+    function cancelCommentReplyEdit() {
+        document.getElementById('comment-reply-id').value = ''; document.getElementById('comment-edit-id').value = '';
+        document.getElementById('comment-reply-preview').classList.add('hidden-panel'); document.getElementById('comment-input').value = '';
+    }
+
+    /* SWIPE GESTURE LOGIC (Vertical & Horizontal Category Change) */
+    function handleCardScroll(e) { if(e.target.scrollTop > 0) e.stopPropagation(); }
+    
+    DOM.newsStream.addEventListener('touchstart', e => {
+        if (isSwipeDisabled) return; // Prevent swipe if disabled
+        if (e.touches.length > 1) return;
+        isDragging = true; 
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        DOM.newsStream.style.transition = 'none';
+    });
+    
+    DOM.newsStream.addEventListener('touchmove', e => {
+        if (isSwipeDisabled || !isDragging) return; 
+        const dragDeltaY = e.touches[0].clientY - touchStartY;
+        const dragDeltaX = e.touches[0].clientX - touchStartX;
+        
+        // Handle vertical drag smoothly
+        if(Math.abs(dragDeltaY) > Math.abs(dragDeltaX)) {
+            // Using percentages (%) consistently avoids mobile viewport jumps 
+            const dragPercent = (dragDeltaY / window.innerHeight) * 100;
+            const currentPercent = -currentNewsIndex * 100;
+            
+            let targetPercent = currentPercent + dragPercent;
+            
+            // Rubber-band resistance effect on first and last card
+            if ((currentNewsIndex === 0 && dragDeltaY > 0) || (currentNewsIndex === activeNewsArray.length - 1 && dragDeltaY < 0)) {
+                targetPercent = currentPercent + (dragPercent * 0.3);
+            } 
+            
+            // translate3d forces GPU hardware acceleration for 60FPS smoothness
+            DOM.newsStream.style.transform = `translate3d(0, ${targetPercent}%, 0)`;
+        }
+    });
+    
+    DOM.newsStream.addEventListener('touchend', e => {
+        if (isSwipeDisabled || !isDragging) return; 
+        isDragging = false;
+        const finalDragDeltaY = e.changedTouches[0].clientY - touchStartY;
+        const finalDragDeltaX = e.changedTouches[0].clientX - touchStartX;
+        
+        // Tweak threshold for better swipe sensitivity
+        const thresholdY = window.innerHeight / 6; 
+        const thresholdX = window.innerWidth / 3.5;
+
+        // Check for Horizontal Swipe (Category change)
+        if (Math.abs(finalDragDeltaX) > thresholdX && Math.abs(finalDragDeltaX) > Math.abs(finalDragDeltaY)) {
+            let cats =["all", "trending", ...dynamicCategories.map(c=>c.toLowerCase())];
+            let cIdx = cats.indexOf(currentCategory);
+            
+            if(finalDragDeltaX < 0 && cIdx < cats.length - 1) { 
+                switchCategory(cats[cIdx+1]); 
+            } else if(finalDragDeltaX > 0 && cIdx > 0) { 
+                switchCategory(cats[cIdx-1]); 
+            }
+            updateStreamPosition(true);
+            return;
+        }
+
+        // Vertical scroll swipe snapping
+        if (Math.abs(finalDragDeltaY) > thresholdY) {
+            if (finalDragDeltaY < 0 && currentNewsIndex < activeNewsArray.length - 1) {
+                currentNewsIndex++;
+            } else if (finalDragDeltaY > 0 && currentNewsIndex > 0) {
+                currentNewsIndex--;
+            }
+        }
+        updateStreamPosition(true);
+    });
+    
+    DOM.newsStream.addEventListener('wheel', e => {
+        if(isSwipeDisabled || isDragging) return; 
+        if(e.deltaY > 0 && currentNewsIndex < activeNewsArray.length - 1) { currentNewsIndex++; updateStreamPosition(true); }
+        else if(e.deltaY < 0 && currentNewsIndex > 0) { currentNewsIndex--; updateStreamPosition(true); }
+    });
+    
+    function updateStreamPosition(animate) {
+        const targetPercent = -currentNewsIndex * 100;
+        if (animate) DOM.newsStream.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+        else DOM.newsStream.style.transition = 'none';
+        
+        // Updated to use translate3d here as well
+        DOM.newsStream.style.transform = `translate3d(0, ${targetPercent}%, 0)`;
+    }
+
+    function closeModal(id) { 
+        document.getElementById(id).classList.add('hidden-panel'); 
+        if(id === 'comment-modal') {
+            if(commentCarouselInterval) clearInterval(commentCarouselInterval);
+            if(commentTextScrollInterval) clearInterval(commentTextScrollInterval);
+        }
+    }
+
+    async function openPredictionModal(newsId) {
+        if(!currentUser) { showPanel('auth'); return; }
+
+        document.getElementById('prediction-modal').classList.remove('hidden-panel');
+        document.getElementById('modal-title').innerText = "Loading...";
+        document.getElementById('modal-questions').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent-color-1);"></i></div>';
+        document.getElementById('modal-other-users').innerHTML = '';
+        document.getElementById('public-stats-container').classList.add('hidden-panel');
+        document.getElementById('btn-submit-prediction').classList.add('hidden-panel');
+        document.getElementById('modal-prizes').style.display = 'none';
+
+        try {
+            const news = allNewsData[newsId];
+            if(!news) throw new Error("News not found");
+            if (!Array.isArray(news.questions)) news.questions = Object.values(news.questions || {});
+
+            const userPred = userPredictions[newsId];
+            const hasDeadline = news.deadline && news.deadline !== "";
+            const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
+
+            document.getElementById('modal-title').innerText = news.title || "Prediction Details";
+            document.getElementById('modal-news-id').value = newsId;
+            
+            const prizeContainer = document.getElementById('modal-prizes');
+            if(news.prize1 || news.prize2 || news.prize3) {
+                prizeContainer.innerHTML = `
+                    <div style="flex:1;"><div style="font-size:0.75rem; color:#a7f3d0;">1st Prize</div><div style="font-weight:bold; color:#34d399;"><i class="fas fa-coins"></i> ${news.prize1 || 0}</div></div>
+                    <div style="flex:1;"><div style="font-size:0.75rem; color:#a7f3d0;">2nd Prize</div><div style="font-weight:bold; color:#34d399;"><i class="fas fa-coins"></i> ${news.prize2 || 0}</div></div>
+                    <div style="flex:1;"><div style="font-size:0.75rem; color:#a7f3d0;">3rd Prize</div><div style="font-weight:bold; color:#34d399;"><i class="fas fa-coins"></i> ${news.prize3 || 0}</div></div>
+                `;
+                prizeContainer.style.display = 'flex';
+            }
+
+            const qContainer = document.getElementById('modal-questions');
+            qContainer.innerHTML = '';
+            const otherUsersContainer = document.getElementById('modal-other-users');
+            const submitBtn = document.getElementById('btn-submit-prediction');
+
+            if(news.questions.length === 0) {
+                qContainer.innerHTML = `<p style="color:#f87171; text-align:center;">Questions will be added by admin soon!</p>`;
+                submitBtn.classList.add('hidden-panel');
+                return;
+            }
+
+            let stats = {};
+            if (userPred || isClosed) {
+                const snap = await db.ref(`predictions/${newsId}`).once('value');
+                const allP = snap.val() || {};
+                const total = Object.keys(allP).length;
+                
+                news.questions.forEach((q, i) => {
+                    stats[i] = {0:0, 1:0, 2:0, 3:0, "-1":0};
+                    for(let uid in allP){
+                        let pAnsArray = allP[uid].answers;
+                        if (pAnsArray && !Array.isArray(pAnsArray)) pAnsArray = Object.values(pAnsArray);
+                        let ansIdx = pAnsArray ? pAnsArray[i] : undefined;
+                        if(ansIdx !== undefined && stats[i][ansIdx] !== undefined) stats[i][ansIdx]++;
+                    }
+                    for(let optIdx in stats[i]) stats[i][optIdx] = total ? Math.round((stats[i][optIdx]/total)*100) : 0;
+                });
+                document.getElementById('public-stats-container').classList.remove('hidden-panel');
+                document.getElementById('public-stats-container').innerHTML = `<h3><i class="fas fa-users"></i> Public Opinion (${total} entries)</h3>`;
+            }
+
+            const optionLabels =['A', 'B', 'C', 'D'];
+            news.questions.forEach((q, qIdx) => {
+                let html = `<div class="question-card"><h4 class="question-title">${qIdx + 1}. ${q.question || "Question"}</h4><div>`;
+                let safeOptions = Array.isArray(q.options) ? q.options : Object.values(q.options ||["A","B","C","D"]);
+                
+                safeOptions.forEach((opt, optIdx) => {
+                    const isChecked = userPred && userPred.answers && parseInt(userPred.answers[qIdx]) === optIdx ? 'checked' : '';
+                    const disabled = isClosed ? 'disabled' : '';
+                    let statHtml = '';
+                    if((userPred || isClosed) && stats[qIdx]) {
+                        const pct = stats[qIdx][optIdx] || 0;
+                        statHtml = `<div class="progress-bg"><div class="progress-fill" style="width: ${pct}%"></div></div><span class="progress-text">${pct}%</span><div style="clear:both;"></div>`;
+                    }
+                    let correctHtml = '';
+                    if(isClosed && q.correctAnswer === optIdx) {
+                        correctHtml = `<span style="color:#4ade80; font-weight:bold; margin-left:8px;"><i class="fas fa-check-circle"></i> Correct</span>`;
+                    }
+                    html += `<label class="option-label ${isChecked}">
+                        <div class="option-flex">
+                            <input type="radio" name="q_${qIdx}" value="${optIdx}" ${isChecked ? 'checked' : ''} ${disabled}>
+                            <span><strong>${optionLabels[optIdx] || '?'}.</strong> ${opt} ${correctHtml}</span>
+                        </div>
+                        ${statHtml}
+                    </label>`;
+                });
+
+                // Add Unattempted Explicit Option
+                const isSkipped = !userPred || !userPred.answers || parseInt(userPred.answers[qIdx]) === -1 || userPred.answers[qIdx] === undefined;
+                html += `<label class="option-label ${isSkipped ? 'checked' : ''}">
+                    <div class="option-flex">
+                        <input type="radio" name="q_${qIdx}" value="-1" ${isSkipped ? 'checked' : ''} ${isClosed ? 'disabled' : ''}>
+                        <span style="color:#9ca3af;"><strong>-</strong> Skip / Leave Unattempted (0 marks)</span>
+                    </div>
+                </label></div></div>`;
+
+                qContainer.innerHTML += html;
+            });
+
+            if (isClosed) {
+                submitBtn.classList.add('hidden-panel');
+                document.getElementById('modal-countdown').innerText = "Predictions are locked!";
+            } else {
+                submitBtn.classList.remove('hidden-panel');
+                submitBtn.innerText = userPred ? "Update Prediction" : `Submit Prediction (Fee: ${news.fee || 0})`;
+                document.getElementById('modal-countdown').innerText = "";
+            }
+
+            if (userPred) {
+                let otherUsersHtml = `<div style="margin-top: 24px; border-top: 1px solid #4b5563; padding-top: 16px;">
+                    <h3 style="color:#60a5fa; margin-bottom:12px;"><i class="fas fa-eye"></i> Other Users' Predictions</h3>`;
+                const predsSnap = await db.ref(`predictions/${newsId}`).once('value');
+                const usersSnap = await db.ref(`users`).once('value');
+                const allP = predsSnap.val() || {};
+                const allU = usersSnap.val() || {};
+                
+                let hasOthers = false;
+                for(let uid in allP) {
+                    if(uid === currentUser.uid) continue;
+                    hasOthers = true;
+                    
+                    let uName = "User";
+                    if(allU[uid]) uName = allU[uid].name || (allU[uid].email ? allU[uid].email.split('@')[0] : "User");
+                    
+                    let pAns = allP[uid].answers;
+                    if (pAns && !Array.isArray(pAns)) pAns = Object.values(pAns);
+                    else if (!pAns) pAns =[];
+                    
+                    let ansText = pAns.map((aIdx, i) => {
+                        if (aIdx === -1) return `Q${i+1}: Skipped`;
+                        return `Q${i+1}: ${optionLabels[aIdx] || '?'}`
+                    }).join(' | ');
+
+                    otherUsersHtml += `<div style="background:rgba(55, 65, 81, 0.6); padding:10px; border-radius:8px; margin-bottom:8px;">
+                        <div style="font-weight:bold; color:#e5e7eb; margin-bottom:2px; font-size:0.95rem;">${uName}</div>
+                        <div style="color:#9ca3af; font-size:0.85rem;">Answers: ${ansText}</div>
+                    </div>`;
+                }
+                if(!hasOthers) otherUsersHtml += `<p style="font-size:0.85rem; color:#9ca3af;">No other predictions yet.</p>`;
+                otherUsersHtml += `</div>`;
+                otherUsersContainer.innerHTML = otherUsersHtml;
+            }
+        } catch(e) {
+            console.error(e);
+            closeModal('prediction-modal');
+            showNotification("Could not load prediction data securely.", "error");
+        }
+    }
+
+    async function submitPrediction(e) {
+        if(e) e.preventDefault();
+        if(!currentUser) return showPanel('auth');
+
+        const newsId = document.getElementById('modal-news-id').value;
+        const news = allNewsData[newsId];
+        if(news.deadline && news.deadline !== "" && new Date().getTime() > new Date(news.deadline).getTime()) {
+            return showNotification("Deadline passed!", "warning");
+        }
+
+        const answers =[];
+        (news.questions||[]).forEach((q, i) => { 
+            const checked = document.querySelector(`input[name="q_${i}"]:checked`);
+            if(checked && parseInt(checked.value) !== -1) answers.push(parseInt(checked.value)); 
+            else answers.push(-1); 
+        });
+
+        if(!userPredictions[newsId]) {
+            const snap = await db.ref(`users/${currentUser.uid}/wallet`).once('value');
+            let wallet = snap.val() || 0;
+            if(wallet < (news.fee || 0)) return showNotification("Not enough coins!", "error");
+            await db.ref(`users/${currentUser.uid}`).update({ wallet: wallet - (news.fee || 0) });
+        }
+
+        await db.ref(`predictions/${newsId}/${currentUser.uid}`).set({
+            answers, timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+        showNotification("Prediction Saved!", "success");
+        closeModal('prediction-modal');
+    }
+
+    /* ADMIN PANEL */
+    function switchAdminTab(tabId) {
+        document.querySelectorAll('.admin-in-nav button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('nav-btn-' + tabId).classList.add('active');
+
+        document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('admin-tab-' + tabId).classList.add('active');
+
+        if(tabId === 'post') renderAdminPostList();
+        if(tabId === 'mcq') renderAdminMCQList();
+        if(tabId === 'request') fetchAdminWithdrawals();
+        if(tabId === 'dashboard') fetchAdminDashboardStats();
+    }
+
+    // AUTOMATIC RSS FEED SYSTEM
+    window.rssIntervals = {};
+
+    function manageAutoRssService() {
+        if (!isAdmin) return;
+        
+        // Clear old intervals
+        if (window.rssIntervals) {
+            Object.values(window.rssIntervals).forEach(clearInterval);
+        }
+        window.rssIntervals = {};
+        
+        Object.keys(allRssFeeds).forEach(feedId => {
+            const feed = allRssFeeds[feedId];
+            const intervalMs = (feed.intervalMins || 30) * 60 * 1000;
+            
+            // Initial check if passed time
+            const now = Date.now();
+            if (!feed.lastChecked || (now - feed.lastChecked) > intervalMs) {
+                checkSingleRssFeed(feedId, feed);
+            }
+            
+            // Setup continuous auto-interval
+            window.rssIntervals[feedId] = setInterval(() => {
+                checkSingleRssFeed(feedId, feed);
+            }, intervalMs);
+        });
+    }
+
+    // New optimized text extraction avoiding browser detached DOM layout limitations
+    function extractTextFromHTML(htmlString) {
+        if(!htmlString) return "";
+        let text = htmlString.replace(/<br\s*[\/]?>/gi, "\n");
+        text = text.replace(/<\/p>/gi, "\n\n");
+        text = text.replace(/<\/div>/gi, "\n");
+        text = text.replace(/<[^>]+>/g, ""); 
+        
+        let tmp = document.createElement("textarea");
+        tmp.innerHTML = text;
+        return tmp.value.trim();
+    }
+
+    async function checkSingleRssFeed(feedId, feed) {
+        if(!feed || !feed.url) return;
+        try {
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`);
+            const data = await res.json();
+            
+            if(data.status === 'ok') {
+                let count = 0;
+                for(let item of data.items) {
+                    // Check against title OR original RSS unique link
+                    let exists = Object.values(allNewsData).some(n => 
+                        (n.rssLink && n.rssLink === item.link) || 
+                        n.title === item.title
+                    );
+                    
+                    if(!exists) {
+                        let descText = extractTextFromHTML(item.description);
+                        let contentText = extractTextFromHTML(item.content);
+
+                        // Use whichever is longer to ensure full content is retrieved
+                        let cleanText = contentText.length > descText.length ? contentText : descText;
+
+                        // Try to find an image in standard API fields
+                        let imgUrl = item.thumbnail || (item.enclosure && item.enclosure.link);
+                        
+                        // Fallback image scrape from HTML body
+                        if (!imgUrl) {
+                            let tmp = document.createElement("DIV");
+                            tmp.innerHTML = item.content || item.description || "";
+                            let img = tmp.querySelector("img");
+                            if (img && img.src) imgUrl = img.src;
+                        }
+                        
+                        // Ultimate Fallback - Use Category-specific default image
+                        if (!imgUrl) imgUrl = getDefaultImageForCategory(feed.category);
+
+                        // Increased length limit significantly so full posts can be read via 'Read more'
+                        if(cleanText.length > 50000) cleanText = cleanText.substring(0, 50000) + "...";
+
+                        let postData = {
+                            title: item.title,
+                            desc: cleanText,
+                            mediaUrls:[imgUrl],
+                            mediaType: 'image',
+                            category: feed.category,
+                            createdAt: firebase.database.ServerValue.TIMESTAMP,
+                            status: 'active',
+                            isPredictionMode: false,
+                            rssLink: item.link 
+                        };
+                        
+                        await db.ref('news').push(postData);
+                        count++;
+                    }
+                }
+                await db.ref(`rss_feeds/${feedId}`).update({ lastChecked: firebase.database.ServerValue.TIMESTAMP });
+                if(count > 0) console.log(`Auto RSS (${feed.url}): Published ${count} new posts.`);
+            }
+        } catch(e) {
+            console.error("Auto RSS Fetch Error:", e);
+        }
+    }
+
+    async function addAutoRssFeed() {
+        const editId = document.getElementById('admin-rss-edit-id').value;
+        const url = document.getElementById('admin-rss-url').value.trim();
+        const cat = document.getElementById('admin-rss-cat').value;
+        const interval = parseInt(document.getElementById('admin-rss-interval').value) || 30;
+        
+        if(!url) return showNotification("Please enter a valid RSS URL.", "error");
+        
+        if (editId) {
+            await db.ref(`rss_feeds/${editId}`).update({
+                url: url,
+                category: cat,
+                intervalMins: interval
+            });
+            showNotification("Auto RSS Feed Updated Successfully!", "success");
+        } else {
+            await db.ref('rss_feeds').push({
+                url: url,
+                category: cat,
+                intervalMins: interval,
+                lastChecked: 0
+            });
+            showNotification("Auto RSS Feed Added Successfully!", "success");
+        }
+        
+        cancelEditRssFeed();
+    }
+
+    function editAutoRssFeed(id) {
+        const feed = allRssFeeds[id];
+        if(!feed) return;
+        
+        document.getElementById('admin-rss-edit-id').value = id;
+        document.getElementById('admin-rss-url').value = feed.url;
+        document.getElementById('admin-rss-cat').value = feed.category || '';
+        document.getElementById('admin-rss-interval').value = feed.intervalMins || 30;
+        
+        document.getElementById('btn-add-rss').innerText = "Update Auto Feed";
+        document.getElementById('btn-add-rss').classList.replace('admin-btn-blue', 'admin-btn-green');
+        document.getElementById('btn-cancel-rss').classList.remove('hidden-panel');
+        
+        document.querySelector('.admin-layout').scrollTo(0, 0);
+    }
+
+    function cancelEditRssFeed() {
+        document.getElementById('admin-rss-edit-id').value = '';
+        document.getElementById('admin-rss-url').value = '';
+        document.getElementById('admin-rss-interval').value = '30';
+        
+        document.getElementById('btn-add-rss').innerText = "Add Auto Feed";
+        document.getElementById('btn-add-rss').classList.replace('admin-btn-green', 'admin-btn-blue');
+        document.getElementById('btn-cancel-rss').classList.add('hidden-panel');
+    }
+
+    async function removeAutoRssFeed(id) {
+        if(await customConfirm("Are you sure you want to remove this Auto RSS Feed?")) {
+            await db.ref(`rss_feeds/${id}`).remove();
+        }
+    }
+
+    function renderAdminRssList() {
+        const list = document.getElementById('admin-rss-list');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        const ids = Object.keys(allRssFeeds);
+        if (ids.length === 0) {
+            list.innerHTML = '<p style="font-size:0.85rem; color:#6b7280;">No auto feeds active.</p>';
+            return;
+        }
+        
+        ids.forEach(id => {
+            const feed = allRssFeeds[id];
+            const lastCheckedStr = feed.lastChecked ? new Date(feed.lastChecked).toLocaleTimeString() : 'Never';
+            
+            list.innerHTML += `
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="overflow: hidden; padding-right: 10px;">
+                    <strong style="font-size: 0.9em; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.url}</strong>
+                    <span style="font-size: 0.8em; color: #6b7280;">Cat: ${feed.category} | Every ${feed.intervalMins}m | Last Check: ${lastCheckedStr}</span>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="checkSingleRssFeed('${id}', allRssFeeds['${id}'])" class="admin-sm-btn" style="background:#3b82f6;" title="Force Check Now"><i class="fas fa-sync-alt"></i></button>
+                    <button onclick="editAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#eab308; color:#111827;" title="Edit Feed"><i class="fas fa-edit"></i></button>
+                    <button onclick="removeAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete Feed"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            `;
+        });
+    }
+
+    function detectMedia(str, category) {
+        if(!str) return { type: 'image', urls:[getDefaultImageForCategory(category)] };
+        let urls = str.split(',').map(s=>s.trim()).filter(s=>s);
+        if(urls.length === 0) urls =[getDefaultImageForCategory(category)];
+        if(urls.length > 1) return { type: 'carousel', urls };
+        let u = urls[0].toLowerCase();
+        if(u.match(/\.(mp4|webm|ogg|mov)$/i)) return { type: 'video', urls };
+        if(u.match(/\.(mp3|wav|m4a|aac)$/i)) return { type: 'audio', urls };
+        return { type: 'image', urls };
+    }
+
+    async function saveNewsToDB() {
+        const editId = document.getElementById('edit-post-id').value;
+        const mediaInput = document.getElementById('admin-media').value.trim();
+        const cat = document.getElementById('admin-cat').value;
+        const detectedMedia = detectMedia(mediaInput, cat);
+        
+        const data = {
+            title: document.getElementById('admin-title').value,
+            mediaType: detectedMedia.type,
+            mediaUrls: detectedMedia.urls,
+            category: cat,
+            desc: document.getElementById('admin-desc').value,
+            deadline: document.getElementById('admin-deadline').value || "", 
+            
+            isPredictionMode: document.getElementById('admin-pred-mode').value === "true",
+            markCorrect: parseInt(document.getElementById('admin-mark-correct').value) || 10,
+            markWrong: parseInt(document.getElementById('admin-mark-wrong').value) || 5,
+            
+            expectedParticipants: parseInt(document.getElementById('admin-participants').value) || 0,
+            fee: parseInt(document.getElementById('admin-fee').value) || 0,
+            adminComm: parseInt(document.getElementById('admin-comm').value) || 0,
+            prize1: parseInt(document.getElementById('admin-1st').value) || 0,
+            prize2: parseInt(document.getElementById('admin-2nd').value) || 0,
+            prize3: parseInt(document.getElementById('admin-3rd').value) || 0,
+            status: 'active'
+        };
+
+        if(!data.title) return showNotification("Headline / Title is required.", "error");
+        
+        if(editId) {
+            await db.ref(`news/${editId}`).update(data);
+            showNotification("Post Updated successfully!", "success");
+            resetPostForm();
+        } else {
+            data.createdAt = firebase.database.ServerValue.TIMESTAMP;
+            data.questions =[];
+            await db.ref('news').push(data);
+            showNotification("New Post Published!", "success");
+            resetPostForm();
+        }
+    }
+
+    function resetPostForm() {
+        document.getElementById('edit-post-id').value = '';
+        document.getElementById('admin-title').value = '';
+        document.getElementById('admin-desc').value = '';
+        document.getElementById('admin-media').value = '';
+        document.getElementById('admin-participants').value = 100;
+        document.getElementById('admin-fee').value = 50;
+        document.getElementById('admin-pred-mode').value = "true";
+        document.getElementById('admin-mark-correct').value = 10;
+        document.getElementById('admin-mark-wrong').value = 5;
+        calcPrizes();
+        
+        document.getElementById('admin-post-form-title').innerText = 'Create / Upload Post';
+        document.getElementById('btn-save-post').innerText = 'Publish Post';
+        document.getElementById('btn-cancel-edit').classList.add('hidden-panel');
+    }
+
+    function renderAdminPostList() {
+        const container = document.getElementById('admin-all-posts-list');
+        if(!container) return;
+        container.innerHTML = '';
+        
+        const ids = Object.keys(allNewsData).reverse();
+        if(ids.length === 0) { 
+            container.innerHTML = "<p style='font-size:0.85rem; color:#6b7280;'>No posts available.</p>"; 
+            return; 
+        }
+
+        ids.forEach(id => {
+            const n = allNewsData[id];
+            let statusText = n.status === 'resolved' ? 'Resolved' : 'Active';
+            let catText = n.category ? n.category : 'N/A';
+            let isPredMode = n.isPredictionMode === true || n.isPredictionMode === "true" ? 'ON' : 'OFF';
+
+            container.innerHTML += `
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="overflow: hidden; padding-right: 10px; flex-grow: 1;">
+                    <strong style="font-size: 0.95em; color: #1f2937; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title || 'Untitled Post'}</strong>
+                    <span style="font-size: 0.8em; color: #6b7280;">Cat: ${catText} | Pred: ${isPredMode} | Status: ${statusText}</span>
+                </div>
+                <div style="display: flex; gap: 5px; flex-shrink: 0;">
+                    <button onclick="editPost('${id}')" class="admin-sm-btn" style="background:#3b82f6;" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePost('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function editPost(id) {
+        const n = allNewsData[id];
+        if(!n) return;
+        document.getElementById('edit-post-id').value = id;
+        document.getElementById('admin-title').value = n.title || '';
+        document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
+        document.getElementById('admin-cat').value = n.category || '';
+        document.getElementById('admin-deadline').value = n.deadline || '';
+        document.getElementById('admin-desc').value = n.desc || '';
+        
+        document.getElementById('admin-pred-mode').value = (n.isPredictionMode !== undefined) ? n.isPredictionMode.toString() : "true";
+        document.getElementById('admin-mark-correct').value = n.markCorrect !== undefined ? n.markCorrect : 10;
+        document.getElementById('admin-mark-wrong').value = n.markWrong !== undefined ? n.markWrong : 5;
+        
+        document.getElementById('admin-participants').value = n.expectedParticipants || 100;
+        document.getElementById('admin-fee').value = n.fee || 0;
+        document.getElementById('admin-comm').value = n.adminComm || 0;
+        document.getElementById('admin-1st').value = n.prize1 || 0;
+        document.getElementById('admin-2nd').value = n.prize2 || 0;
+        document.getElementById('admin-3rd').value = n.prize3 || 0;
+
+        document.getElementById('admin-post-form-title').innerText = 'Editing Post: ' + (n.title.length > 20 ? n.title.substring(0, 20) + '...' : n.title);
+        document.getElementById('btn-save-post').innerText = 'Update Post';
+        document.getElementById('btn-cancel-edit').classList.remove('hidden-panel');
+        
+        document.querySelector('.admin-layout').scrollTo(0,0);
+    }
+
+    async function deletePost(id) {
+        if(await customConfirm("Are you sure you want to delete this post? All predictions will also be deleted.")) {
+            await db.ref(`news/${id}`).remove();
+            await db.ref(`predictions/${id}`).remove();
+            await db.ref(`leaderboards/${id}`).remove();
+            await db.ref(`likes/${id}`).remove();
+            await db.ref(`comments/${id}`).remove();
+            showNotification("Post deleted successfully.", "success");
+        }
+    }
+
+    function renderAdminMCQList() {
+        const container = document.getElementById('admin-mcq-post-list');
+        if(!container) return;
+        container.innerHTML = '';
+        const now = new Date().getTime();
+
+        Object.keys(allNewsData).reverse().forEach(id => {
+            const n = allNewsData[id];
+            const isPredictionMode = n.isPredictionMode !== undefined ? (n.isPredictionMode === true || n.isPredictionMode === "true") : true;
+            if(!isPredictionMode) return;
+
+            const hasDeadline = n.deadline && n.deadline !== "";
+            const isClosed = hasDeadline && (now > new Date(n.deadline).getTime());
+            const isResolved = n.status === 'resolved';
+
+            let qCount = n.questions ? n.questions.length : 0;
+            let statusHtml = '';
+            
+            if(isResolved) statusHtml = `<span style="color:#9333ea; font-size:0.85em; font-weight:bold;">Resolved</span>`;
+            else if(isClosed) statusHtml = `<span style="color:#dc2626; font-size:0.85em; font-weight:bold;">Awaiting Resolution</span>`;
+            else statusHtml = `<span style="color:#10b981; font-size:0.85em; font-weight:bold;">Active (${qCount} Questions)</span>`;
+
+            let html = `
+                <div class="admin-manage-card" style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h3 style="margin:0;">${n.title}</h3>
+                        ${statusHtml}
+                    </div>
+                    <button onclick="openMCQEditor('${id}')" class="admin-btn-blue"><i class="fas fa-list-ol"></i> Set Questions</button>
+            `;
+
+            if(isClosed && !isResolved) {
+                html += `
+                    <div class="admin-resolve-box">
+                        <h4>Resolve Match (Confirm Prizes & Distribute):</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+                            <div><label style="font-size:0.8em;">1st Prize:</label> <input type="number" id="res_1st_${id}" value="${n.prize1||0}" class="admin-input" style="padding:6px;"></div>
+                            <div><label style="font-size:0.8em;">2nd Prize:</label> <input type="number" id="res_2nd_${id}" value="${n.prize2||0}" class="admin-input" style="padding:6px;"></div>
+                            <div><label style="font-size:0.8em;">3rd Prize:</label> <input type="number" id="res_3rd_${id}" value="${n.prize3||0}" class="admin-input" style="padding:6px;"></div>
+                        </div>
+                        <div class="admin-resolve-row">
+                            <label style="color:#4b5563; font-size:0.85rem;"><i class="fas fa-info-circle"></i> Ties are automatically resolved by submission time (Earlier predictions win).</label>
+                        </div>
+                        <button onclick="resolveNews('${id}')" class="admin-btn-danger" style="width:100%; margin-top:5px; padding:12px;">Calculate & Distribute Prizes</button>
+                    </div>
+                `;
+            }
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    let mcqEditorCount = 0;
+    function openMCQEditor(id) {
+        const n = allNewsData[id];
+        if(!n) return;
+        document.getElementById('mcq-target-news-id').value = id;
+        const container = document.getElementById('mcq-builder-container');
+        container.innerHTML = ''; mcqEditorCount = 0;
+
+        let questions = n.questions ||[];
+        if (!Array.isArray(questions)) questions = Object.values(questions);
+        
+        if(questions.length > 0) {
+            questions.forEach((q, i) => {
+                let opts = Array.isArray(q.options) ? q.options : Object.values(q.options ||[]);
+                appendMCQEditorForm(q.question, opts[0], opts[1], opts[2], opts[3], q.correctAnswer);
+            });
+        } else appendMCQEditorForm();
+
+        document.getElementById('mcq-editor-modal').classList.remove('hidden-panel');
+    }
+
+    function appendMCQEditorForm(qText="", o0="", o1="", o2="", o3="", correctAns=null) {
+        const container = document.getElementById('mcq-builder-container');
+        const div = document.createElement('div');
+        div.className = "mcq-q-box"; div.id = `mcq_box_${mcqEditorCount}`;
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <strong>Question ${mcqEditorCount + 1}</strong>
+                <button type="button" onclick="document.getElementById('mcq_box_${mcqEditorCount}').remove()" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="emcq_q_${mcqEditorCount}" value="${qText}" placeholder="Question text..." class="admin-input" style="margin-bottom:8px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_0" value="${o0}" placeholder="Option A" class="admin-input" style="font-size:0.9em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_1" value="${o1}" placeholder="Option B" class="admin-input" style="font-size:0.9em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_2" value="${o2}" placeholder="Option C" class="admin-input" style="font-size:0.9em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_3" value="${o3}" placeholder="Option D" class="admin-input" style="font-size:0.9em;">
+            </div>
+            <div>
+                <label style="font-size:0.85em; font-weight:bold; margin-bottom:4px; display:block;">Correct Answer:</label>
+                <select id="emcq_c_${mcqEditorCount}" class="admin-resolve-select">
+                    <option value="">-- Select Correct --</option>
+                    <option value="0" ${correctAns===0?'selected':''}>Option A</option>
+                    <option value="1" ${correctAns===1?'selected':''}>Option B</option>
+                    <option value="2" ${correctAns===2?'selected':''}>Option C</option>
+                    <option value="3" ${correctAns===3?'selected':''}>Option D</option>
+                </select>
+            </div>
+        `;
+        container.appendChild(div); mcqEditorCount++;
+    }
+
+    function addMCQEditorQuestion() { appendMCQEditorForm(); }
+
+    async function saveMCQsToDB() {
+        const id = document.getElementById('mcq-target-news-id').value;
+        const container = document.getElementById('mcq-builder-container');
+        const boxes = container.querySelectorAll('.mcq-q-box');
+        let questions =[];
+        boxes.forEach(box => {
+            let idxStr = box.id.replace('mcq_box_', '');
+            let qText = document.getElementById(`emcq_q_${idxStr}`).value;
+            let o0 = document.getElementById(`emcq_o_${idxStr}_0`).value || "Opt A";
+            let o1 = document.getElementById(`emcq_o_${idxStr}_1`).value || "Opt B";
+            let o2 = document.getElementById(`emcq_o_${idxStr}_2`).value || "Opt C";
+            let o3 = document.getElementById(`emcq_o_${idxStr}_3`).value || "Opt D";
+            let cAns = document.getElementById(`emcq_c_${idxStr}`).value;
+
+            if(qText.trim() !== '') {
+                questions.push({ question: qText, options:[o0, o1, o2, o3], correctAnswer: cAns !== "" ? parseInt(cAns) : null });
+            }
+        });
+        await db.ref(`news/${id}/questions`).set(questions);
+        showNotification("Questions saved successfully!", "success");
+        closeModal('mcq-editor-modal'); renderAdminMCQList(); 
+    }
+
+    async function resolveNews(id) {
+        const news = allNewsData[id];
+        
+        let correctAns =[];
+        let safeQues = Array.isArray(news.questions) ? news.questions : Object.values(news.questions || {});
+        for(let i=0; i<safeQues.length; i++){
+            let ans = safeQues[i].correctAnswer;
+            if(ans === null || ans === undefined || isNaN(ans)) return showNotification("Please ensure all Correct Answers are set.", "warning");
+            correctAns.push(ans);
+        }
+        
+        const mc = news.markCorrect !== undefined ? parseInt(news.markCorrect) : 10;
+        const mw = news.markWrong !== undefined ? parseInt(news.markWrong) : 5;
+        
+        const p1 = parseInt(document.getElementById(`res_1st_${id}`).value) || 0;
+        const p2 = parseInt(document.getElementById(`res_2nd_${id}`).value) || 0;
+        const p3 = parseInt(document.getElementById(`res_3rd_${id}`).value) || 0;
+
+        const snap = await db.ref(`predictions/${id}`).once('value');
+        const preds = snap.val() || {};
+        const totalEntries = Object.keys(preds).length;
+        
+        if(totalEntries === 0) { await db.ref(`news/${id}`).update({ status: 'resolved' }); return showNotification("No predictions to resolve.", "info"); }
+
+        const actualPool = totalEntries * (news.fee || 0);
+        const totalPrizePaid = p1 + p2 + p3;
+        const actualAdminProfit = actualPool - totalPrizePaid;
+
+        let users =[];
+        for(let uid in preds) {
+            let p = preds[uid];
+            let score = 0;
+            let pAns = p.answers;
+            if (pAns && !Array.isArray(pAns)) pAns = Object.values(pAns);
+            
+            if(pAns) {
+                pAns.forEach((aIdx, qIdx) => { 
+                    if(aIdx === -1) score += 0; 
+                    else if(aIdx === correctAns[qIdx]) score += mc; 
+                    else score -= mw;
+                });
+            }
+            users.push({ uid, score, timestamp: p.timestamp || 0, answers: pAns||[] });
+        }
+
+        users.sort((a,b) => {
+            if(b.score !== a.score) return b.score - a.score;
+            return a.timestamp - b.timestamp; 
+        });
+
+        if(users.length > 0 && p1 > 0) { users[0].won = p1; await rewardUser(users[0].uid, users[0].won); }
+        if(users.length > 1 && p2 > 0) { users[1].won = p2; await rewardUser(users[1].uid, users[1].won); }
+        if(users.length > 2 && p3 > 0) { users[2].won = p3; await rewardUser(users[2].uid, users[2].won); }
+
+        await db.ref(`leaderboards/${id}`).set({ correctAnswers: correctAns, prizePool: totalPrizePaid, adminProfit: actualAdminProfit, rankings: users.slice(0,10) });
+        await db.ref(`news/${id}`).update({ status: 'resolved' });
+
+        showNotification("Resolved! Payouts done. Check Dashboard for profits.", "success");
+        renderAdminMCQList();
+    }
+
+    async function rewardUser(uid, amt) {
+        const snap = await db.ref(`users/${uid}/wallet`).once('value');
+        await db.ref(`users/${uid}`).update({ wallet: (snap.val()||0) + amt });
+    }
+
+    function fetchAdminWithdrawals() {
+        db.ref('withdrawals').on('value', snap => {
+            const w = snap.val() || {};
+            const list = document.getElementById('admin-withdrawals-list');
+            list.innerHTML = '';
+            let hasPending = false;
+
+            Object.keys(w).forEach(id => {
+                const req = w[id];
+                if(req.status === 'pending') {
+                    hasPending = true;
+                    list.innerHTML += `
+                    <div class="withdrawal-req-card">
+                        <div class="withdrawal-info">
+                            <h4>User: ${req.name || 'Unknown'}</h4>
+                            <p><strong>Email:</strong> ${req.email}</p>
+                            <p><strong>Amount:</strong> ${req.amount} Coins</p>
+                            <p><strong>UPI ID:</strong> <span style="color:#3b82f6; font-weight:bold;">${req.upi}</span></p>
+                            <p><strong>Date:</strong> ${new Date(req.timestamp).toLocaleString()}</p>
+                        </div>
+                        <div class="withdrawal-actions">
+                            <a href="upi://pay?pa=${req.upi}&pn=SinthaShorts&am=${req.amount}&cu=INR" target="_blank" class="btn-pay">
+                                <i class="fas fa-qrcode"></i> Pay Now via UPI
+                            </a>
+                            <div style="display:flex; gap:8px; margin-top:8px;">
+                                <button onclick="resolveWithdrawal('${id}', 'paid')" class="admin-btn-blue" style="background:#059669; flex:1;">Mark Paid</button>
+                                <button onclick="resolveWithdrawal('${id}', 'rejected', '${req.uid}', ${req.amount})" class="admin-btn-danger" style="flex:1;">Reject/Refund</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            });
+            if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.9rem;">No pending requests.</p>';
+        });
+    }
+
+    async function fetchAdminDashboardStats() {
+        let totalProfit = 0;
+        const lbSnap = await db.ref('leaderboards').once('value');
+        const lbs = lbSnap.val() || {};
+        Object.values(lbs).forEach(lb => { if(lb.adminProfit) totalProfit += lb.adminProfit; });
+        document.getElementById('stat-profit').innerText = totalProfit;
+
+        let totalPaid = 0;
+        const wSnap = await db.ref('withdrawals').once('value');
+        const ws = wSnap.val() || {};
+        Object.values(ws).forEach(w => { if(w.status === 'paid') totalPaid += w.amount; });
+        document.getElementById('stat-paid').innerText = totalPaid;
+
+        db.ref('users').on('value', snap => {
+            const users = snap.val() || {};
+            let totalWallets = 0;
+            
+            const adminContainer = document.getElementById('list-admin-users');
+            const normalContainer = document.getElementById('list-normal-users');
+            adminContainer.innerHTML = ''; normalContainer.innerHTML = '';
+
+            Object.keys(users).forEach(uid => {
+                const u = users[uid];
+                totalWallets += (u.wallet || 0);
+
+                const isBanned = u.banned || false;
+                const phoneTxt = u.phone ? u.phone : 'N/A';
+                
+                const userHtml = `
+                <div class="user-manage-card">
+                    <div class="user-manage-header">
+                        <div class="user-manage-info">
+                            <h4>${u.name} ${isBanned ? '<span style="color:#dc2626; font-size:0.8rem; border:1px solid #dc2626; padding:2px 4px; border-radius:4px;">BANNED</span>' : ''}</h4>
+                            <p><strong>Email:</strong> ${u.email}</p>
+                            <p><strong>Phone:</strong> ${phoneTxt}</p>
+                            <p><strong>Wallet:</strong> ${u.wallet || 0} Coins</p>
+                        </div>
+                    </div>
+                    <div class="user-manage-actions">
+                        <button onclick="toggleBanUser('${uid}', ${isBanned})" class="admin-btn-warn">${isBanned ? 'Unban' : 'Ban'}</button>
+                        ${uid !== currentUser.uid ? `<button onclick="deleteUser('${uid}')" class="admin-btn-danger"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>`;
+
+                if(u.role === 'admin') adminContainer.innerHTML += userHtml;
+                else normalContainer.innerHTML += userHtml;
+            });
+            
+            document.getElementById('stat-wallets').innerText = totalWallets;
+            if(adminContainer.innerHTML === '') adminContainer.innerHTML = '<p>No Admin users found.</p>';
+            if(normalContainer.innerHTML === '') normalContainer.innerHTML = '<p>No Normal users found.</p>';
+        });
+    }
+
+    async function toggleBanUser(uid, isBanned) {
+        let msg = isBanned ? "Unban this user?" : "Ban this user? They will not be able to login.";
+        if(await customConfirm(msg)) { 
+            await db.ref(`users/${uid}`).update({ banned: !isBanned }); 
+            showNotification("Status updated.", "success"); 
+        }
+    }
+
+    async function deleteUser(uid) {
+        if(await customConfirm("DANGER: Are you absolutely sure you want to delete this user? Their DB records will be erased.")) {
+            await db.ref(`users/${uid}`).remove(); 
+            showNotification("User removed from Database.", "success");
+        }
+    }
+
+    async function showLeaderboard(id) {
+        const snap = await db.ref(`leaderboards/${id}`).once('value');
+        const data = snap.val();
+        if(!data) return;
+
+        const usersSnap = await db.ref(`users`).once('value');
+        const allU = usersSnap.val() || {};
+
+        let html = `<div class="lb-header">
+            <h3>Prize Pool Distributed</h3>
+            <p><i class="fas fa-coins" style="color: #facc15;"></i> ${data.prizePool}</p>
+        </div>
+        <div class="lb-table-wrap">
+            <table class="lb-table">
+                <tr><th>Rank</th><th>User & Answers</th><th>Score</th><th>Won</th></tr>`;
+        
+        let safeRankings = Array.isArray(data.rankings) ? data.rankings : Object.values(data.rankings || {});
+        
+        safeRankings.forEach((r, i) => {
+            let badge = i === 0 ? '🏆' : (i===1 ? '🥈' : (i===2 ? '🥉' : ''));
+            let uName = "User";
+            if(allU[r.uid]) uName = allU[r.uid].name || (allU[r.uid].email ? allU[r.uid].email.split('@')[0] : "User");
+            
+            let pAns = r.answers;
+            if (pAns && !Array.isArray(pAns)) pAns = Object.values(pAns);
+            else if (!pAns) pAns =[];
+            
+            let rAnsText = pAns.map((aIdx, idx) => {
+                if(aIdx === -1) return `Q${idx+1}: Skipped`;
+                return `Q${idx+1}: ${['A','B','C','D'][aIdx]||'?'}`
+            }).join('<br>');
+
+            html += `<tr>
+                <td style="font-weight: bold; vertical-align:top; padding-top:14px;">${i+1} ${badge}</td>
+                <td>
+                    <strong style="color:#e5e7eb; font-size:1rem;">${uName}</strong><br>
+                    <span style="font-size:0.75rem; color:#9ca3af;">${rAnsText}</span>
+                </td>
+                <td style="vertical-align:top; font-weight:bold; padding-top:14px;">${r.score}</td>
+                <td style="font-weight: bold; color: #4ade80; vertical-align:top; padding-top:14px;">${r.won ? '+'+r.won : '-'}</td>
+            </tr>`;
+        });
+        html += `</table></div>`;
+
+        document.getElementById('leaderboard-content').innerHTML = html;
+        document.getElementById('leaderboard-modal').classList.remove('hidden-panel');
+    }
+
+</script>
+</body>
+</html>
