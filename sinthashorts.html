@@ -188,7 +188,7 @@
         .inline-action-btn:hover { color: #fff; }
         .inline-action-btn.liked i { color: #ef4444; }
 
-        .swipe-indicator { position: fixed; bottom: 44%; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.8em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
+        .swipe-indicator { position: fixed; bottom: 50%; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.8em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
         .animate-bounce { animation: bounce 1s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
 
@@ -341,6 +341,18 @@
         .toast-info i { color: #3b82f6; }
         @keyframes slideDownFade { to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUpFade { to { opacity: 0; transform: translateY(-20px); } }
+
+        /* WITHDRAWAL HISTORY CSS */
+        .history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 250px; overflow-y: auto; }
+        .history-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .history-item-info { display: flex; flex-direction: column; gap: 4px; }
+        .history-amt { font-weight: bold; font-size: 1rem; color: #111827; }
+        .history-date { font-size: 0.75rem; color: #6b7280; }
+        .history-upi { font-size: 0.8rem; color: #4b5563; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-paid { background: #d1fae5; color: #059669; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
 
     </style>
 </head>
@@ -548,6 +560,14 @@
             <button onclick="requestWithdrawal()" class="btn-pay"><i class="fas fa-paper-plane"></i> Request Payout</button>
         </div>
 
+        <!-- Withdrawal History Section -->
+        <div class="admin-panel-card yellow">
+            <h2 class="admin-card-title"><i class="fas fa-history"></i> Withdrawal History</h2>
+            <div id="profile-withdrawal-history" class="history-list">
+                <p style="font-size: 0.85rem; color: #6b7280;">Loading history...</p>
+            </div>
+        </div>
+
         <!-- Links Section -->
         <div class="admin-panel-card purple">
             <h2 class="admin-card-title"><i class="fas fa-link"></i> More Info</h2>
@@ -604,7 +624,7 @@
 
             <div class="admin-panel-card green">
                 <h2 class="admin-card-title" id="admin-post-form-title">Create / Upload Post</h2>
-                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Configure mode, marks logic, and details.</p>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Configure mode, marks logic, start/end times, and details.</p>
                 
                 <input type="hidden" id="edit-post-id">
 
@@ -624,17 +644,28 @@
                         <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
                         <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
                         
-                        <div style="display:flex; gap:6px;">
+                        <div style="display:flex; gap:6px;" class="admin-input-col-2">
                             <select id="admin-cat" class="admin-input" style="flex:1;">
                             </select>
                             <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 8px;">Add Cat</button>
                             <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.9rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
                         </div>
-                        
-                        <input type="datetime-local" id="admin-deadline" class="admin-input" title="Deadline">
                     </div>
                     
                     <textarea id="admin-desc" placeholder="News Snippet/Description" class="admin-textarea" rows="3"></textarea>
+                    
+                    <div class="admin-input-grid" style="align-items: flex-start;">
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">Start Time:</label>
+                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">When predicting starts (optional)</p>
+                            <input type="datetime-local" id="admin-start-time" class="admin-input">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: bold;">End Time (Deadline):</label>
+                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">When predicting locks/ends</p>
+                            <input type="datetime-local" id="admin-deadline" class="admin-input">
+                        </div>
+                    </div>
                     
                     <div class="admin-input-grid" style="align-items: flex-start;">
                         <div>
@@ -696,7 +727,7 @@
 
                 <!-- File Bulk Upload Section -->
                 <div id="upload-file-section" class="hidden-panel">
-                    <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Upload a file containing multiple posts. Valid keys/headers: <strong>title, desc, media, category, deadline, isPredictionMode, fee</strong></p>
+                    <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Upload a file containing multiple posts. Valid keys/headers: <strong>title, desc, media, category, startTime, deadline, isPredictionMode, fee</strong></p>
                     <input type="file" id="admin-bulk-file" accept=".json,.csv" class="modern-input">
                     <button onclick="processBulkFile()" class="admin-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fas fa-upload"></i> Upload & Process</button>
                     <a href="#" onclick="downloadSampleFile()" style="font-size: 0.85rem; color: #3b82f6; display: inline-block; margin-top: 10px; text-decoration: none; font-weight: bold;"><i class="fas fa-download"></i> Download Sample Format</a>
@@ -1072,6 +1103,7 @@
                             window.rssIntervals = {};
                         }
                     }
+                    fetchUserWithdrawalHistory(user.uid);
                 });
                 
                 showPanel('user');
@@ -1190,6 +1222,39 @@
         });
         showNotification("Withdrawal request sent!", "success");
         document.getElementById('withdraw-upi').value = ''; document.getElementById('withdraw-amt').value = '';
+    }
+
+    function fetchUserWithdrawalHistory(uid) {
+        db.ref('withdrawals').orderByChild('uid').equalTo(uid).on('value', snap => {
+            const data = snap.val() || {};
+            const container = document.getElementById('profile-withdrawal-history');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const historyArr = Object.keys(data).map(id => ({ id, ...data[id] })).sort((a,b) => b.timestamp - a.timestamp);
+            
+            if(historyArr.length === 0) {
+                container.innerHTML = '<p style="font-size: 0.85rem; color: #6b7280;">No withdrawal history found.</p>';
+                return;
+            }
+            
+            historyArr.forEach(req => {
+                let statusClass = 'status-pending';
+                if(req.status === 'paid') statusClass = 'status-paid';
+                if(req.status === 'rejected') statusClass = 'status-rejected';
+                
+                container.innerHTML += `
+                    <div class="history-item">
+                        <div class="history-item-info">
+                            <span class="history-amt"><i class="fas fa-coins" style="color: #facc15; font-size: 0.8em;"></i> ${req.amount}</span>
+                            <span class="history-upi">UPI: ${req.upi}</span>
+                            <span class="history-date">${new Date(req.timestamp).toLocaleString()}</span>
+                        </div>
+                        <span class="status-badge ${statusClass}">${req.status}</span>
+                    </div>
+                `;
+            });
+        });
     }
 
     function showStaticInfo(type) {
@@ -1441,6 +1506,8 @@
 
         activeNewsArray.forEach((news, idx) => {
             let isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
+            const hasStartTime = news.startTime && news.startTime !== "";
+            const hasStarted = !hasStartTime || now >= new Date(news.startTime).getTime();
             const hasDeadline = news.deadline && news.deadline !== "";
             const isClosed = (hasDeadline && now > new Date(news.deadline).getTime()) || news.status === 'resolved';
             const hasPredicted = !!userPredictions[news.id];
@@ -1455,11 +1522,17 @@
             let timerDisplay = '';
 
             if(isPredictionMode) {
-                timerDisplay = isClosed ? 'Deadline Passed' : (hasDeadline ? 'Loading...' : 'More details coming soon');
-                activeBadgeHtml = (isReadyForPrediction && !isClosed) ? '<span class="live-badge live-pulse">Active Prediction</span>' : '';
+                if (isClosed) timerDisplay = 'Deadline Passed';
+                else if (!hasStarted) timerDisplay = 'Starting Soon...';
+                else if (hasDeadline) timerDisplay = 'Loading...';
+                else timerDisplay = 'More details coming soon';
+
+                activeBadgeHtml = (isReadyForPrediction && !isClosed && hasStarted) ? '<span class="live-badge live-pulse">Active Prediction</span>' : '';
 
                 if(news.status === 'resolved') {
                     btnHtml = `<button onclick="showLeaderboard('${news.id}')" class="btn-predict btn-purple">View Match Results & Winners</button>`;
+                } else if(!hasStarted) {
+                    btnHtml = `<button disabled class="btn-predict btn-closed">Predict Starts Later</button>`;
                 } else if(isClosed && hasDeadline) {
                     btnHtml = `<button disabled class="btn-predict btn-closed">Predict Closed (Awaiting Results)</button>`;
                 } else if (!isReadyForPrediction) {
@@ -1546,24 +1619,36 @@
                 activeCarouselIntervals.push(cInterval);
             }
 
-            if (isPredictionMode && !isClosed && hasDeadline) {
+            if (isPredictionMode && (!isClosed || !hasStarted) && (hasDeadline || hasStartTime)) {
                 const timerEl = card.querySelector(`#timer-${news.id}`);
                 const interval = setInterval(() => {
-                    const dist = new Date(news.deadline).getTime() - new Date().getTime();
-                    if (dist < 0) {
-                        clearInterval(interval); timerEl.innerText = "Deadline Passed"; timerEl.style.color = '#ff4444';
-                        // AUTO SUBMIT TRIGGER
-                        if(!document.getElementById('prediction-modal').classList.contains('hidden-panel') && document.getElementById('modal-news-id').value === news.id) {
-                            if(document.getElementById('btn-submit-prediction') && !document.getElementById('btn-submit-prediction').classList.contains('hidden-panel')) {
-                                submitPrediction(); // programmatically submit
-                            }
-                        }
-                    } else {
+                    const nowTime = new Date().getTime();
+                    if (hasStartTime && nowTime < new Date(news.startTime).getTime()) {
+                        const dist = new Date(news.startTime).getTime() - nowTime;
                         const d = Math.floor(dist / (1000 * 60 * 60 * 24));
                         const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
                         const s = Math.floor((dist % (1000 * 60)) / 1000);
-                        timerEl.innerHTML = `<i class="far fa-clock"></i> Closes in: ${d}d ${h}h ${m}m ${s}s`;
+                        timerEl.innerHTML = `<i class="far fa-clock"></i> Starts in: ${d}d ${h}h ${m}m ${s}s`;
+                        timerEl.style.color = '#60a5fa'; // Blue for upcoming
+                    } else if (hasDeadline) {
+                        const dist = new Date(news.deadline).getTime() - nowTime;
+                        if (dist < 0) {
+                            clearInterval(interval); timerEl.innerText = "Deadline Passed"; timerEl.style.color = '#ff4444';
+                            // AUTO SUBMIT TRIGGER
+                            if(!document.getElementById('prediction-modal').classList.contains('hidden-panel') && document.getElementById('modal-news-id').value === news.id) {
+                                if(document.getElementById('btn-submit-prediction') && !document.getElementById('btn-submit-prediction').classList.contains('hidden-panel')) {
+                                    submitPrediction(); // programmatically submit
+                                }
+                            }
+                        } else {
+                            const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((dist % (1000 * 60)) / 1000);
+                            timerEl.innerHTML = `<i class="far fa-clock"></i> Closes in: ${d}d ${h}h ${m}m ${s}s`;
+                            timerEl.style.color = '#ffeb3b'; // Yellow for active
+                        }
                     }
                 }, 1000);
                 activeCountdownIntervals.push(interval);
@@ -1593,22 +1678,24 @@
             const isPredictionMode = news.isPredictionMode !== undefined ? (news.isPredictionMode === true || news.isPredictionMode === "true") : true;
             const hasDeadline = news.deadline && news.deadline !== "";
             const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
-            const hasQuestions = news.questions && news.questions.length > 0;
             
-            let shareText = `${news.title}\n\n`;
+            let shareText = `📰 ${news.title}\n\n`;
+            
             if (news.desc) {
-                shareText += `${news.desc}\n\n`;
+                // some news text (limiting to ~150 chars for better share formatting)
+                let shortDesc = news.desc.length > 150 ? news.desc.substring(0, 150) + '...' : news.desc;
+                shareText += `${shortDesc}\n\n`;
             }
             
             if (news.mediaUrls && news.mediaUrls.length > 0) {
-                shareText += `🖼️ Image/Media: ${news.mediaUrls[0]}\n\n`;
+                shareText += `🖼️ Post Image: ${news.mediaUrls[0]}\n\n`;
             }
             
-            if (isPredictionMode && !isClosed && hasQuestions) {
-                shareText += `🎯 Active MCQ / Prediction available!\nJoin the match, predict answers and win exciting Coin Prizes! 🏆\n\n`;
+            if (isPredictionMode && !isClosed) {
+                shareText += `⚡ 🔥 EXCITING PREDICTION LIVE! 🔥 ⚡\nJoin the match now, test your knowledge, predict the right answers, and win massive Coin Prizes! 🏆💸 Don't miss out on the action!\n\n`;
             }
             
-            shareText += `Check it out here: `;
+            shareText += `📖 Read more please visit website: `;
 
             navigator.share({ 
                 title: news.title, 
@@ -1911,17 +1998,25 @@
     async function openPredictionModal(newsId) {
         if(!currentUser) { showPanel('auth'); return; }
 
-        document.getElementById('prediction-modal').classList.remove('hidden-panel');
-        document.getElementById('modal-title').innerText = "Loading...";
-        document.getElementById('modal-questions').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent-color-1);"></i></div>';
-        document.getElementById('modal-other-users').innerHTML = '';
-        document.getElementById('public-stats-container').classList.add('hidden-panel');
-        document.getElementById('btn-submit-prediction').classList.add('hidden-panel');
-        document.getElementById('modal-prizes').style.display = 'none';
-
         try {
             const news = allNewsData[newsId];
             if(!news) throw new Error("News not found");
+            
+            const hasStartTime = news.startTime && news.startTime !== "";
+            const hasStarted = !hasStartTime || new Date().getTime() >= new Date(news.startTime).getTime();
+            
+            if (!hasStarted) {
+                return showNotification("Prediction has not started yet!", "warning");
+            }
+
+            document.getElementById('prediction-modal').classList.remove('hidden-panel');
+            document.getElementById('modal-title').innerText = "Loading...";
+            document.getElementById('modal-questions').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent-color-1);"></i></div>';
+            document.getElementById('modal-other-users').innerHTML = '';
+            document.getElementById('public-stats-container').classList.add('hidden-panel');
+            document.getElementById('btn-submit-prediction').classList.add('hidden-panel');
+            document.getElementById('modal-prizes').style.display = 'none';
+
             if (!Array.isArray(news.questions)) news.questions = Object.values(news.questions || {});
 
             const userPred = userPredictions[newsId];
@@ -2066,6 +2161,10 @@
 
         const newsId = document.getElementById('modal-news-id').value;
         const news = allNewsData[newsId];
+        
+        if(news.startTime && news.startTime !== "" && new Date().getTime() < new Date(news.startTime).getTime()) {
+            return showNotification("Prediction has not started yet!", "warning");
+        }
         if(news.deadline && news.deadline !== "" && new Date().getTime() > new Date(news.deadline).getTime()) {
             return showNotification("Deadline passed!", "warning");
         }
@@ -2328,6 +2427,7 @@
                 "desc": "This is a sample description.",
                 "media": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80",
                 "category": "sports",
+                "startTime": "2026-01-01T10:00",
                 "deadline": "2026-12-31T23:59",
                 "isPredictionMode": "true",
                 "fee": 50
@@ -2335,7 +2435,7 @@
             filename = "sample_posts.json";
             downloadFile(content, filename, "application/json");
         } else if (mode === 'csv') {
-            content = 'title,desc,media,category,deadline,isPredictionMode,fee\n"Sample Bulk Post 1","This is a sample description.","https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80","sports","2026-12-31T23:59","true",50';
+            content = 'title,desc,media,category,startTime,deadline,isPredictionMode,fee\n"Sample Bulk Post 1","This is a sample description.","https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80","sports","2026-01-01T10:00","2026-12-31T23:59","true",50';
             filename = "sample_posts.csv";
             downloadFile(content, filename, "text/csv");
         }
@@ -2355,7 +2455,7 @@
         let row = 0, col = 0;
         for (let c = 0; c < str.length; c++) {
             let cc = str[c], nc = str[c+1];
-            arr[row] = arr[row] || [];
+            arr[row] = arr[row] ||[];
             arr[row][col] = arr[row][col] || '';
             if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
             if (cc == '"') { quote = !quote; continue; }
@@ -2366,7 +2466,7 @@
             arr[row][col] += cc;
         }
         
-        let result = [];
+        let result =[];
         let headers = arr[0].map(h => h.trim());
         for (let i = 1; i < arr.length; i++) {
             if (arr[i].length === 1 && !arr[i][0]) continue; 
@@ -2396,7 +2496,7 @@
                     items = parseCSV(content);
                 }
                 
-                if (!Array.isArray(items)) items = [items];
+                if (!Array.isArray(items)) items =[items];
                 
                 let count = 0;
                 for (let item of items) {
@@ -2413,6 +2513,7 @@
                         mediaUrls: detectedMedia.urls,
                         category: cat.toLowerCase(),
                         desc: item.desc || '',
+                        startTime: item.startTime || "", 
                         deadline: item.deadline || "", 
                         isPredictionMode: isPred,
                         markCorrect: parseInt(item.markCorrect) || 10,
@@ -2452,6 +2553,7 @@
             mediaUrls: detectedMedia.urls,
             category: cat,
             desc: document.getElementById('admin-desc').value,
+            startTime: document.getElementById('admin-start-time').value || "", 
             deadline: document.getElementById('admin-deadline').value || "", 
             
             isPredictionMode: document.getElementById('admin-pred-mode').value === "true",
@@ -2489,6 +2591,8 @@
         document.getElementById('admin-title').value = '';
         document.getElementById('admin-desc').value = '';
         document.getElementById('admin-media').value = '';
+        document.getElementById('admin-start-time').value = '';
+        document.getElementById('admin-deadline').value = '';
         document.getElementById('admin-participants').value = 100;
         document.getElementById('admin-fee').value = 50;
         document.getElementById('admin-pred-mode').value = "true";
@@ -2543,6 +2647,7 @@
         document.getElementById('admin-title').value = n.title || '';
         document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
         document.getElementById('admin-cat').value = n.category || '';
+        document.getElementById('admin-start-time').value = n.startTime || '';
         document.getElementById('admin-deadline').value = n.deadline || '';
         document.getElementById('admin-desc').value = n.desc || '';
         
@@ -2803,6 +2908,19 @@
             });
             if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.85rem;">No pending requests.</p>';
         });
+    }
+
+    async function resolveWithdrawal(id, status, uid = null, amount = 0) {
+        if (await customConfirm(`Are you sure you want to mark this withdrawal as ${status.toUpperCase()}?`)) {
+            if (status === 'rejected' && uid && amount) {
+                // Refund the amount back to user's wallet
+                const snap = await db.ref(`users/${uid}/wallet`).once('value');
+                const bal = snap.val() || 0;
+                await db.ref(`users/${uid}`).update({ wallet: bal + amount });
+            }
+            await db.ref(`withdrawals/${id}`).update({ status: status });
+            showNotification(`Withdrawal request marked as ${status}`, "success");
+        }
     }
 
     async function fetchAdminDashboardStats() {
