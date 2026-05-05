@@ -380,7 +380,7 @@
             <input type="hidden" id="comment-reply-id">
             <input type="hidden" id="comment-edit-id">
             <div style="display:flex; gap:8px;">
-                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:6px 10px;">
+                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:6px 10px;" onkeypress="if(event.key === 'Enter') postComment();">
                 <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -747,6 +747,22 @@
     let allRssFeeds = {}; 
     let currentCommentsNewsId = null;
     let isSwipeDisabled = false; 
+
+    // Dynamically rebuild user predictions anytime DB or auth state changes
+    function rebuildUserPredictions() {
+        if (currentUser && allPredictions) {
+            userPredictions = {};
+            for(let newsId in allPredictions){
+                if(allPredictions[newsId] && allPredictions[newsId][currentUser.uid]) {
+                    let p = allPredictions[newsId][currentUser.uid];
+                    if (p.answers && !Array.isArray(p.answers)) p.answers = Object.values(p.answers);
+                    userPredictions[newsId] = p;
+                }
+            }
+        } else {
+            userPredictions = {};
+        }
+    }
     
     let dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
     let currentCategory = "all";
@@ -901,6 +917,10 @@
                 currentUser = user;
                 DOM.authPanel.classList.add('hidden-panel');
                 
+                rebuildUserPredictions();
+                if (currentMainTab === 'mcq') renderMCQList();
+                renderStreamDecorations();
+
                 db.ref(`users/${user.uid}`).once('value', snap => {
                     const data = snap.val();
                     if(!data) {
@@ -1136,17 +1156,8 @@
 
         db.ref('predictions').on('value', snap => {
             allPredictions = snap.val() || {};
-            if (currentUser) {
-                userPredictions = {};
-                for(let newsId in allPredictions){
-                    if(allPredictions[newsId][currentUser.uid]) {
-                        let p = allPredictions[newsId][currentUser.uid];
-                        if (p.answers && !Array.isArray(p.answers)) p.answers = Object.values(p.answers);
-                        userPredictions[newsId] = p;
-                    }
-                }
-                if (currentMainTab === 'mcq') renderMCQList();
-            }
+            rebuildUserPredictions();
+            if (currentMainTab === 'mcq') renderMCQList();
             if (isAdmin && document.getElementById('admin-tab-mcq').classList.contains('active')) renderAdminMCQList();
         });
 
@@ -1525,14 +1536,47 @@
 
     async function postComment() {
         if(!currentUser) return showPanel('auth');
-        const newsId = document.getElementById('comment-news-id').value, text = document.getElementById('comment-input').value.trim(), parentId = document.getElementById('comment-reply-id').value || null;
+        
+        const newsId = document.getElementById('comment-news-id').value;
+        const text = document.getElementById('comment-input').value.trim();
+        const parentId = document.getElementById('comment-reply-id').value;
+        
         if(!text) return;
-        const name = document.getElementById('profile-name').innerText || currentUser.email.split('@')[0];
+        
+        let name = document.getElementById('profile-name').innerText;
+        if (!name || name === "Loading...") {
+            name = currentUser.email.split('@')[0];
+        }
+        
         let commentRef = db.ref(`comments/${newsId}`);
-        if(document.getElementById('comment-edit-id').value) {
-            await commentRef.child(document.getElementById('comment-edit-id').value).update({ text }); document.getElementById('comment-edit-id').value = '';
-        } else { await commentRef.push({ uid: currentUser.uid, name, text, timestamp: firebase.database.ServerValue.TIMESTAMP, parentId }); }
-        document.getElementById('comment-input').value = ''; document.getElementById('comment-reply-id').value = ''; document.getElementById('comment-reply-preview').classList.add('hidden-panel');
+        const editId = document.getElementById('comment-edit-id').value;
+        
+        try {
+            if(editId) {
+                await commentRef.child(editId).update({ text }); 
+                document.getElementById('comment-edit-id').value = '';
+            } else { 
+                let payload = { 
+                    uid: currentUser.uid, 
+                    name: name, 
+                    text: text, 
+                    timestamp: firebase.database.ServerValue.TIMESTAMP 
+                };
+                
+                if (parentId) {
+                    payload.parentId = parentId;
+                }
+                
+                await commentRef.push(payload); 
+            }
+            
+            document.getElementById('comment-input').value = ''; 
+            document.getElementById('comment-reply-id').value = ''; 
+            document.getElementById('comment-reply-preview').classList.add('hidden-panel');
+        } catch(error) {
+            console.error("Comment Error: ", error);
+            showNotification("Failed to post comment. Please try again.", "error");
+        }
     }
 
     async function deleteComment(newsId, commentId) {
