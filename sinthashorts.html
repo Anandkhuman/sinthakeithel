@@ -202,7 +202,7 @@
         
         /* FULL TEXT CSS SUPPORT */
         .card-snippet { font-size: 0.85em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
-        .text-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .text-clamped { display: -webkit-box; -webkit-line-clamp: 20; -webkit-box-orient: vertical; overflow: hidden; }
         .text-expanded { display: block !important; overflow-y: auto; max-height: 60vh; padding-right: 5px; }
         .text-expanded::-webkit-scrollbar { width: 4px; }
         .text-expanded::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
@@ -669,7 +669,15 @@
                 <div>
                     <div class="admin-input-grid" style="align-items: center;">
                         <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
-                        <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
+                        
+                        <!-- REPLACED: Added File Upload integration alongside URL -->
+                        <div class="admin-input-col-2" style="display:flex; flex-direction:column; gap:6px;">
+                            <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input">
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1px solid #d1d5db; border-radius:4px; padding:6px;">
+                                <span style="font-size:0.75rem; color:#6b7280; margin-right:10px; white-space:nowrap;">Or Upload File:</span>
+                                <input type="file" id="admin-media-file" accept="image/*, audio/*, video/*" class="admin-input" style="border:none; padding:0; background:transparent; margin:0; height:auto;">
+                            </div>
+                        </div>
                         
                         <div style="display:flex; gap:6px;" class="admin-input-col-2">
                             <select id="admin-cat" class="admin-input" style="flex:1;">
@@ -994,6 +1002,48 @@
     let DEFAULT_NEWS_IMAGE = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
 
     let initialPostId = new URLSearchParams(window.location.search).get('post');
+
+    // NEW VARIABLES ADDED FOR FILE UPLOADS
+    let currentUploadedBase64 = null;
+    let currentUploadedMediaType = null;
+    let existingBase64Media = null;
+    let existingBase64MediaType = null;
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // FILE UPLOAD EVENT LISTENER
+    document.getElementById('admin-media-file').addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) {
+            currentUploadedBase64 = null;
+            currentUploadedMediaType = null;
+            return;
+        }
+        
+        if(file.size > 5 * 1024 * 1024) { 
+            showNotification("Warning: Uploading large files as Base64 may slow down performance.", "warning");
+        }
+
+        try {
+            const base64 = await fileToBase64(file);
+            currentUploadedBase64 = base64;
+            if (file.type.startsWith('image/')) currentUploadedMediaType = 'image';
+            else if (file.type.startsWith('video/')) currentUploadedMediaType = 'video';
+            else if (file.type.startsWith('audio/')) currentUploadedMediaType = 'audio';
+            else currentUploadedMediaType = 'image'; 
+            
+            showNotification("File loaded successfully, ready to publish.", "success");
+        } catch (err) {
+            showNotification("Error reading file", "error");
+        }
+    });
 
     function timeAgo(timestamp) {
         if (!timestamp) return '';
@@ -2524,16 +2574,40 @@
                         let contentText = extractTextFromHTML(item.content);
 
                         let cleanText = contentText.length > descText.length ? contentText : descText;
-                        let imgUrl = item.thumbnail || (item.enclosure && item.enclosure.link);
                         
-                        if (!imgUrl) {
+                        // --- ENHANCED RSS IMAGE EXTRACTION ---
+                        let imgUrl = "";
+                        
+                        // Priority 1: Try to get image from thumbnail (often provided by rss2json)
+                        if (item.thumbnail && item.thumbnail.trim() !== "") {
+                            imgUrl = item.thumbnail;
+                        } 
+                        // Priority 1: Try to get image from standard enclosure links
+                        else if (item.enclosure && item.enclosure.link && item.enclosure.link.trim() !== "") {
+                            imgUrl = item.enclosure.link;
+                        }
+
+                        // Priority 1: If still no image, forcefully parse the content string for an <img> tag
+                        if (!imgUrl && item.content) {
                             let tmp = document.createElement("DIV");
-                            tmp.innerHTML = item.content || item.description || "";
+                            tmp.innerHTML = item.content;
+                            let img = tmp.querySelector("img");
+                            if (img && img.src) imgUrl = img.src;
+                        }
+
+                        // Priority 1: If still no image, forcefully parse the description string for an <img> tag
+                        if (!imgUrl && item.description) {
+                            let tmp = document.createElement("DIV");
+                            tmp.innerHTML = item.description;
                             let img = tmp.querySelector("img");
                             if (img && img.src) imgUrl = img.src;
                         }
                         
-                        if (!imgUrl) imgUrl = getDefaultImageForCategory(feed.category);
+                        // Priority 2: Fallback to default category image if absolutely no image was found in the RSS
+                        if (!imgUrl || imgUrl.trim() === "") {
+                            imgUrl = getDefaultImageForCategory(feed.category);
+                        }
+                        // ----------------------------------------
 
                         if(cleanText.length > 50000) cleanText = cleanText.substring(0, 50000) + "...";
 
@@ -2787,12 +2861,27 @@
         const editId = document.getElementById('edit-post-id').value;
         const mediaInput = document.getElementById('admin-media').value.trim();
         const cat = document.getElementById('admin-cat').value;
-        const detectedMedia = detectMedia(mediaInput, cat);
+        
+        let finalMediaType = 'image';
+        let finalMediaUrls =[];
+
+        // NEW: Process base64 file or fallback to URL
+        if (currentUploadedBase64) {
+            finalMediaType = currentUploadedMediaType;
+            finalMediaUrls = [currentUploadedBase64];
+        } else if (existingBase64Media && document.getElementById('admin-media').value === 'Existing File Retained') {
+            finalMediaType = existingBase64MediaType;
+            finalMediaUrls = existingBase64Media;
+        } else {
+            const detectedMedia = detectMedia(mediaInput, cat);
+            finalMediaType = detectedMedia.type;
+            finalMediaUrls = detectedMedia.urls;
+        }
         
         const data = {
             title: document.getElementById('admin-title').value,
-            mediaType: detectedMedia.type,
-            mediaUrls: detectedMedia.urls,
+            mediaType: finalMediaType,
+            mediaUrls: finalMediaUrls,
             category: cat,
             desc: document.getElementById('admin-desc').value,
             startTime: document.getElementById('admin-start-time').value || "", 
@@ -2831,6 +2920,14 @@
         document.getElementById('admin-title').value = '';
         document.getElementById('admin-desc').value = '';
         document.getElementById('admin-media').value = '';
+        
+        // NEW: Clear uploaded file variables
+        document.getElementById('admin-media-file').value = '';
+        currentUploadedBase64 = null;
+        currentUploadedMediaType = null;
+        existingBase64Media = null;
+        existingBase64MediaType = null;
+
         document.getElementById('admin-start-time').value = '';
         document.getElementById('admin-deadline').value = '';
         document.getElementById('admin-participants').value = 100;
@@ -2896,12 +2993,26 @@
         
         document.getElementById('edit-post-id').value = id;
         document.getElementById('admin-title').value = n.title || '';
-        document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
         document.getElementById('admin-cat').value = n.category || '';
         document.getElementById('admin-start-time').value = n.startTime || '';
         document.getElementById('admin-deadline').value = n.deadline || '';
         document.getElementById('admin-desc').value = n.desc || '';
         
+        // NEW: Load existing variables so large base64 strings don't crash input
+        document.getElementById('admin-media-file').value = '';
+        currentUploadedBase64 = null;
+        currentUploadedMediaType = null;
+        existingBase64Media = null;
+        existingBase64MediaType = null;
+
+        if (n.mediaUrls && n.mediaUrls[0] && n.mediaUrls[0].startsWith('data:')) {
+            document.getElementById('admin-media').value = 'Existing File Retained';
+            existingBase64Media = n.mediaUrls;
+            existingBase64MediaType = n.mediaType;
+        } else {
+            document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
+        }
+
         document.getElementById('admin-pred-mode').value = (n.isPredictionMode !== undefined) ? n.isPredictionMode.toString() : "true";
         document.getElementById('admin-mark-correct').value = n.markCorrect !== undefined ? n.markCorrect : 10;
         document.getElementById('admin-mark-wrong').value = n.markWrong !== undefined ? n.markWrong : 5;
