@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sintha Shorts</title>
     
     <!-- Font Awesome -->
@@ -11,7 +11,7 @@
     <!-- Razorpay Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-    <!-- STANDARD CUSTOM CSS -->
+    <!-- STANDARD CUSTOM CSS WITH MOBILE NATIVE OPTIMIZATIONS -->
     <style>
         :root {
             --bg-color: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
@@ -24,16 +24,18 @@
             --border-color: #2f2f2f;
             --menu-bg-color: rgba(20, 20, 20, 0.85);
             --font-main: 'Inter', system-ui, sans-serif;
-            /* DECREASED VARIABLES */
-            --media-container-height: 200px;
-            --app-header-height: 55px;
-            --search-bar-height: 45px;
-            --top-menu-height: 40px;
+            /* DECREASED VARIABLES FOR MOBILE NATIVE APP FEEL */
+            --media-container-height: 180px;
+            --app-header-height: 50px;
+            --search-bar-height: 40px;
+            --top-menu-height: 35px;
+            --upcoming-banner-height: 0px; /* DYNAMICALLY CONTROLLED */
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
-        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-color); color: var(--primary-text-color); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-color); color: var(--primary-text-color); -webkit-user-select: none; user-select: none; touch-action: manipulation; overscroll-behavior-y: none; }
+        input, textarea, [contenteditable] { -webkit-user-select: auto; user-select: auto; }
         
         .hidden-panel { display: none !important; }
         .live-pulse { animation: pulseRed 2s infinite; }
@@ -55,30 +57,30 @@
             animation: splashFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         .splash-logo {
-            font-size: 3.5rem;
+            font-size: 3rem;
             color: #60a5fa;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             animation: splashFloat 3s ease-in-out infinite;
         }
         .splash-title {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: white;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             letter-spacing: 1px;
             background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .splash-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #b0b0b0;
             font-weight: 500;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .splash-loader {
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
             border: 3px solid rgba(255, 255, 255, 0.1);
             border-top: 3px solid var(--accent-color-1);
             border-radius: 50%;
@@ -101,23 +103,23 @@
 
         /* AUTHENTICATION UI */
         .welcome-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1a1a1d 0%, #121212 100%); padding: 15px; position: fixed; top: 0; left: 0; z-index: 500; overflow-y: auto; }
-        .welcome-brand { font-size: 1.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 5px; }
-        .welcome-subtitle { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 20px; }
-        .auth-container { width: 100%; max-width: 350px; background: #1f2937; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
+        .welcome-brand { font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+        .welcome-subtitle { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 15px; }
+        .auth-container { width: 100%; max-width: 320px; background: #1f2937; padding: 15px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
         
         .auth-view { display: none; }
         .auth-view.active { display: block; }
-        .auth-title { font-size: 1.2rem; font-weight: 600; color: white; margin-bottom: 12px; text-align: left; }
+        .auth-title { font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 10px; text-align: left; }
         
-        .auth-input { width: 100%; background: #111827; color: white; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #4b5563; outline: none; font-size: 0.95rem; }
+        .auth-input { width: 100%; background: #111827; color: white; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #4b5563; outline: none; font-size: 0.85rem; }
         .auth-input:focus { border-color: #3b82f6; }
         
-        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 10px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 10px; font-size: 0.95rem; transition: 0.2s; }
+        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 8px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 8px; font-size: 0.9rem; transition: 0.2s; }
         .auth-btn:hover { background: #2563eb; }
         .auth-btn.admin-btn { background: #eab308; color: #111827; }
         .auth-btn.admin-btn:hover { background: #ca8a04; }
         
-        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: block; text-align: center; margin-top: 12px; background: none; border: none; width: 100%; }
+        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.8rem; text-decoration: none; display: block; text-align: center; margin-top: 10px; background: none; border: none; width: 100%; }
         .auth-link:hover { text-decoration: underline; }
         .auth-close-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; }
         
@@ -126,65 +128,96 @@
         /* MAIN APP UI */
         .app-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
         
-        .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header-title { font-size: 1.1em; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
+        .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-title { font-size: 1rem; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
         
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 5px; }
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.15em; transition: 0.2s; }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 5px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.1em; transition: 0.2s; }
         .icon-btn.logout { color: #f87171; } .icon-btn.logout:hover { color: #fca5a5; }
         
-        .admin-nav-btn { background: #eab308; color: #111827; padding: 5px 10px; border-radius: 6px; font-size: 0.8em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .admin-nav-btn { background: #eab308; color: #111827; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .admin-nav-btn:hover { background: #facc15; }
-        .profile-nav-btn { background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 0.8em; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .profile-nav-btn { background: #3b82f6; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 
         /* SEARCH BAR ROW */
-        .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 12px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
-        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 15px; padding: 6px 12px; outline: none; transition: 0.3s; font-size: 0.9em; }
+        .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 10px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
+        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 15px; padding: 5px 10px; outline: none; transition: 0.3s; font-size: 0.85em; }
         .search-input:focus { background: rgba(255,255,255,0.2); border-color: var(--accent-color-1); }
 
         /* TOP MENU ROW */
         .top-menu { position: fixed; top: calc(var(--app-header-height) + var(--search-bar-height)); left: 0; width: 100%; height: var(--top-menu-height); background-color: var(--menu-bg-color); backdrop-filter: blur(10px); display: flex; align-items: center; overflow-x: auto; white-space: nowrap; z-index: 150; scrollbar-width: none; border-bottom: 1px solid var(--border-color); scroll-behavior: smooth;}
         .top-menu::-webkit-scrollbar { display: none; }
-        .top-menu ul { list-style: none; padding: 0 12px; }
+        .top-menu ul { list-style: none; padding: 0 10px; }
         .top-menu li { display: inline-block; margin-right: 4px; }
-        .top-menu li a { display: block; padding: 6px 12px; color: var(--primary-text-color); text-decoration: none; font-size: 0.85em; border-radius: 15px; transition: 0.2s ease; text-transform: capitalize; }
+        .top-menu li a { display: block; padding: 4px 10px; color: var(--primary-text-color); text-decoration: none; font-size: 0.8em; border-radius: 15px; transition: 0.2s ease; text-transform: capitalize; }
         .top-menu li a.active { background-color: var(--accent-color-1); color: #fff; }
         
+        /* UPCOMING JOINED PREDICTIONS BANNER */
+        #upcoming-banner {
+            position: fixed;
+            top: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height));
+            left: 0;
+            width: 100%;
+            height: var(--upcoming-banner-height);
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            z-index: 145;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: height 0.3s ease;
+        }
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: swipeInRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes swipeInRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
         /* UPDATED FOR SMOOTH SWIPE */
         .news-stream { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; will-change: transform; }
         .news-card { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: var(--card-bg-color); overflow: hidden; position: relative; z-index: 1; flex-shrink: 0; }
         .news-card::before { content: ''; position: absolute; top: 30%; left: -15%; width: 250px; height: 250px; background: var(--accent-color-1); border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: -1; pointer-events: none; }
         
-        /* Adjust padding to account for header + search + menu */
-        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + 12px) 12px 12px 12px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; }
-        .card-media { width: 100%; height: var(--media-container-height); border-radius: 10px; overflow: hidden; margin-bottom: 12px; background: #000; flex-shrink: 0; position: relative; }
+        /* Adjust padding to account for header + search + menu + dynamic upcoming banner */
+        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + var(--upcoming-banner-height) + 10px) 10px 10px 10px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; transition: padding 0.3s ease; }
+        .card-media { width: 100%; height: var(--media-container-height); border-radius: 8px; overflow: hidden; margin-bottom: 8px; background: #000; flex-shrink: 0; position: relative; }
         .card-media img, .card-media video { width: 100%; height: 100%; object-fit: cover; }
         
-        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; margin-bottom: 12px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
-        .card-title { font-size: 1.2em; font-weight: 700; line-height: 1.3; margin-bottom: 6px; flex-shrink: 0; }
-        .card-meta { font-size: 0.8em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
-        .cat-badge { background: #374151; padding: 3px 6px; border-radius: 4px; color: #e5e7eb; }
+        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; margin-bottom: 8px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.05em; font-weight: 700; line-height: 1.3; margin-bottom: 4px; flex-shrink: 0; }
+        .card-meta { font-size: 0.75em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
+        .cat-badge { background: #374151; padding: 2px 5px; border-radius: 4px; color: #e5e7eb; }
         .live-badge { position: absolute; top: 0px; right: 0px; background: #dc2626; color: white; font-size: 0.7em; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         
         /* FULL TEXT CSS SUPPORT */
-        .card-snippet { font-size: 0.9em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
+        .card-snippet { font-size: 0.85em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
         .text-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .text-expanded { display: block !important; overflow-y: auto; max-height: 60vh; padding-right: 5px; }
         .text-expanded::-webkit-scrollbar { width: 4px; }
         .text-expanded::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
         .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.85em; cursor: pointer; padding: 0; text-align: left; }
 
-        .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; width: 100%; flex-shrink: 0; }
-        .timer-badge { text-align: center; font-weight: bold; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 8px; color: #ffeb3b; font-size: 0.9em;}
-        .btn-predict { background: var(--accent-color-1); color: #fff; padding: 10px; text-align: center; border-radius: 20px; font-weight: bold; font-size: 1rem; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 174, 255, 0.4); cursor: pointer; border: none; }
+        .card-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 8px; width: 100%; flex-shrink: 0; }
+        .timer-badge { text-align: center; font-weight: bold; background: rgba(0,0,0,0.5); padding: 4px; border-radius: 8px; color: #ffeb3b; font-size: 0.85em;}
+        .btn-predict { background: var(--accent-color-1); color: #fff; padding: 8px; text-align: center; border-radius: 20px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 174, 255, 0.4); cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-predict.btn-yellow { background: #eab308; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4); color: black;}
         .btn-predict.btn-purple { background: #9333ea; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4); }
         .btn-predict.btn-closed { background: #555; color: #ccc; box-shadow: none; cursor: not-allowed; }
         
         /* SOCIAL ACTION BUTTONS INSIDE TEXT CONTAINER */
-        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; padding-bottom: 5px; flex-shrink: 0; margin-top: auto; }
-        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 6px; font-size: 1rem; cursor: pointer; transition: 0.2s; font-weight: 600;}
+        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; padding-bottom: 4px; flex-shrink: 0; margin-top: auto; }
+        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; transition: 0.2s; font-weight: 600;}
         .inline-action-btn:hover { color: #fff; }
         .inline-action-btn.liked i { color: #ef4444; }
 
@@ -193,24 +226,25 @@
         @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
 
         /* MODALS */
-        .overlay-modal { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 12px; }
-        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 450px; max-height: 90vh; border-radius: 12px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .overlay-modal { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 450px; max-height: 95vh; border-radius: 10px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
-        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 12px 16px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
-        .modal-title { font-weight: bold; font-size: 1.05em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 10px 14px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
+        .modal-title { font-weight: bold; font-size: 1em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.6em; cursor: pointer; line-height: 1; }
-        .modal-body { padding: 15px; flex-grow: 1; }
+        .modal-body { padding: 12px; flex-grow: 1; }
         
-        .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 12px; background: rgba(113, 63, 18, 0.3); padding: 6px; border-radius: 4px; font-size: 0.9rem;}
-        .public-stats { background: rgba(30, 58, 138, 0.3); border: 1px solid rgba(59, 130, 246, 0.3); padding: 12px; border-radius: 10px; margin-bottom: 20px; }
-        .public-stats h3 { color: #5eead4; font-weight: bold; margin-bottom: 4px; font-size: 0.95rem; }
+        .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 10px; background: rgba(113, 63, 18, 0.3); padding: 4px; border-radius: 4px; font-size: 0.85rem;}
+        .public-stats { background: rgba(30, 58, 138, 0.3); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .public-stats h3 { color: #5eead4; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
         
-        .question-card { background: rgba(55, 65, 81, 0.5); padding: 12px; border-radius: 10px; border: 1px solid #4b5563; margin-bottom: 16px; }
-        .question-title { font-weight: bold; color: #e5e7eb; margin-bottom: 8px; font-size: 0.95rem; }
+        .question-card { background: rgba(55, 65, 81, 0.5); padding: 10px; border-radius: 8px; border: 1px solid #4b5563; margin-bottom: 12px; }
+        .question-title { font-weight: bold; color: #e5e7eb; margin-bottom: 6px; font-size: 0.9rem; }
         
-        .option-label { display: block; padding: 10px; border: 1px solid #4b5563; border-radius: 8px; cursor: pointer; background: #1f2937; margin-bottom: 6px; transition: 0.2s; font-size: 0.9rem;}
+        .option-label { display: block; padding: 8px; border: 1px solid #4b5563; border-radius: 8px; cursor: pointer; background: #1f2937; margin-bottom: 5px; transition: 0.2s; font-size: 0.85rem;}
         .option-label:hover { background: #374151; }
         .option-label.checked { background: rgba(30, 58, 138, 0.4); border-color: #60a5fa; }
+        .option-label.disabled { opacity: 0.6; cursor: not-allowed; }
         .option-flex { display: flex; align-items: center; color: #e5e7eb; }
         .option-flex input { margin-right: 10px; width: 14px; height: 14px; accent-color: #3b82f6; }
         
@@ -218,119 +252,119 @@
         .progress-fill { background: #2dd4bf; height: 100%; transition: width 0.5s ease-in-out; }
         .progress-text { font-size: 0.7rem; color: #9ca3af; float: right; margin-top: 3px; }
         
-        .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 10px; border-radius: 20px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        .lb-header { background: linear-gradient(to right, #9333ea, #ec4899); color: white; padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: center; }
-        .lb-header h3 { font-weight: bold; font-size: 1.1rem; }
-        .lb-header p { font-size: 1.3rem; font-weight: 900; margin-top: 4px; }
-        .lb-table-wrap { background: #1f2937; border-radius: 10px; overflow: hidden; border: 1px solid #374151; }
-        .lb-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-        .lb-table th { background: #111827; padding: 10px; border-bottom: 1px solid #374151; color: #d1d5db; }
-        .lb-table td { padding: 10px; border-bottom: 1px solid rgba(55, 65, 81, 0.5); color: #e5e7eb; }
+        .lb-header { background: linear-gradient(to right, #9333ea, #ec4899); color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        .lb-header h3 { font-weight: bold; font-size: 1rem; }
+        .lb-header p { font-size: 1.2rem; font-weight: 900; margin-top: 4px; }
+        .lb-table-wrap { background: #1f2937; border-radius: 8px; overflow: hidden; border: 1px solid #374151; }
+        .lb-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
+        .lb-table th { background: #111827; padding: 8px; border-bottom: 1px solid #374151; color: #d1d5db; }
+        .lb-table td { padding: 8px; border-bottom: 1px solid rgba(55, 65, 81, 0.5); color: #e5e7eb; }
 
         /* COMMENTS CSS */
-        .comment-item { background: #1f2937; padding: 10px; border-radius: 8px; margin-bottom: 8px; }
-        .comment-header { display: flex; justify-content: space-between; font-size: 0.8em; color: #9ca3af; margin-bottom: 4px; }
-        .comment-body { font-size: 0.9em; color: #e5e7eb; margin-bottom: 6px; line-height: 1.4; word-break: break-word; }
-        .comment-actions { display: flex; gap: 12px; font-size: 0.8em; color: #6b7280; }
+        .comment-item { background: #1f2937; padding: 8px; border-radius: 8px; margin-bottom: 6px; }
+        .comment-header { display: flex; justify-content: space-between; font-size: 0.75em; color: #9ca3af; margin-bottom: 4px; }
+        .comment-body { font-size: 0.85em; color: #e5e7eb; margin-bottom: 6px; line-height: 1.4; word-break: break-word; }
+        .comment-actions { display: flex; gap: 12px; font-size: 0.75em; color: #6b7280; }
         .comment-action-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold;}
         .comment-action-btn:hover { color: #3b82f6; }
         .comment-action-btn.liked { color: #ef4444; }
         .reply-list { margin-left: 15px; border-left: 2px solid #374151; padding-left: 8px; margin-top: 8px; }
         
         /* Comment Modal Post Preview */
-        .comment-post-preview { display: flex; flex-direction: column; background: #1f2937; border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid #374151; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);}
-        .comment-preview-media { width: 100%; height: 150px; position: relative; overflow: hidden; background: #000; }
+        .comment-post-preview { display: flex; flex-direction: column; background: #1f2937; border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 1px solid #374151; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);}
+        .comment-preview-media { width: 100%; height: 140px; position: relative; overflow: hidden; background: #000; }
         .comment-preview-media img, .comment-preview-media video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: transform 0.5s ease-in-out; }
-        .comment-preview-text-wrap { padding: 10px; height: 70px; overflow: hidden; position: relative; background: #111827; }
-        .comment-preview-text { font-size: 0.8em; color: #d1d5db; line-height: 1.4; position: absolute; width: calc(100% - 20px); transition: transform 0.1s linear; }
+        .comment-preview-text-wrap { padding: 10px; height: 65px; overflow: hidden; position: relative; background: #111827; }
+        .comment-preview-text { font-size: 0.75em; color: #d1d5db; line-height: 1.4; position: absolute; width: calc(100% - 20px); transition: transform 0.1s linear; }
 
         /* DASHBOARDS (ADMIN & PROFILE) */
         .admin-layout { position: absolute; inset: 0; background: #f3f4f6; overflow-y: auto; z-index: 400; color: #1f2937; }
-        .admin-topbar { background: #3b82f6; padding: 12px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
+        .admin-topbar { background: #3b82f6; padding: 10px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
         .admin-topbar.yellow { background: #111827; color: white; border-bottom: 3px solid #eab308; }
-        .admin-topbar h1 { font-size: 1.2em; font-weight: bold; color: #eab308;}
-        .admin-back-btn { background: #374151; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; font-size: 0.85em;}
+        .admin-topbar h1 { font-size: 1.05em; font-weight: bold; color: #eab308;}
+        .admin-back-btn { background: #374151; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; font-size: 0.8em;}
         .admin-back-btn:hover { background: #4b5563; }
         
-        .admin-in-nav { display: flex; background: #1f2937; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 500; box-shadow: 0 -4px 10px rgba(0,0,0,0.2); overflow-x: auto; white-space: nowrap; padding-bottom: env(safe-area-inset-bottom); }
-        .admin-in-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 5px; background: none; border: none; color: #9ca3af; font-weight: bold; font-size: 0.75rem; cursor: pointer; border-top: 3px solid transparent; transition: 0.2s; gap: 4px; }
-        .admin-in-nav button i { font-size: 1.1rem; }
+        .admin-in-nav { display: flex; background: #1f2937; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 500; box-shadow: 0 -4px 10px rgba(0,0,0,0.2); overflow-x: auto; white-space: nowrap; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+        .admin-in-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; background: none; border: none; color: #9ca3af; font-weight: bold; font-size: 0.7rem; cursor: pointer; border-top: 3px solid transparent; transition: 0.2s; gap: 2px; }
+        .admin-in-nav button i { font-size: 1rem; }
         .admin-in-nav button:hover { color: white; }
         .admin-in-nav button.active { color: #eab308; border-top-color: #eab308; }
 
-        .admin-content { max-width: 900px; margin: 16px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 16px; padding-bottom: 75px; }
+        .admin-content { max-width: 900px; margin: 12px auto; padding: 0 10px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 65px; }
         
         .admin-tab { display: none; }
-        .admin-tab.active { display: flex; flex-direction: column; gap: 16px; }
+        .admin-tab.active { display: flex; flex-direction: column; gap: 12px; }
         
-        .admin-panel-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 3px solid #3b82f6; }
+        .admin-panel-card { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 3px solid #3b82f6; }
         .admin-panel-card.green { border-left-color: #22c55e; }
         .admin-panel-card.red { border-left-color: #ef4444; }
         .admin-panel-card.purple { border-left-color: #9333ea; }
         .admin-panel-card.orange { border-left-color: #f97316; }
         .admin-panel-card.yellow { border-left-color: #eab308; }
-        .admin-card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .admin-card-title { font-size: 1em; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         
         .admin-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .admin-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .admin-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .admin-input-col-2 { grid-column: span 2; }
-        .admin-input { flex: 1; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; font-family: inherit; font-size: 0.9rem; }
-        .admin-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; margin-bottom: 10px; font-family: inherit; resize: vertical; font-size: 0.9rem;}
+        .admin-input { flex: 1; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; font-family: inherit; font-size: 0.85rem; }
+        .admin-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; font-family: inherit; resize: vertical; font-size: 0.85rem;}
         
-        .modern-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 0.95rem; margin-bottom: 10px; outline: none; transition: border-color 0.2s; }
+        .modern-input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 0.85rem; margin-bottom: 8px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #3b82f6; background: white; }
-        .btn-pay { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: transform 0.1s; text-align: center; text-decoration: none; display: inline-block; }
+        .btn-pay { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: transform 0.1s; text-align: center; text-decoration: none; display: inline-block; }
         .btn-pay:active { transform: scale(0.98); }
 
-        .list-btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .list-link-btn { background: #f3f4f6; color: #374151; padding: 12px; border-radius: 8px; font-weight: 600; text-align: left; border: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; font-size: 0.9rem;}
+        .list-btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .list-link-btn { background: #f3f4f6; color: #374151; padding: 10px; border-radius: 8px; font-weight: 600; text-align: left; border: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; font-size: 0.85rem;}
         .list-link-btn:hover { background: #e5e7eb; color: #111827; }
 
-        .admin-btn-blue { background: #2563eb; color: white; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem;}
-        .admin-btn-green { background: #16a34a; color: white; padding: 10px; border-radius: 4px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
-        .admin-btn-gray { background: #e5e7eb; color: #1f2937; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8em; border: none; cursor: pointer; }
-        .admin-btn-danger { background: #dc2626; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem;}
-        .admin-btn-warn { background: #eab308; color: #111827; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem;}
+        .admin-btn-blue { background: #2563eb; color: white; padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 0.85rem;}
+        .admin-btn-green { background: #16a34a; color: white; padding: 8px 10px; border-radius: 4px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 8px; font-size: 0.9rem; }
+        .admin-btn-gray { background: #e5e7eb; color: #1f2937; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.75em; border: none; cursor: pointer; }
+        .admin-btn-danger { background: #dc2626; color: white; padding: 6px 10px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.85rem;}
+        .admin-btn-warn { background: #eab308; color: #111827; padding: 6px 10px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 0.85rem;}
         
         .admin-sm-btn { background: #22c55e; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.75rem; border: none; cursor: pointer; margin-left: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;}
         .admin-sm-btn:hover { filter: brightness(1.1); }
         
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;}
-        .stat-box { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); text-align: center; border-bottom: 3px solid #3b82f6;}
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;}
+        .stat-box { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); text-align: center; border-bottom: 3px solid #3b82f6;}
         .stat-box.green { border-bottom-color: #10b981; }
         .stat-box.yellow { border-bottom-color: #facc15; }
-        .stat-box h3 { font-size: 0.8rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;}
-        .stat-box .val { font-size: 1.5rem; font-weight: 900; }
+        .stat-box h3 { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
+        .stat-box .val { font-size: 1.2rem; font-weight: 900; }
 
         /* USER LIST CONTAINER CLEANUP */
-        .user-manage-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .user-manage-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .user-manage-header { display: flex; justify-content: space-between; align-items: flex-start;}
         .user-manage-info { flex-grow: 1; word-break: break-word; }
-        .user-manage-info h4 { font-size: 1rem; color: #111827; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-weight: bold;}
-        .user-manage-info p { font-size: 0.85rem; color: #4b5563; margin-bottom: 3px;}
-        .user-manage-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; padding-top: 10px; border-top: 1px solid #f3f4f6;}
-        .user-manage-actions button { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; flex: 1; display: flex; justify-content: center; align-items: center; gap: 4px; }
+        .user-manage-info h4 { font-size: 0.95rem; color: #111827; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-weight: bold;}
+        .user-manage-info p { font-size: 0.8rem; color: #4b5563; margin-bottom: 3px;}
+        .user-manage-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 4px; padding-top: 8px; border-top: 1px solid #f3f4f6;}
+        .user-manage-actions button { padding: 6px 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; flex: 1; display: flex; justify-content: center; align-items: center; gap: 4px; }
         
-        .admin-manage-card { background: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 10px; }
-        .admin-manage-card h3 { font-weight: bold; margin-bottom: 4px; font-size: 1rem;}
-        .admin-manage-card p { font-size: 0.8em; color: #6b7280; margin-bottom: 6px; }
-        .admin-resolve-box { background: #fef2f2; padding: 10px; border: 1px solid #fecaca; border-radius: 4px; margin-top: 8px; }
-        .admin-resolve-box h4 { color: #dc2626; font-size: 0.85em; font-weight: bold; margin-bottom: 6px; }
-        .admin-resolve-row { margin-bottom: 4px; font-size: 0.85em; }
-        .admin-resolve-select { border: 1px solid #d1d5db; border-radius: 4px; padding: 5px 8px; margin-top: 3px; width: 100%; font-family: inherit; font-size: 0.85rem;}
+        .admin-manage-card { background: #f9fafb; padding: 10px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 8px; }
+        .admin-manage-card h3 { font-weight: bold; margin-bottom: 4px; font-size: 0.95rem;}
+        .admin-manage-card p { font-size: 0.75em; color: #6b7280; margin-bottom: 6px; }
+        .admin-resolve-box { background: #fef2f2; padding: 8px; border: 1px solid #fecaca; border-radius: 4px; margin-top: 6px; }
+        .admin-resolve-box h4 { color: #dc2626; font-size: 0.8em; font-weight: bold; margin-bottom: 6px; }
+        .admin-resolve-row { margin-bottom: 4px; font-size: 0.8em; }
+        .admin-resolve-select { border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 6px; margin-top: 3px; width: 100%; font-family: inherit; font-size: 0.8rem;}
         
-        .withdrawal-req-card { background: white; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;}
-        .withdrawal-info h4 { margin-bottom: 3px; color: #111827; font-size: 1rem;}
-        .withdrawal-info p { font-size: 0.85rem; color: #4b5563; margin-bottom: 3px;}
+        .withdrawal-req-card { background: white; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px;}
+        .withdrawal-info h4 { margin-bottom: 3px; color: #111827; font-size: 0.95rem;}
+        .withdrawal-info p { font-size: 0.8rem; color: #4b5563; margin-bottom: 3px;}
         .withdrawal-actions { display: flex; gap: 6px; flex-direction: column; }
         
-        .mcq-builder-area { background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-        .mcq-q-box { background: white; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px; }
+        .mcq-builder-area { background: #f3f4f6; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .mcq-q-box { background: white; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 8px; }
 
         /* Modern Notifications CSS */
         #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .modern-toast { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 10px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(-20px); animation: slideDownFade 0.3s forwards; pointer-events: auto; }
+        .modern-toast { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(-20px); animation: slideDownFade 0.3s forwards; pointer-events: auto; }
         .toast-success { border-left: 3px solid #10b981; }
         .toast-success i { color: #10b981; }
         .toast-error { border-left: 3px solid #ef4444; }
@@ -343,13 +377,13 @@
         @keyframes slideUpFade { to { opacity: 0; transform: translateY(-20px); } }
 
         /* WITHDRAWAL HISTORY CSS */
-        .history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 250px; overflow-y: auto; }
-        .history-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item-info { display: flex; flex-direction: column; gap: 4px; }
-        .history-amt { font-weight: bold; font-size: 1rem; color: #111827; }
-        .history-date { font-size: 0.75rem; color: #6b7280; }
-        .history-upi { font-size: 0.8rem; color: #4b5563; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .history-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; max-height: 250px; overflow-y: auto; }
+        .history-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .history-item-info { display: flex; flex-direction: column; gap: 3px; }
+        .history-amt { font-weight: bold; font-size: 0.95rem; color: #111827; }
+        .history-date { font-size: 0.7rem; color: #6b7280; }
+        .history-upi { font-size: 0.75rem; color: #4b5563; }
+        .status-badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; text-align: center; }
         .status-pending { background: #fef3c7; color: #d97706; }
         .status-paid { background: #d1fae5; color: #059669; }
         .status-rejected { background: #fee2e2; color: #dc2626; }
@@ -439,6 +473,9 @@
     <nav class="top-menu" id="topMenu">
         <ul id="category-list"></ul>
     </nav>
+    
+    <!-- UPCOMING JOINED PREDICTIONS BANNER (AUTO SWIPING) -->
+    <div id="upcoming-banner" class="hidden-panel"></div>
 
     <div class="news-stream" id="newsStream"></div>
 
@@ -459,17 +496,17 @@
         
         <div class="modal-body">
             <div id="modal-countdown" class="modal-countdown"></div>
-            <div style="font-size: 0.8rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; margin-bottom: 12px;">
+            <div style="font-size: 0.8rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; margin-bottom: 10px;">
                 <i class="fas fa-info-circle"></i> <strong>Rules:</strong> You will get points for correct answers and <strong style="color:#f87171;">Negative Points</strong> for wrong answers. Leave unattempted for 0 points.
             </div>
-            <div id="modal-prizes" style="display: none; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 10px; border-radius: 8px; margin-bottom: 14px; text-align: center;"></div>
+            <div id="modal-prizes" style="display: none; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 8px; border-radius: 8px; margin-bottom: 10px; text-align: center;"></div>
             <div id="public-stats-container" class="public-stats hidden-panel"></div>
 
             <form id="prediction-form" onsubmit="submitPrediction(event)">
                 <div id="modal-questions"></div>
                 
                 <input type="hidden" id="modal-news-id">
-                <button type="submit" id="btn-submit-prediction" class="submit-pred-btn">Loading...</button>
+                <button type="submit" id="btn-submit-prediction" class="submit-pred-btn">Save Answers</button>
             </form>
 
             <div id="modal-other-users"></div>
@@ -484,20 +521,20 @@
             <h2 class="modal-title">Comments</h2>
             <button onclick="closeModal('comment-modal')" class="modal-close">&times;</button>
         </div>
-        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 12px; background: #111827;">
+        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 10px; background: #111827;">
             <div id="comment-post-preview-container"></div>
             <div id="comment-list" style="flex-grow: 1;">
                 <!-- Comments list dynamically injected here -->
             </div>
         </div>
-        <div style="padding: 8px 12px; background: #1f2937; border-top: 1px solid #374151;">
+        <div style="padding: 6px 10px; background: #1f2937; border-top: 1px solid #374151; margin-bottom: env(safe-area-inset-bottom);">
             <div id="comment-reply-preview" class="hidden-panel" style="font-size: 0.75em; color: #9ca3af; margin-bottom: 4px; display:flex; justify-content:space-between;"></div>
             <input type="hidden" id="comment-news-id">
             <input type="hidden" id="comment-reply-id">
             <input type="hidden" id="comment-edit-id">
             <div style="display:flex; gap:8px;">
-                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:8px 12px;">
-                <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 12px; border-radius:10px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:6px 10px;">
+                <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -521,7 +558,7 @@
             <h2 class="modal-title" id="info-modal-title">Info</h2>
             <button onclick="closeModal('info-modal')" class="modal-close">&times;</button>
         </div>
-        <div class="modal-body" id="info-modal-body" style="line-height: 1.5; color: #e5e7eb; font-size: 0.9rem;"></div>
+        <div class="modal-body" id="info-modal-body" style="line-height: 1.5; color: #e5e7eb; font-size: 0.85rem;"></div>
     </div>
 </div>
 
@@ -536,12 +573,12 @@
         <!-- Profile Info & Settings -->
         <div class="admin-panel-card">
             <h2 class="admin-card-title"><i class="fas fa-id-badge"></i> Account Details</h2>
-            <p style="margin-bottom: 10px; color: #4b5563; font-size: 0.9rem;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
-            <p style="margin-bottom: 10px; color: #4b5563; font-size: 0.9rem;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+            <p style="margin-bottom: 8px; color: #4b5563; font-size: 0.85rem;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+            <p style="margin-bottom: 8px; color: #4b5563; font-size: 0.85rem;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
             
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 12px 0;">
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0;">
             
-            <h3 style="font-size: 0.95rem; margin-bottom: 8px;">Change Password</h3>
+            <h3 style="font-size: 0.9rem; margin-bottom: 6px;">Change Password</h3>
             <input type="password" id="profile-new-pass" placeholder="Enter new password" class="modern-input">
             <button onclick="changeUserPassword()" class="admin-btn-blue">Update Password</button>
         </div>
@@ -549,12 +586,12 @@
         <!-- Withdrawal Section -->
         <div class="admin-panel-card green">
             <h2 class="admin-card-title" style="color: #059669;"><i class="fas fa-money-bill-wave"></i> Withdraw Winnings</h2>
-            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 12px;">Available Balance: <strong id="profile-withdraw-bal">0</strong> Coins</p>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 10px;">Available Balance: <strong id="profile-withdraw-bal">0</strong> Coins</p>
             
-            <label style="font-weight: bold; font-size: 0.85rem;">UPI ID</label>
+            <label style="font-weight: bold; font-size: 0.8rem;">UPI ID</label>
             <input type="text" id="withdraw-upi" placeholder="e.g., yourname@upi" class="modern-input">
             
-            <label style="font-weight: bold; font-size: 0.85rem;">Amount (Coins)</label>
+            <label style="font-weight: bold; font-size: 0.8rem;">Amount (Coins)</label>
             <input type="number" id="withdraw-amt" placeholder="Enter amount to withdraw" class="modern-input">
             
             <button onclick="requestWithdrawal()" class="btn-pay"><i class="fas fa-paper-plane"></i> Request Payout</button>
@@ -564,7 +601,7 @@
         <div class="admin-panel-card yellow">
             <h2 class="admin-card-title"><i class="fas fa-history"></i> Withdrawal History</h2>
             <div id="profile-withdrawal-history" class="history-list">
-                <p style="font-size: 0.85rem; color: #6b7280;">Loading history...</p>
+                <p style="font-size: 0.8rem; color: #6b7280;">Loading history...</p>
             </div>
         </div>
 
@@ -597,7 +634,7 @@
         <button id="nav-btn-dashboard" onclick="switchAdminTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
     </div>
 
-    <div class="admin-content" style="margin-top: 12px;">
+    <div class="admin-content" style="margin-top: 10px;">
         
         <!-- MENU 1: POST TAB -->
         <div id="admin-tab-post" class="admin-tab active">
@@ -605,7 +642,7 @@
             <!-- AUTO RSS FEED SECTION -->
             <div class="admin-panel-card orange">
                 <h2 class="admin-card-title"><i class="fas fa-rss"></i> Auto RSS Feeds</h2>
-                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Add RSS URLs here. The system automatically checks and posts new articles periodically while you're online.</p>
+                <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 8px;">Add RSS URLs here. The system automatically checks and posts new articles periodically while you're online.</p>
                 <input type="hidden" id="admin-rss-edit-id">
                 <div class="admin-input-grid">
                     <input type="url" id="admin-rss-url" placeholder="Enter RSS Feed URL" class="admin-input admin-input-col-2">
@@ -614,32 +651,22 @@
                 </div>
                 <div style="display: flex; gap: 6px; margin-top: 6px;">
                     <button onclick="addAutoRssFeed()" id="btn-add-rss" class="admin-btn-blue" style="flex: 1;">Add Auto Feed</button>
-                    <button onclick="cancelEditRssFeed()" id="btn-cancel-rss" class="admin-btn-gray hidden-panel" style="padding: 8px;">Cancel Edit</button>
+                    <button onclick="cancelEditRssFeed()" id="btn-cancel-rss" class="admin-btn-gray hidden-panel" style="padding: 6px;">Cancel Edit</button>
                 </div>
                 
-                <div id="admin-rss-list" style="margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 8px;">
+                <div id="admin-rss-list" style="margin-top: 10px; border-top: 1px solid #e5e7eb; padding-top: 8px;">
                     <!-- Active feeds list -->
                 </div>
             </div>
 
             <div class="admin-panel-card green">
                 <h2 class="admin-card-title" id="admin-post-form-title">Create / Upload Post</h2>
-                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Configure mode, marks logic, start/end times, and details.</p>
+                <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 8px;">Configure mode, marks logic, start/end times, and details.</p>
                 
                 <input type="hidden" id="edit-post-id">
 
-                <!-- MODIFIED: File Upload & Mode Selection functionality -->
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px;">
-                    <label style="font-size: 0.8em; font-weight: bold;">Upload Mode:</label>
-                    <select id="admin-upload-mode" class="admin-input" onchange="toggleUploadMode()">
-                        <option value="manual">Manual Entry</option>
-                        <option value="json">Upload JSON File</option>
-                        <option value="csv">Upload CSV File</option>
-                    </select>
-                </div>
-
                 <!-- Manual Upload Section -->
-                <div id="upload-manual-section">
+                <div>
                     <div class="admin-input-grid" style="align-items: center;">
                         <input type="text" id="admin-title" placeholder="Headline / Title" class="admin-input admin-input-col-2">
                         <input type="text" id="admin-media" placeholder="Media URL(s) (comma separated)" class="admin-input admin-input-col-2">
@@ -648,7 +675,7 @@
                             <select id="admin-cat" class="admin-input" style="flex:1;">
                             </select>
                             <button type="button" onclick="addNewCategory()" class="admin-btn-gray" style="padding: 0 8px;">Add Cat</button>
-                            <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.9rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
+                            <button type="button" onclick="removeSelectedCategory()" class="admin-btn-danger" style="padding: 0 10px; font-size: 0.85rem;" title="Remove Selected Category"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                     
@@ -656,81 +683,73 @@
                     
                     <div class="admin-input-grid" style="align-items: flex-start;">
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Start Time:</label>
-                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">When predicting starts (optional)</p>
+                            <label style="font-size: 0.75em; font-weight: bold;">Start Time:</label>
+                            <p style="font-size: 0.65rem; color: #6b7280; margin-bottom: 3px;">When predicting starts</p>
                             <input type="datetime-local" id="admin-start-time" class="admin-input">
                         </div>
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">End Time (Deadline):</label>
-                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">When predicting locks/ends</p>
+                            <label style="font-size: 0.75em; font-weight: bold;">End Time:</label>
+                            <p style="font-size: 0.65rem; color: #6b7280; margin-bottom: 3px;">When predicting locks</p>
                             <input type="datetime-local" id="admin-deadline" class="admin-input">
                         </div>
                     </div>
                     
                     <div class="admin-input-grid" style="align-items: flex-start;">
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Post Mode:</label>
-                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Normal Posts hide Prediction buttons.</p>
+                            <label style="font-size: 0.75em; font-weight: bold;">Post Mode:</label>
+                            <p style="font-size: 0.65rem; color: #6b7280; margin-bottom: 3px;">Normal Posts hide Predict.</p>
                             <select id="admin-pred-mode" class="admin-input">
                                 <option value="true">ON (With Prediction)</option>
                                 <option value="false">OFF (Normal Post)</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Expected Participants:</label>
-                            <p style="font-size: 0.7rem; color: #6b7280; margin-bottom: 3px;">Used to auto-calculate the prize pool below.</p>
+                            <label style="font-size: 0.75em; font-weight: bold;">Participants:</label>
+                            <p style="font-size: 0.65rem; color: #6b7280; margin-bottom: 3px;">For prize calculation.</p>
                             <input type="number" id="admin-participants" value="100" oninput="calcPrizes()" class="admin-input">
                         </div>
                     </div>
 
                     <div class="admin-input-grid" style="align-items: flex-start;">
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Marks for Correct Ans:</label>
+                            <label style="font-size: 0.75em; font-weight: bold;">Marks for Correct:</label>
                             <input type="number" id="admin-mark-correct" value="10" class="admin-input">
                         </div>
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Negative Marks for Wrong:</label>
+                            <label style="font-size: 0.75em; font-weight: bold;">Negative Marks:</label>
                             <input type="number" id="admin-mark-wrong" value="5" class="admin-input">
                         </div>
                     </div>
 
                     <div class="admin-input-grid" style="align-items: flex-start;">
                         <div>
-                            <label style="font-size: 0.8em; font-weight: bold;">Entry Fee (Coins):</label>
+                            <label style="font-size: 0.75em; font-weight: bold;">Entry Fee (Coins):</label>
                             <input type="number" id="admin-fee" value="50" oninput="calcPrizes()" class="admin-input">
                         </div>
                     </div>
 
-                    <p style="font-size: 0.8em; font-weight: bold; margin-top: 8px; color: #059669;">Guaranteed Prize Distribution (Editable)</p>
-                    <div class="admin-input-grid" style="align-items: center; margin-bottom: 10px; background: #d1fae5; padding: 8px; border-radius: 6px;">
+                    <p style="font-size: 0.75em; font-weight: bold; margin-top: 6px; color: #059669;">Guaranteed Prize Distribution</p>
+                    <div class="admin-input-grid" style="align-items: center; margin-bottom: 8px; background: #d1fae5; padding: 6px; border-radius: 6px;">
                         <div>
-                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">Admin (10%):</label>
-                            <input type="number" id="admin-comm" class="admin-input" style="margin-top: 3px;">
+                            <label style="font-size: 0.7em; font-weight: bold; color: #065f46;">Admin (10%):</label>
+                            <input type="number" id="admin-comm" class="admin-input" style="margin-top: 2px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">1st Prize:</label>
-                            <input type="number" id="admin-1st" class="admin-input" style="margin-top: 3px;">
+                            <label style="font-size: 0.7em; font-weight: bold; color: #065f46;">1st Prize:</label>
+                            <input type="number" id="admin-1st" class="admin-input" style="margin-top: 2px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">2nd Prize:</label>
-                            <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 3px;">
+                            <label style="font-size: 0.7em; font-weight: bold; color: #065f46;">2nd Prize:</label>
+                            <input type="number" id="admin-2nd" class="admin-input" style="margin-top: 2px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.75em; font-weight: bold; color: #065f46;">3rd Prize:</label>
-                            <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 3px;">
+                            <label style="font-size: 0.7em; font-weight: bold; color: #065f46;">3rd Prize:</label>
+                            <input type="number" id="admin-3rd" class="admin-input" style="margin-top: 2px;">
                         </div>
                     </div>
 
                     <button onclick="saveNewsToDB()" id="btn-save-post" class="admin-btn-green">Publish Post</button>
-                    <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 6px; padding: 8px;">Cancel Edit</button>
-                </div>
-
-                <!-- File Bulk Upload Section -->
-                <div id="upload-file-section" class="hidden-panel">
-                    <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 8px;">Upload a file containing multiple posts. Valid keys/headers: <strong>title, desc, media, category, startTime, deadline, isPredictionMode, fee</strong></p>
-                    <input type="file" id="admin-bulk-file" accept=".json,.csv" class="modern-input">
-                    <button onclick="processBulkFile()" class="admin-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fas fa-upload"></i> Upload & Process</button>
-                    <a href="#" onclick="downloadSampleFile()" style="font-size: 0.85rem; color: #3b82f6; display: inline-block; margin-top: 10px; text-decoration: none; font-weight: bold;"><i class="fas fa-download"></i> Download Sample Format</a>
+                    <button onclick="resetPostForm()" id="btn-cancel-edit" class="admin-btn-gray hidden-panel" style="width: 100%; margin-top: 6px; padding: 6px;">Cancel Edit</button>
                 </div>
             </div>
 
@@ -746,7 +765,7 @@
         <div id="admin-tab-mcq" class="admin-tab">
             <div class="admin-panel-card purple">
                 <h2 class="admin-card-title"><i class="fas fa-tasks"></i> Manage MCQs & Resolve</h2>
-                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 12px;">Select a post below to set questions or resolve matches that have ended.</p>
+                <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 10px;">Select a post below to set questions or resolve matches that have ended.</p>
                 <div id="admin-mcq-post-list"></div>
             </div>
         </div>
@@ -756,7 +775,7 @@
             <div class="admin-panel-card green">
                 <h2 class="admin-card-title"><i class="fas fa-hand-holding-usd"></i> Withdrawal Requests</h2>
                 <div id="admin-withdrawals-list">
-                    <p style="color: #6b7280; font-size: 0.85rem;">No pending requests.</p>
+                    <p style="color: #6b7280; font-size: 0.8rem;">No pending requests.</p>
                 </div>
             </div>
         </div>
@@ -801,30 +820,52 @@
         </div>
         <div class="modal-body">
             <input type="hidden" id="mcq-target-news-id">
-            
-            <div id="mcq-builder-container" class="mcq-builder-area">
+
+            <!-- MCQ UPLOAD MODE OPTIONS -->
+            <div style="margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+                <label style="font-size: 0.8em; font-weight: bold;">Upload Mode:</label>
+                <select id="mcq-upload-mode" class="admin-input" onchange="toggleMCQUploadMode()">
+                    <option value="manual">Manual Entry</option>
+                    <option value="json">Upload JSON File</option>
+                    <option value="csv">Upload CSV File</option>
+                </select>
             </div>
-            
-            <div style="display: flex; gap: 8px; margin-top: 12px;">
-                <button type="button" onclick="addMCQEditorQuestion()" class="admin-btn-gray" style="flex: 1; padding: 10px;">+ Add Question</button>
-                <button type="button" onclick="saveMCQsToDB()" class="admin-btn-green" style="flex: 2; margin-top: 0;">Save All Questions</button>
+
+            <!-- MANUAL SECTION -->
+            <div id="mcq-manual-section">
+                <div id="mcq-builder-container" class="mcq-builder-area">
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button type="button" onclick="addMCQEditorQuestion()" class="admin-btn-gray" style="flex: 1; padding: 8px;">+ Add Question</button>
+                    <button type="button" onclick="saveMCQsToDB()" class="admin-btn-green" style="flex: 2; margin-top: 0; padding: 8px;">Save All</button>
+                </div>
             </div>
+
+            <!-- FILE UPLOAD SECTION -->
+            <div id="mcq-file-section" class="hidden-panel">
+                <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 8px;">Upload a file containing multiple questions. Valid headers/keys: <strong>question, optionA, optionB, optionC, optionD, correctAnswer</strong> (0 for A, 1 for B...)</p>
+                <input type="file" id="mcq-bulk-file" accept=".json,.csv" class="modern-input">
+                <button onclick="processMCQBulkFile()" class="admin-btn-blue" style="width: 100%; padding: 10px; font-size: 0.95rem;"><i class="fas fa-upload"></i> Upload & Process</button>
+                <a href="#" onclick="downloadMCQSampleFile()" style="font-size: 0.8rem; color: #3b82f6; display: inline-block; margin-top: 8px; text-decoration: none; font-weight: bold;"><i class="fas fa-download"></i> Download Sample Format</a>
+            </div>
+
         </div>
     </div>
 </div>
 
 <!-- MODERN DIALOG MODAL (For Confirm/Prompt) -->
 <div id="modern-dialog" class="overlay-modal hidden-panel" style="z-index: 10000;">
-    <div class="modal-content" style="max-width: 350px; border: 1px solid #374151;">
+    <div class="modal-content" style="max-width: 300px; border: 1px solid #374151;">
         <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
             <h2 class="modal-title" id="dialog-title">Confirm</h2>
         </div>
         <div class="modal-body">
-            <p id="dialog-msg" style="margin-bottom: 12px; color: #e5e7eb; font-size: 0.95rem; line-height: 1.4;"></p>
+            <p id="dialog-msg" style="margin-bottom: 10px; color: #e5e7eb; font-size: 0.85rem; line-height: 1.4;"></p>
             <input type="text" id="dialog-input" class="modern-input hidden-panel" style="margin-bottom: 0;">
-            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px;">
-                <button id="dialog-btn-cancel" class="admin-btn-gray" style="padding: 8px 16px;">Cancel</button>
-                <button id="dialog-btn-confirm" class="admin-btn-blue" style="padding: 8px 16px;">OK</button>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+                <button id="dialog-btn-cancel" class="admin-btn-gray" style="padding: 6px 12px;">Cancel</button>
+                <button id="dialog-btn-confirm" class="admin-btn-blue" style="padding: 6px 12px;">OK</button>
             </div>
         </div>
     </div>
@@ -926,14 +967,14 @@
     let allNewsData = {}; 
     let activeNewsArray =[]; 
     let userPredictions = {}; 
+    let allPredictions = {}; 
     let allLikes = {};
     let allComments = {};
     let allRssFeeds = {}; 
     let currentCommentsNewsId = null;
     
-    let isSwipeDisabled = false; // FLAG FOR SWIPE CONTROL
+    let isSwipeDisabled = false; 
     
-    // UPDATED EXPANDED CATEGORIES LIST
     let dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
     let currentCategory = "all";
     
@@ -952,10 +993,8 @@
     let isFetchingRealtime = false; 
     let DEFAULT_NEWS_IMAGE = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
 
-    // Store URL Post ID to handle sharing behavior directly on Load
     let initialPostId = new URLSearchParams(window.location.search).get('post');
 
-    // Helper for relative time "Today ago" implementation
     function timeAgo(timestamp) {
         if (!timestamp) return '';
         const now = new Date();
@@ -987,7 +1026,6 @@
         return past.toLocaleDateString();
     }
 
-    // DYNAMIC CATEGORY DEFAULT IMAGE ALLOCATOR
     function getDefaultImageForCategory(cat) {
         if(!cat) return DEFAULT_NEWS_IMAGE;
         const c = cat.toLowerCase();
@@ -1116,20 +1154,6 @@
                     document.getElementById('profile-withdraw-bal').innerText = bal;
                 });
                 
-                db.ref('predictions').on('value', snap => {
-                    const allPreds = snap.val() || {};
-                    userPredictions = {};
-                    for(let newsId in allPreds){
-                        if(allPreds[newsId][currentUser.uid]) {
-                            let p = allPreds[newsId][currentUser.uid];
-                            if (p.answers && !Array.isArray(p.answers)) {
-                                p.answers = Object.values(p.answers);
-                            }
-                            userPredictions[newsId] = p;
-                        }
-                    }
-                    renderStream(); 
-                });
             } else {
                 currentUser = null;
                 isAdmin = false;
@@ -1237,7 +1261,7 @@
             const historyArr = Object.keys(data).map(id => ({ id, ...data[id] })).sort((a,b) => b.timestamp - a.timestamp);
             
             if(historyArr.length === 0) {
-                container.innerHTML = '<p style="font-size: 0.85rem; color: #6b7280;">No withdrawal history found.</p>';
+                container.innerHTML = '<p style="font-size: 0.8rem; color: #6b7280;">No withdrawal history found.</p>';
                 return;
             }
             
@@ -1297,7 +1321,6 @@
         const catToRemove = document.getElementById('admin-cat').value;
         if(!catToRemove) return showNotification("Please select a category to remove.", "warning");
         
-        // Cannot remove default categories safely to maintain system stability
         const defaultCats =["headlines", "sports", "jobs", "editorial", "announcement", "education", "snippets", "press", "tech", "politics", "crypto"];
         if(defaultCats.includes(catToRemove.toLowerCase())) {
             return showNotification("Cannot delete default categories.", "error");
@@ -1311,11 +1334,9 @@
                     if(cats[key].toLowerCase() === catToRemove.toLowerCase()) {
                         await db.ref('categories/' + key).remove();
                         
-                        // Remove from the dynamic array locally
                         const index = dynamicCategories.findIndex(c => c.toLowerCase() === catToRemove.toLowerCase());
                         if(index > -1) dynamicCategories.splice(index, 1);
                         
-                        // Reset App view
                         currentCategory = "all";
                         setupCategories();
                         populateAdminCategories();
@@ -1378,7 +1399,6 @@
 
         db.ref('categories').on('value', snap => {
             const cats = snap.val();
-            // Reset to default on fetch, then merge custom additions
             dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
             if(cats) {
                 let customCats = Object.values(cats);
@@ -1405,6 +1425,27 @@
             renderAdminRssList();
             if(isAdmin) {
                 manageAutoRssService();
+            }
+        });
+
+        db.ref('predictions').on('value', snap => {
+            allPredictions = snap.val() || {};
+            
+            if (currentUser) {
+                userPredictions = {};
+                for(let newsId in allPredictions){
+                    if(allPredictions[newsId][currentUser.uid]) {
+                        let p = allPredictions[newsId][currentUser.uid];
+                        if (p.answers && !Array.isArray(p.answers)) {
+                            p.answers = Object.values(p.answers);
+                        }
+                        userPredictions[newsId] = p;
+                    }
+                }
+                renderStream(); 
+            }
+            if (isAdmin && document.getElementById('admin-tab-mcq').classList.contains('active')) {
+                renderAdminMCQList();
             }
         });
 
@@ -1453,14 +1494,12 @@
             }
         }
 
-        // Feature: Automatically push externally shared POST id to the top index so it's directly visible
         if (initialPostId) {
             const targetIdx = activeNewsArray.findIndex(n => n.id === initialPostId);
             if (targetIdx > -1) {
                 const targetPost = activeNewsArray.splice(targetIdx, 1)[0];
                 activeNewsArray.unshift(targetPost);
             }
-            // Clear from URL state without refreshing so regular swiping resumes smoothly after
             window.history.replaceState({}, document.title, window.location.pathname);
             initialPostId = null;
         }
@@ -1487,7 +1526,7 @@
     }
 
     window.toggleReadMore = function(e, id) {
-        e.stopPropagation(); // prevent swipe conflicts
+        e.stopPropagation(); 
         const snippet = document.getElementById(`snippet-${id}`);
         const btn = document.getElementById(`rm-btn-${id}`);
         const fullBtn = document.getElementById(`full-btn-${id}`);
@@ -1497,19 +1536,19 @@
             snippet.classList.add('text-expanded');
             btn.innerText = 'Read less';
             if (fullBtn) fullBtn.classList.remove('hidden-panel');
-            isSwipeDisabled = true; // Disable vertical swipe navigation on Read More
+            isSwipeDisabled = true; 
         } else {
             snippet.classList.remove('text-expanded');
             snippet.classList.add('text-clamped');
             snippet.scrollTop = 0;
             btn.innerText = 'Read more';
             if (fullBtn) fullBtn.classList.add('hidden-panel');
-            isSwipeDisabled = false; // Enable vertical swipe navigation when closed
+            isSwipeDisabled = false; 
         }
     };
 
     function renderStream() {
-        isSwipeDisabled = false; // Reset whenever stream updates
+        isSwipeDisabled = false; 
         DOM.newsStream.innerHTML = '';
         
         activeCountdownIntervals.forEach(clearInterval); activeCountdownIntervals =[];
@@ -1529,8 +1568,9 @@
             const hasDeadline = news.deadline && news.deadline !== "";
             const isClosed = (hasDeadline && now > new Date(news.deadline).getTime()) || news.status === 'resolved';
             const hasPredicted = !!userPredictions[news.id];
-            const hasQuestions = news.questions && news.questions.length > 0;
-            const isReadyForPrediction = hasDeadline && hasQuestions;
+            
+            // Allow joining early regardless of whether admin has populated questions yet
+            const isReadyForPrediction = hasDeadline;
 
             const card = document.createElement('div');
             card.className = "news-card";
@@ -1549,16 +1589,18 @@
 
                 if(news.status === 'resolved') {
                     btnHtml = `<button onclick="showLeaderboard('${news.id}')" class="btn-predict btn-purple">View Match Results & Winners</button>`;
-                } else if(!hasStarted) {
-                    btnHtml = `<button disabled class="btn-predict btn-closed">Predict Starts Later</button>`;
-                } else if(isClosed && hasDeadline) {
+                } else if (isClosed && hasDeadline) {
                     btnHtml = `<button disabled class="btn-predict btn-closed">Predict Closed (Awaiting Results)</button>`;
                 } else if (!isReadyForPrediction) {
                     btnHtml = ``;
                 } else {
-                    btnHtml = `<button onclick="openPredictionModal('${news.id}')" class="btn-predict ${hasPredicted ? 'btn-yellow' : ''}">
-                                ${hasPredicted ? '<i class="fas fa-edit"></i> Update Prediction' : '<i class="fas fa-bolt"></i> Predict Now (Fee: '+news.fee+')'}
-                               </button>`;
+                    if (hasPredicted && userPredictions[news.id].submitted) {
+                        btnHtml = `<button onclick="openPredictionModal('${news.id}')" class="btn-predict btn-yellow"><i class="fas fa-eye"></i> View Your Answers</button>`;
+                    } else if (hasPredicted) {
+                        btnHtml = `<button onclick="openPredictionModal('${news.id}')" class="btn-predict btn-yellow"><i class="fas fa-edit"></i> Complete Prediction</button>`;
+                    } else {
+                        btnHtml = `<button onclick="handlePredictClick('${news.id}')" class="btn-predict"><i class="fas fa-bolt"></i> Predict Now (Fee: ${news.fee})</button>`;
+                    }
                 }
             }
 
@@ -1597,7 +1639,6 @@
                             </div>
                         </div>
                         
-                        <!-- Social Actions Grouped Inside Text Container at the bottom -->
                         <div class="inline-actions">
                             <button onclick="toggleLike('${news.id}')" class="inline-action-btn" id="btn-like-${news.id}">
                                 <i class="fas fa-heart"></i><span id="like-count-${news.id}">0</span>
@@ -1648,15 +1689,14 @@
                         const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
                         const s = Math.floor((dist % (1000 * 60)) / 1000);
                         timerEl.innerHTML = `<i class="far fa-clock"></i> Starts in: ${d}d ${h}h ${m}m ${s}s`;
-                        timerEl.style.color = '#60a5fa'; // Blue for upcoming
+                        timerEl.style.color = '#60a5fa'; 
                     } else if (hasDeadline) {
                         const dist = new Date(news.deadline).getTime() - nowTime;
                         if (dist < 0) {
                             clearInterval(interval); timerEl.innerText = "Deadline Passed"; timerEl.style.color = '#ff4444';
-                            // AUTO SUBMIT TRIGGER
                             if(!document.getElementById('prediction-modal').classList.contains('hidden-panel') && document.getElementById('modal-news-id').value === news.id) {
                                 if(document.getElementById('btn-submit-prediction') && !document.getElementById('btn-submit-prediction').classList.contains('hidden-panel')) {
-                                    submitPrediction(); // programmatically submit
+                                    submitPrediction(); 
                                 }
                             }
                         } else {
@@ -1665,7 +1705,7 @@
                             const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
                             const s = Math.floor((dist % (1000 * 60)) / 1000);
                             timerEl.innerHTML = `<i class="far fa-clock"></i> Closes in: ${d}d ${h}h ${m}m ${s}s`;
-                            timerEl.style.color = '#ffeb3b'; // Yellow for active
+                            timerEl.style.color = '#ffeb3b'; 
                         }
                     }
                 }, 1000);
@@ -1673,6 +1713,63 @@
             }
         });
         renderStreamDecorations();
+    }
+
+    // USER PREDICTION WALLET AGREEMENT FLOW
+    async function handlePredictClick(newsId) {
+        if(!currentUser) return showPanel('auth');
+
+        const news = allNewsData[newsId];
+        if(!news) return;
+
+        // 1. Immediate local check
+        if (userPredictions[newsId]) {
+            openPredictionModal(newsId);
+            return;
+        }
+
+        // 2. Absolute DB Check to ensure we NEVER double deduct on a page refresh race condition
+        const predSnap = await db.ref(`predictions/${newsId}/${currentUser.uid}`).once('value');
+        if (predSnap.exists()) {
+            userPredictions[newsId] = predSnap.val(); // Sync local state
+            openPredictionModal(newsId);
+            return;
+        }
+        
+        const hasDeadline = news.deadline && news.deadline !== "";
+        const isClosed = (hasDeadline && new Date().getTime() > new Date(news.deadline).getTime()) || news.status === 'resolved';
+        if (isClosed) return showNotification("Prediction is closed!", "warning");
+
+        const fee = news.fee || 0;
+        const msg = `Entry fee is ${fee} Coins. This amount will be deducted from your wallet to enter the prediction. Do you agree?`;
+        
+        const agreed = await customConfirm(msg);
+        if (!agreed) return;
+
+        const snap = await db.ref(`users/${currentUser.uid}/wallet`).once('value');
+        let wallet = snap.val() || 0;
+        
+        if (wallet < fee) {
+            showNotification("Insufficient balance! Please top up your wallet.", "error");
+            openTopUpModal();
+            return;
+        }
+
+        // Deduct wallet directly
+        await db.ref(`users/${currentUser.uid}`).update({ wallet: wallet - fee });
+        
+        // Push an empty placeholder so we know user has joined immediately
+        let emptyAnswers =[];
+        let qCount = news.questions ? (Array.isArray(news.questions) ? news.questions.length : Object.values(news.questions).length) : 0;
+        for(let i=0; i<qCount; i++) emptyAnswers.push(-1);
+
+        await db.ref(`predictions/${newsId}/${currentUser.uid}`).set({
+            answers: emptyAnswers,
+            submitted: false,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        openPredictionModal(newsId);
     }
 
     // SOCIAL FUNCTIONS (LIKE, COMMENT, SHARE)
@@ -1713,7 +1810,6 @@
         
         shareText += `📖 Read more please visit website: `;
 
-        // Appending exactly which post to jump to on the URL
         const shareUrl = window.location.origin + window.location.pathname + "?post=" + newsId;
         
         let shareData = { 
@@ -1722,7 +1818,6 @@
             url: shareUrl 
         };
 
-        // Try dynamically converting the image into a Shareable File natively so we don't display it as a boring text URL link
         if (news.mediaUrls && news.mediaUrls.length > 0) {
             try {
                 const response = await fetch(news.mediaUrls[0]);
@@ -1735,8 +1830,8 @@
 
                 const file = new File([blob], `media.${ext}`, { type: blob.type || 'image/jpeg' });
                 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    shareData.files = [file];
+                if (navigator.canShare && navigator.canShare({ files:[file] })) {
+                    shareData.files =[file];
                 }
             } catch (e) {
                 console.log('Error attaching media file to share (falling back to standard link share):', e);
@@ -1750,7 +1845,6 @@
         }
     }
     
-    // CUSTOM TIME FORMATTER FOR COMMENTS
     function formatCommentTime(ts) {
         if (!ts) return '';
         const date = new Date(ts);
@@ -1776,7 +1870,6 @@
         document.getElementById('comment-news-id').value = newsId;
         document.getElementById('comment-modal').classList.remove('hidden-panel');
         
-        // Setup Post Preview Auto-Swipe and Scroll
         if(commentCarouselInterval) clearInterval(commentCarouselInterval);
         if(commentTextScrollInterval) clearInterval(commentTextScrollInterval);
 
@@ -1806,7 +1899,6 @@
             </div>
         `;
 
-        // Start Auto-Swipe Carousel
         if((mType === 'image' || mType === 'carousel') && mUrls.length > 1) {
             let cIndex = 0;
             const slides = previewContainer.querySelectorAll('.comment-slide');
@@ -1823,7 +1915,6 @@
             }, 3000);
         }
 
-        // Start Auto-Scroll Text
         const textWrap = document.getElementById('cp-text-wrap');
         const textEl = document.getElementById('cp-text');
         
@@ -1832,11 +1923,11 @@
             const textHeight = textEl.clientHeight;
             
             if(textHeight > wrapHeight) {
-                let currentY = wrapHeight; // start from bottom
+                let currentY = wrapHeight; 
                 commentTextScrollInterval = setInterval(() => {
                     currentY -= 0.5;
                     if (currentY <= -textHeight) {
-                        currentY = wrapHeight; // reset position
+                        currentY = wrapHeight; 
                     }
                     textEl.style.transform = `translateY(${currentY}px)`;
                 }, 30);
@@ -1919,7 +2010,6 @@
     async function deleteComment(newsId, commentId) {
         if(await customConfirm("Delete this comment?")) {
             await db.ref(`comments/${newsId}/${commentId}`).remove();
-            // Find and delete any replies recursively
             const cArr = Object.keys(allComments[newsId]||{}).map(id=>({id, ...allComments[newsId][id]}));
             const replies = cArr.filter(c => c.parentId === commentId);
             for(let r of replies) await db.ref(`comments/${newsId}/${r.id}`).remove();
@@ -1949,7 +2039,7 @@
     function handleCardScroll(e) { if(e.target.scrollTop > 0) e.stopPropagation(); }
     
     DOM.newsStream.addEventListener('touchstart', e => {
-        if (isSwipeDisabled) return; // Prevent swipe if disabled
+        if (isSwipeDisabled) return; 
         if (e.touches.length > 1) return;
         isDragging = true; 
         touchStartY = e.touches[0].clientY;
@@ -1962,20 +2052,15 @@
         const dragDeltaY = e.touches[0].clientY - touchStartY;
         const dragDeltaX = e.touches[0].clientX - touchStartX;
         
-        // Handle vertical drag smoothly
         if(Math.abs(dragDeltaY) > Math.abs(dragDeltaX)) {
-            // Using percentages (%) consistently avoids mobile viewport jumps 
             const dragPercent = (dragDeltaY / window.innerHeight) * 100;
             const currentPercent = -currentNewsIndex * 100;
-            
             let targetPercent = currentPercent + dragPercent;
             
-            // Rubber-band resistance effect on first and last card
             if ((currentNewsIndex === 0 && dragDeltaY > 0) || (currentNewsIndex === activeNewsArray.length - 1 && dragDeltaY < 0)) {
                 targetPercent = currentPercent + (dragPercent * 0.3);
             } 
             
-            // translate3d forces GPU hardware acceleration for 60FPS smoothness
             DOM.newsStream.style.transform = `translate3d(0, ${targetPercent}%, 0)`;
         }
     });
@@ -1986,11 +2071,9 @@
         const finalDragDeltaY = e.changedTouches[0].clientY - touchStartY;
         const finalDragDeltaX = e.changedTouches[0].clientX - touchStartX;
         
-        // Tweak threshold for better swipe sensitivity
         const thresholdY = window.innerHeight / 6; 
         const thresholdX = window.innerWidth / 3.5;
 
-        // Check for Horizontal Swipe (Category change)
         if (Math.abs(finalDragDeltaX) > thresholdX && Math.abs(finalDragDeltaX) > Math.abs(finalDragDeltaY)) {
             let cats =["all", "trending", "predictions", ...dynamicCategories.map(c=>c.toLowerCase())];
             let cIdx = cats.indexOf(currentCategory);
@@ -2004,7 +2087,6 @@
             return;
         }
 
-        // Vertical scroll swipe snapping
         if (Math.abs(finalDragDeltaY) > thresholdY) {
             if (finalDragDeltaY < 0 && currentNewsIndex < activeNewsArray.length - 1) {
                 currentNewsIndex++;
@@ -2026,7 +2108,6 @@
         if (animate) DOM.newsStream.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
         else DOM.newsStream.style.transition = 'none';
         
-        // Updated to use translate3d here as well
         DOM.newsStream.style.transform = `translate3d(0, ${targetPercent}%, 0)`;
     }
 
@@ -2035,6 +2116,9 @@
         if(id === 'comment-modal') {
             if(commentCarouselInterval) clearInterval(commentCarouselInterval);
             if(commentTextScrollInterval) clearInterval(commentTextScrollInterval);
+        }
+        if(id === 'prediction-modal') {
+            if (window.modalCountdownInterval) clearInterval(window.modalCountdownInterval);
         }
     }
 
@@ -2047,10 +2131,6 @@
             
             const hasStartTime = news.startTime && news.startTime !== "";
             const hasStarted = !hasStartTime || new Date().getTime() >= new Date(news.startTime).getTime();
-            
-            if (!hasStarted) {
-                return showNotification("Prediction has not started yet!", "warning");
-            }
 
             document.getElementById('prediction-modal').classList.remove('hidden-panel');
             document.getElementById('modal-title').innerText = "Loading...";
@@ -2065,6 +2145,7 @@
             const userPred = userPredictions[newsId];
             const hasDeadline = news.deadline && news.deadline !== "";
             const isClosed = hasDeadline && (new Date().getTime() > new Date(news.deadline).getTime());
+            const isSubmitted = userPred && userPred.submitted === true;
 
             document.getElementById('modal-title').innerText = news.title || "Prediction Details";
             document.getElementById('modal-news-id').value = newsId;
@@ -2084,82 +2165,133 @@
             const otherUsersContainer = document.getElementById('modal-other-users');
             const submitBtn = document.getElementById('btn-submit-prediction');
 
-            if(news.questions.length === 0) {
+            if (!hasStarted) {
+                qContainer.innerHTML = `
+                    <div style="text-align:center; padding: 40px 10px; background: rgba(31, 41, 55, 0.5); border-radius: 8px; border: 1px dashed #4b5563; margin-bottom: 15px;">
+                        <i class="fas fa-lock" style="font-size: 3em; color: #60a5fa; margin-bottom: 15px;"></i>
+                        <h3 style="color: #e5e7eb; margin-bottom: 5px;">Questions Locked</h3>
+                        <p style="color: #9ca3af; font-size: 0.85rem;">The questions will be revealed exactly when the timer hits zero.</p>
+                    </div>`;
+            } else if(news.questions.length === 0) {
                 qContainer.innerHTML = `<p style="color:#f87171; text-align:center;">Questions will be added by admin soon!</p>`;
-                submitBtn.classList.add('hidden-panel');
-                return;
-            }
-
-            let stats = {};
-            if (userPred || isClosed) {
-                const snap = await db.ref(`predictions/${newsId}`).once('value');
-                const allP = snap.val() || {};
-                const total = Object.keys(allP).length;
-                
-                news.questions.forEach((q, i) => {
-                    stats[i] = {0:0, 1:0, 2:0, 3:0, "-1":0};
-                    for(let uid in allP){
-                        let pAnsArray = allP[uid].answers;
-                        if (pAnsArray && !Array.isArray(pAnsArray)) pAnsArray = Object.values(pAnsArray);
-                        let ansIdx = pAnsArray ? pAnsArray[i] : undefined;
-                        if(ansIdx !== undefined && stats[i][ansIdx] !== undefined) stats[i][ansIdx]++;
-                    }
-                    for(let optIdx in stats[i]) stats[i][optIdx] = total ? Math.round((stats[i][optIdx]/total)*100) : 0;
-                });
-                document.getElementById('public-stats-container').classList.remove('hidden-panel');
-                document.getElementById('public-stats-container').innerHTML = `<h3><i class="fas fa-users"></i> Public Opinion (${total} entries)</h3>`;
-            }
-
-            const optionLabels =['A', 'B', 'C', 'D'];
-            news.questions.forEach((q, qIdx) => {
-                let html = `<div class="question-card"><h4 class="question-title">${qIdx + 1}. ${q.question || "Question"}</h4><div>`;
-                let safeOptions = Array.isArray(q.options) ? q.options : Object.values(q.options ||["A","B","C","D"]);
-                
-                safeOptions.forEach((opt, optIdx) => {
-                    const isChecked = userPred && userPred.answers && parseInt(userPred.answers[qIdx]) === optIdx ? 'checked' : '';
-                    const disabled = isClosed ? 'disabled' : '';
-                    let statHtml = '';
-                    if((userPred || isClosed) && stats[qIdx]) {
-                        const pct = stats[qIdx][optIdx] || 0;
-                        statHtml = `<div class="progress-bg"><div class="progress-fill" style="width: ${pct}%"></div></div><span class="progress-text">${pct}%</span><div style="clear:both;"></div>`;
-                    }
-                    let correctHtml = '';
-                    if(isClosed && q.correctAnswer === optIdx) {
-                        correctHtml = `<span style="color:#4ade80; font-weight:bold; margin-left:8px;"><i class="fas fa-check-circle"></i> Correct</span>`;
-                    }
-                    html += `<label class="option-label ${isChecked}">
-                        <div class="option-flex">
-                            <input type="radio" name="q_${qIdx}" value="${optIdx}" ${isChecked ? 'checked' : ''} ${disabled}>
-                            <span><strong>${optionLabels[optIdx] || '?'}.</strong> ${opt} ${correctHtml}</span>
-                        </div>
-                        ${statHtml}
-                    </label>`;
-                });
-
-                // Add Unattempted Explicit Option
-                const isSkipped = !userPred || !userPred.answers || parseInt(userPred.answers[qIdx]) === -1 || userPred.answers[qIdx] === undefined;
-                html += `<label class="option-label ${isSkipped ? 'checked' : ''}">
-                    <div class="option-flex">
-                        <input type="radio" name="q_${qIdx}" value="-1" ${isSkipped ? 'checked' : ''} ${isClosed ? 'disabled' : ''}>
-                        <span style="color:#9ca3af;"><strong>-</strong> Skip / Leave Unattempted (0 marks)</span>
-                    </div>
-                </label></div></div>`;
-
-                qContainer.innerHTML += html;
-            });
-
-            if (isClosed) {
-                submitBtn.classList.add('hidden-panel');
-                document.getElementById('modal-countdown').innerText = "Predictions are locked!";
             } else {
-                submitBtn.classList.remove('hidden-panel');
-                submitBtn.innerText = userPred ? "Update Prediction" : `Submit Prediction (Fee: ${news.fee || 0})`;
-                document.getElementById('modal-countdown').innerText = "";
+                let stats = {};
+                if (userPred || isClosed) {
+                    const snap = await db.ref(`predictions/${newsId}`).once('value');
+                    const allP = snap.val() || {};
+                    const total = Object.keys(allP).length;
+                    
+                    news.questions.forEach((q, i) => {
+                        stats[i] = {0:0, 1:0, 2:0, 3:0, "-1":0};
+                        for(let uid in allP){
+                            let pAnsArray = allP[uid].answers;
+                            if (pAnsArray && !Array.isArray(pAnsArray)) pAnsArray = Object.values(pAnsArray);
+                            let ansIdx = pAnsArray ? pAnsArray[i] : undefined;
+                            if(ansIdx !== undefined && stats[i][ansIdx] !== undefined) stats[i][ansIdx]++;
+                        }
+                        for(let optIdx in stats[i]) stats[i][optIdx] = total ? Math.round((stats[i][optIdx]/total)*100) : 0;
+                    });
+                    document.getElementById('public-stats-container').classList.remove('hidden-panel');
+                    document.getElementById('public-stats-container').innerHTML = `<h3><i class="fas fa-users"></i> Public Opinion (${total} entries)</h3>`;
+                }
+
+                const optionLabels =['A', 'B', 'C', 'D'];
+                news.questions.forEach((q, qIdx) => {
+                    let html = `<div class="question-card"><h4 class="question-title">${qIdx + 1}. ${q.question || "Question"}</h4><div>`;
+                    let safeOptions = Array.isArray(q.options) ? q.options : Object.values(q.options ||["A","B","C","D"]);
+                    
+                    safeOptions.forEach((opt, optIdx) => {
+                        const isChecked = userPred && userPred.answers && parseInt(userPred.answers[qIdx]) === optIdx ? 'checked' : '';
+                        const disabled = (isClosed || !hasStarted || isSubmitted) ? 'disabled' : '';
+                        let statHtml = '';
+                        if((userPred || isClosed) && stats[qIdx]) {
+                            const pct = stats[qIdx][optIdx] || 0;
+                            statHtml = `<div class="progress-bg"><div class="progress-fill" style="width: ${pct}%"></div></div><span class="progress-text">${pct}%</span><div style="clear:both;"></div>`;
+                        }
+                        let correctHtml = '';
+                        if(isClosed && q.correctAnswer === optIdx) {
+                            correctHtml = `<span style="color:#4ade80; font-weight:bold; margin-left:8px;"><i class="fas fa-check-circle"></i> Correct</span>`;
+                        }
+                        html += `<label class="option-label ${isChecked} ${disabled}">
+                            <div class="option-flex">
+                                <input type="radio" name="q_${qIdx}" value="${optIdx}" ${isChecked ? 'checked' : ''} ${disabled}>
+                                <span><strong>${optionLabels[optIdx] || '?'}.</strong> ${opt} ${correctHtml}</span>
+                            </div>
+                            ${statHtml}
+                        </label>`;
+                    });
+
+                    const isSkipped = !userPred || !userPred.answers || parseInt(userPred.answers[qIdx]) === -1 || userPred.answers[qIdx] === undefined;
+                    html += `<label class="option-label ${isSkipped ? 'checked' : ''} ${(isClosed || !hasStarted || isSubmitted) ? 'disabled' : ''}">
+                        <div class="option-flex">
+                            <input type="radio" name="q_${qIdx}" value="-1" ${isSkipped ? 'checked' : ''} ${(isClosed || !hasStarted || isSubmitted) ? 'disabled' : ''}>
+                            <span style="color:#9ca3af;"><strong>-</strong> Skip / Leave Unattempted (0 marks)</span>
+                        </div>
+                    </label></div></div>`;
+
+                    qContainer.innerHTML += html;
+                });
             }
 
-            if (userPred) {
-                let otherUsersHtml = `<div style="margin-top: 24px; border-top: 1px solid #4b5563; padding-top: 16px;">
-                    <h3 style="color:#60a5fa; margin-bottom:12px;"><i class="fas fa-eye"></i> Other Users' Predictions</h3>`;
+            if (isClosed || isSubmitted) {
+                submitBtn.classList.add('hidden-panel');
+                if (isSubmitted && !isClosed) {
+                    document.getElementById('modal-countdown').innerText = "Answers submitted securely.";
+                    document.getElementById('modal-countdown').style.color = "#4ade80";
+                } else {
+                    document.getElementById('modal-countdown').innerText = "Predictions are locked!";
+                    document.getElementById('modal-countdown').style.color = "#facc15";
+                }
+            } else if (!hasStarted) {
+                submitBtn.classList.add('hidden-panel');
+                document.getElementById('modal-countdown').innerText = "Waiting for prediction to start...";
+                document.getElementById('modal-countdown').style.color = "#60a5fa"; 
+            } else if (news.questions.length > 0) {
+                submitBtn.classList.remove('hidden-panel');
+                submitBtn.innerText = "Save Answers";
+                document.getElementById('modal-countdown').innerText = "";
+                document.getElementById('modal-countdown').style.color = "#facc15"; 
+            }
+
+            // MODAL LIVE COUNTDOWN LOGIC
+            if (window.modalCountdownInterval) clearInterval(window.modalCountdownInterval);
+            
+            if (!isClosed && !hasStarted && !isSubmitted) {
+                window.modalCountdownInterval = setInterval(() => {
+                    const nowTime = new Date().getTime();
+                    const dist = new Date(news.startTime).getTime() - nowTime;
+                    if (dist <= 0) {
+                        clearInterval(window.modalCountdownInterval);
+                        openPredictionModal(newsId); 
+                    } else {
+                        const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((dist % (1000 * 60)) / 1000);
+                        document.getElementById('modal-countdown').innerText = `Starts in: ${d}d ${h}h ${m}m ${s}s`;
+                    }
+                }, 1000);
+            } else if (!isClosed && hasStarted && !isSubmitted) {
+                window.modalCountdownInterval = setInterval(() => {
+                    const nowTime = new Date().getTime();
+                    const dist = new Date(news.deadline).getTime() - nowTime;
+                    if (dist <= 0) {
+                        clearInterval(window.modalCountdownInterval);
+                        document.getElementById('modal-countdown').innerText = "Predictions are locked!";
+                        submitBtn.classList.add('hidden-panel');
+                    } else {
+                        const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((dist % (1000 * 60)) / 1000);
+                        document.getElementById('modal-countdown').innerText = `Closes in: ${d}d ${h}h ${m}m ${s}s`;
+                    }
+                }, 1000);
+            }
+
+            if (userPred && userPred.submitted) { 
+                let otherUsersHtml = `<div style="margin-top: 20px; border-top: 1px solid #4b5563; padding-top: 15px;">
+                    <h3 style="color:#60a5fa; margin-bottom:10px;"><i class="fas fa-eye"></i> Other Users' Predictions</h3>`;
                 const predsSnap = await db.ref(`predictions/${newsId}`).once('value');
                 const usersSnap = await db.ref(`users`).once('value');
                 const allP = predsSnap.val() || {};
@@ -2168,12 +2300,16 @@
                 let hasOthers = false;
                 for(let uid in allP) {
                     if(uid === currentUser.uid) continue;
+                    
+                    let pData = allP[uid];
+                    if (!pData.submitted) continue; // Only show submitted answers
+                    
                     hasOthers = true;
                     
                     let uName = "User";
                     if(allU[uid]) uName = allU[uid].name || (allU[uid].email ? allU[uid].email.split('@')[0] : "User");
                     
-                    let pAns = allP[uid].answers;
+                    let pAns = pData.answers;
                     if (pAns && !Array.isArray(pAns)) pAns = Object.values(pAns);
                     else if (!pAns) pAns =[];
                     
@@ -2182,12 +2318,12 @@
                         return `Q${i+1}: ${optionLabels[aIdx] || '?'}`
                     }).join(' | ');
 
-                    otherUsersHtml += `<div style="background:rgba(55, 65, 81, 0.6); padding:10px; border-radius:8px; margin-bottom:8px;">
-                        <div style="font-weight:bold; color:#e5e7eb; margin-bottom:2px; font-size:0.95rem;">${uName}</div>
-                        <div style="color:#9ca3af; font-size:0.85rem;">Answers: ${ansText}</div>
+                    otherUsersHtml += `<div style="background:rgba(55, 65, 81, 0.6); padding:8px; border-radius:8px; margin-bottom:6px;">
+                        <div style="font-weight:bold; color:#e5e7eb; margin-bottom:2px; font-size:0.85rem;">${uName}</div>
+                        <div style="color:#9ca3af; font-size:0.8rem;">Answers: ${ansText}</div>
                     </div>`;
                 }
-                if(!hasOthers) otherUsersHtml += `<p style="font-size:0.85rem; color:#9ca3af;">No other predictions yet.</p>`;
+                if(!hasOthers) otherUsersHtml += `<p style="font-size:0.8rem; color:#9ca3af;">No other submitted predictions yet.</p>`;
                 otherUsersHtml += `</div>`;
                 otherUsersContainer.innerHTML = otherUsersHtml;
             }
@@ -2219,19 +2355,103 @@
             else answers.push(-1); 
         });
 
-        if(!userPredictions[newsId]) {
-            const snap = await db.ref(`users/${currentUser.uid}/wallet`).once('value');
-            let wallet = snap.val() || 0;
-            if(wallet < (news.fee || 0)) return showNotification("Not enough coins!", "error");
-            await db.ref(`users/${currentUser.uid}`).update({ wallet: wallet - (news.fee || 0) });
-        }
-
-        await db.ref(`predictions/${newsId}/${currentUser.uid}`).set({
-            answers, timestamp: firebase.database.ServerValue.TIMESTAMP
+        await db.ref(`predictions/${newsId}/${currentUser.uid}`).update({
+            answers, 
+            submitted: true,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-        showNotification("Prediction Saved!", "success");
+        showNotification("Prediction Saved! You cannot change answers now.", "success");
         closeModal('prediction-modal');
     }
+    
+    // GLOBAL TICKER FOR UPCOMING PREDICTIONS BANNER & AUTO-OPEN
+    const autoOpenedSet = new Set();
+    let currentBannerIndex = 0;
+    let lastBannerSwipeTime = 0;
+    let lastDisplayedBannerIndex = -1;
+
+    setInterval(() => {
+        if(!currentUser) return;
+        const now = new Date().getTime();
+        let upcoming =[];
+
+        for(let newsId in userPredictions) {
+            const news = allNewsData[newsId];
+            if(!news) continue;
+
+            const hasStartTime = news.startTime && news.startTime !== "";
+            if(hasStartTime) {
+                const startTimeMs = new Date(news.startTime).getTime();
+                const hasStarted = now >= startTimeMs;
+                const hasDeadline = news.deadline && news.deadline !== "";
+                const isClosed = (hasDeadline && now > new Date(news.deadline).getTime()) || news.status === 'resolved';
+
+                if (!hasStarted && !isClosed) {
+                    upcoming.push(news);
+                } else if (hasStarted && !isClosed && !autoOpenedSet.has(newsId)) {
+                    if (now - startTimeMs >= 0 && now - startTimeMs < 5000) {
+                        autoOpenedSet.add(newsId);
+                        
+                        const currentModalNewsId = document.getElementById('modal-news-id').value;
+                        const isModalHidden = document.getElementById('prediction-modal').classList.contains('hidden-panel');
+                        
+                        if (isModalHidden || currentModalNewsId !== newsId) {
+                            showNotification(`🔥 ${news.title} is starting now!`, "info");
+                            openPredictionModal(newsId);
+                        }
+                    }
+                }
+            }
+        }
+
+        const banner = document.getElementById('upcoming-banner');
+        if (upcoming.length === 0) {
+            if(banner) banner.classList.add('hidden-panel');
+            document.documentElement.style.setProperty('--upcoming-banner-height', '0px');
+        } else {
+            if(banner) {
+                banner.classList.remove('hidden-panel');
+                document.documentElement.style.setProperty('--upcoming-banner-height', '30px');
+                
+                let indexChanged = false;
+                if (now - lastBannerSwipeTime > 3500) {
+                    currentBannerIndex = (currentBannerIndex + 1) % upcoming.length;
+                    lastBannerSwipeTime = now;
+                    indexChanged = true;
+                }
+                
+                if (currentBannerIndex >= upcoming.length) {
+                    currentBannerIndex = 0;
+                    indexChanged = true;
+                }
+                
+                const targetNews = upcoming[currentBannerIndex];
+                const startTimeMs = new Date(targetNews.startTime).getTime();
+                const dist = startTimeMs - now;
+                
+                if (dist > 0) {
+                    const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((dist % (1000 * 60)) / 1000);
+                    
+                    let timeStr = "";
+                    if(d > 0) timeStr += `${d}d `;
+                    timeStr += `${h}h ${m}m ${s}s`;
+                    
+                    let currentCat = targetNews.category ? targetNews.category.toUpperCase() : 'PREDICTION';
+                    
+                    if (indexChanged || lastDisplayedBannerIndex !== currentBannerIndex || !banner.querySelector('.time-val')) {
+                        banner.innerHTML = `<div class="banner-content"><i class="fas fa-clock" style="color:#facc15;"></i> <strong>${currentCat}</strong>: Starts in <span class="time-val" style="color:#60a5fa;">${timeStr}</span> <span style="font-size:0.7em; color:#9ca3af; margin-left:5px;">(${currentBannerIndex+1}/${upcoming.length})</span></div>`;
+                        lastDisplayedBannerIndex = currentBannerIndex;
+                    } else {
+                        const timeSpan = banner.querySelector('.time-val');
+                        if (timeSpan) timeSpan.innerText = timeStr;
+                    }
+                }
+            }
+        }
+    }, 1000);
 
     /* ADMIN PANEL */
     function switchAdminTab(tabId) {
@@ -2253,7 +2473,6 @@
     function manageAutoRssService() {
         if (!isAdmin) return;
         
-        // Clear old intervals
         if (window.rssIntervals) {
             Object.values(window.rssIntervals).forEach(clearInterval);
         }
@@ -2263,13 +2482,11 @@
             const feed = allRssFeeds[feedId];
             const intervalMs = (feed.intervalMins || 30) * 60 * 1000;
             
-            // Initial check if passed time
             const now = Date.now();
             if (!feed.lastChecked || (now - feed.lastChecked) > intervalMs) {
                 checkSingleRssFeed(feedId, feed);
             }
             
-            // Setup continuous auto-interval
             window.rssIntervals[feedId] = setInterval(() => {
                 checkSingleRssFeed(feedId, feed);
             }, intervalMs);
@@ -2411,7 +2628,7 @@
         
         const ids = Object.keys(allRssFeeds);
         if (ids.length === 0) {
-            list.innerHTML = '<p style="font-size:0.85rem; color:#6b7280;">No auto feeds active.</p>';
+            list.innerHTML = '<p style="font-size:0.8rem; color:#6b7280;">No auto feeds active.</p>';
             return;
         }
         
@@ -2420,10 +2637,10 @@
             const lastCheckedStr = feed.lastChecked ? new Date(feed.lastChecked).toLocaleTimeString() : 'Never';
             
             list.innerHTML += `
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="overflow: hidden; padding-right: 10px;">
-                    <strong style="font-size: 0.9em; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.url}</strong>
-                    <span style="font-size: 0.8em; color: #6b7280;">Cat: ${feed.category} | Every ${feed.intervalMins}m | Last Check: ${lastCheckedStr}</span>
+                    <strong style="font-size: 0.85em; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.url}</strong>
+                    <span style="font-size: 0.75em; color: #6b7280;">Cat: ${feed.category} | Every ${feed.intervalMins}m | Last Check: ${lastCheckedStr}</span>
                 </div>
                 <div style="display: flex; gap: 5px;">
                     <button onclick="checkSingleRssFeed('${id}', allRssFeeds['${id}'])" class="admin-sm-btn" style="background:#3b82f6;" title="Force Check Now"><i class="fas fa-sync-alt"></i></button>
@@ -2446,40 +2663,37 @@
         return { type: 'image', urls };
     }
 
-    // BULK UPLOAD FEATURES (MANUAL, JSON, CSV)
-    function toggleUploadMode() {
-        const mode = document.getElementById('admin-upload-mode').value;
+    function toggleMCQUploadMode() {
+        const mode = document.getElementById('mcq-upload-mode').value;
         if (mode === 'manual') {
-            document.getElementById('upload-manual-section').classList.remove('hidden-panel');
-            document.getElementById('upload-file-section').classList.add('hidden-panel');
+            document.getElementById('mcq-manual-section').classList.remove('hidden-panel');
+            document.getElementById('mcq-file-section').classList.add('hidden-panel');
         } else {
-            document.getElementById('upload-manual-section').classList.add('hidden-panel');
-            document.getElementById('upload-file-section').classList.remove('hidden-panel');
-            const fileInput = document.getElementById('admin-bulk-file');
+            document.getElementById('mcq-manual-section').classList.add('hidden-panel');
+            document.getElementById('mcq-file-section').classList.remove('hidden-panel');
+            const fileInput = document.getElementById('mcq-bulk-file');
             fileInput.accept = mode === 'json' ? '.json' : '.csv';
         }
     }
 
-    function downloadSampleFile() {
-        const mode = document.getElementById('admin-upload-mode').value;
+    function downloadMCQSampleFile() {
+        const mode = document.getElementById('mcq-upload-mode').value;
         let content = "";
         let filename = "";
         if (mode === 'json') {
             content = JSON.stringify([{
-                "title": "Sample Bulk Post 1",
-                "desc": "This is a sample description.",
-                "media": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80",
-                "category": "sports",
-                "startTime": "2026-01-01T10:00",
-                "deadline": "2026-12-31T23:59",
-                "isPredictionMode": "true",
-                "fee": 50
+                "question": "What is the capital of France?",
+                "optionA": "Berlin",
+                "optionB": "Madrid",
+                "optionC": "Paris",
+                "optionD": "Rome",
+                "correctAnswer": 2
             }], null, 4);
-            filename = "sample_posts.json";
+            filename = "sample_mcqs.json";
             downloadFile(content, filename, "application/json");
         } else if (mode === 'csv') {
-            content = 'title,desc,media,category,startTime,deadline,isPredictionMode,fee\n"Sample Bulk Post 1","This is a sample description.","https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80","sports","2026-01-01T10:00","2026-12-31T23:59","true",50';
-            filename = "sample_posts.csv";
+            content = 'question,optionA,optionB,optionC,optionD,correctAnswer\n"What is the capital of France?","Berlin","Madrid","Paris","Rome",2';
+            filename = "sample_mcqs.csv";
             downloadFile(content, filename, "text/csv");
         }
     }
@@ -2522,9 +2736,9 @@
         return result;
     }
 
-    async function processBulkFile() {
-        const fileInput = document.getElementById('admin-bulk-file');
-        const mode = document.getElementById('admin-upload-mode').value;
+    async function processMCQBulkFile() {
+        const fileInput = document.getElementById('mcq-bulk-file');
+        const mode = document.getElementById('mcq-upload-mode').value;
         if (!fileInput.files.length) return showNotification("Please select a file.", "error");
 
         const file = fileInput.files[0];
@@ -2543,39 +2757,24 @@
                 
                 let count = 0;
                 for (let item of items) {
-                    if (!item.title) continue;
+                    if (!item.question) continue;
                     
-                    const cat = item.category || 'headlines';
-                    const detectedMedia = detectMedia(item.media || '', cat);
-                    const isPred = item.isPredictionMode === 'true' || item.isPredictionMode === true;
-                    const fee = parseInt(item.fee) || 0;
+                    let optA = item.optionA || item.options?.[0] || "Option A";
+                    let optB = item.optionB || item.options?.[1] || "Option B";
+                    let optC = item.optionC || item.options?.[2] || "Option C";
+                    let optD = item.optionD || item.options?.[3] || "Option D";
+                    let cAns = item.correctAnswer !== undefined && item.correctAnswer !== "" ? parseInt(item.correctAnswer) : "";
                     
-                    const data = {
-                        title: item.title,
-                        mediaType: detectedMedia.type,
-                        mediaUrls: detectedMedia.urls,
-                        category: cat.toLowerCase(),
-                        desc: item.desc || '',
-                        startTime: item.startTime || "", 
-                        deadline: item.deadline || "", 
-                        isPredictionMode: isPred,
-                        markCorrect: parseInt(item.markCorrect) || 10,
-                        markWrong: parseInt(item.markWrong) || 5,
-                        expectedParticipants: parseInt(item.expectedParticipants) || 100,
-                        fee: fee,
-                        adminComm: Math.round((fee * (parseInt(item.expectedParticipants) || 100)) * 0.10) || 0,
-                        prize1: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.50) || 0,
-                        prize2: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.30) || 0,
-                        prize3: Math.round(((fee * (parseInt(item.expectedParticipants) || 100)) * 0.90) * 0.20) || 0,
-                        status: 'active',
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        questions:[]
-                    };
-                    await db.ref('news').push(data);
+                    appendMCQEditorForm(item.question, optA, optB, optC, optD, cAns);
                     count++;
                 }
-                showNotification(`Successfully uploaded ${count} posts!`, "success");
+                
+                showNotification(`Successfully imported ${count} questions! Review and click Save.`, "success");
                 fileInput.value = "";
+                
+                document.getElementById('mcq-upload-mode').value = 'manual';
+                toggleMCQUploadMode();
+                
             } catch (err) {
                 console.error(err);
                 showNotification("Error processing file. Please check format.", "error");
@@ -2628,8 +2827,6 @@
     }
 
     function resetPostForm() {
-        document.getElementById('admin-upload-mode').value = 'manual';
-        toggleUploadMode();
         document.getElementById('edit-post-id').value = '';
         document.getElementById('admin-title').value = '';
         document.getElementById('admin-desc').value = '';
@@ -2655,7 +2852,7 @@
         
         const ids = Object.keys(allNewsData).reverse();
         if(ids.length === 0) { 
-            container.innerHTML = "<p style='font-size:0.85rem; color:#6b7280;'>No posts available.</p>"; 
+            container.innerHTML = "<p style='font-size:0.8rem; color:#6b7280;'>No posts available.</p>"; 
             return; 
         }
 
@@ -2663,15 +2860,29 @@
             const n = allNewsData[id];
             let statusText = n.status === 'resolved' ? 'Resolved' : 'Active';
             let catText = n.category ? n.category : 'N/A';
-            let isPredMode = n.isPredictionMode === true || n.isPredictionMode === "true" ? 'ON' : 'OFF';
+            let isPredModeBool = n.isPredictionMode === true || n.isPredictionMode === "true";
+            let isPredMode = isPredModeBool ? 'ON' : 'OFF';
+            
+            // Highlight Prediction ON posts
+            let bgStyle = isPredModeBool ? "background: #f0fdf4; border: 1px solid #bbf7d0;" : "background: #f9fafb; border: 1px solid #e5e7eb;";
+
+            // Check if resolved (Prize distributed / Ended)
+            let isResolved = n.status === 'resolved';
+
+            // Start New Prediction on SAME POST button
+            let newPredBtn = '';
+            if (isPredModeBool && isResolved) {
+                newPredBtn = `<button onclick="startNewPredictionOnSamePost('${id}')" class="admin-sm-btn" style="background:#8b5cf6;" title="Start New Prediction"><i class="fas fa-sync-alt"></i></button>`;
+            }
 
             container.innerHTML += `
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="${bgStyle} padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="overflow: hidden; padding-right: 10px; flex-grow: 1;">
-                    <strong style="font-size: 0.95em; color: #1f2937; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title || 'Untitled Post'}</strong>
-                    <span style="font-size: 0.8em; color: #6b7280;">Cat: ${catText} | Pred: ${isPredMode} | Status: ${statusText}</span>
+                    <strong style="font-size: 0.85em; color: #1f2937; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title || 'Untitled Post'}</strong>
+                    <span style="font-size: 0.75em; color: #6b7280;">Cat: ${catText} | Pred: ${isPredMode} | Status: ${statusText}</span>
                 </div>
                 <div style="display: flex; gap: 5px; flex-shrink: 0;">
+                    ${newPredBtn}
                     <button onclick="editPost('${id}')" class="admin-sm-btn" style="background:#3b82f6;" title="Edit"><i class="fas fa-edit"></i></button>
                     <button onclick="deletePost('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button>
                 </div>
@@ -2683,9 +2894,6 @@
         const n = allNewsData[id];
         if(!n) return;
         
-        document.getElementById('admin-upload-mode').value = 'manual';
-        toggleUploadMode();
-
         document.getElementById('edit-post-id').value = id;
         document.getElementById('admin-title').value = n.title || '';
         document.getElementById('admin-media').value = n.mediaUrls ? n.mediaUrls.join(',') : '';
@@ -2710,6 +2918,44 @@
         document.getElementById('btn-cancel-edit').classList.remove('hidden-panel');
         
         document.querySelector('.admin-layout').scrollTo(0,0);
+    }
+    
+    async function startNewPredictionOnSamePost(id) {
+        const n = allNewsData[id];
+        if(!n) return;
+
+        if (n.status !== 'resolved') {
+            return showNotification("Prediction must be resolved (prizes distributed) before starting a new one.", "warning");
+        }
+
+        const msg = "Start a new prediction for this post? This will safely archive the old results, clear current questions/predictions, and allow you to set new start/end times.";
+        if(await customConfirm(msg)) {
+            const ts = new Date().getTime();
+            
+            // Backup old data to archives
+            const predsSnap = await db.ref(`predictions/${id}`).once('value');
+            const lbSnap = await db.ref(`leaderboards/${id}`).once('value');
+            
+            if (predsSnap.exists()) await db.ref(`archive_predictions/${id}_${ts}`).set(predsSnap.val());
+            if (lbSnap.exists()) await db.ref(`archive_leaderboards/${id}_${ts}`).set(lbSnap.val());
+            if (n.questions) await db.ref(`archive_questions/${id}_${ts}`).set(n.questions);
+
+            // Clear current data & Reset state
+            await db.ref(`predictions/${id}`).remove();
+            await db.ref(`leaderboards/${id}`).remove();
+            await db.ref(`news/${id}/questions`).remove();
+            await db.ref(`news/${id}/status`).set('active');
+            await db.ref(`news/${id}/startTime`).set('');
+            await db.ref(`news/${id}/deadline`).set('');
+
+            showNotification("Old prediction archived. Please set new times and update.", "success");
+            
+            // Load into edit form
+            editPost(id);
+            // Manually blank the times out so admin knows they need to set new ones
+            document.getElementById('admin-start-time').value = '';
+            document.getElementById('admin-deadline').value = '';
+        }
     }
 
     async function deletePost(id) {
@@ -2741,32 +2987,56 @@
             let qCount = n.questions ? n.questions.length : 0;
             let statusHtml = '';
             
-            if(isResolved) statusHtml = `<span style="color:#9333ea; font-size:0.85em; font-weight:bold;">Resolved</span>`;
-            else if(isClosed) statusHtml = `<span style="color:#dc2626; font-size:0.85em; font-weight:bold;">Awaiting Resolution</span>`;
-            else statusHtml = `<span style="color:#10b981; font-size:0.85em; font-weight:bold;">Active (${qCount} Questions)</span>`;
+            if(isResolved) statusHtml = `<span style="color:#9333ea; font-size:0.75em; font-weight:bold;">Resolved</span>`;
+            else if(isClosed) statusHtml = `<span style="color:#dc2626; font-size:0.75em; font-weight:bold;">Awaiting Resolution</span>`;
+            else statusHtml = `<span style="color:#10b981; font-size:0.75em; font-weight:bold;">Active (${qCount} Questions)</span>`;
+
+            let currentParts = allPredictions[id] ? Object.keys(allPredictions[id]).length : 0;
+            let fee = n.fee || 0;
+            let currentCollection = currentParts * fee;
+            let expCollection = (n.expectedParticipants || 0) * fee;
+            let tPrize = (n.prize1 || 0) + (n.prize2 || 0) + (n.prize3 || 0);
+            let currentProfit = currentCollection - tPrize;
 
             let html = `
-                <div class="admin-manage-card" style="display:flex; flex-direction:column; gap:8px;">
+                <div class="admin-manage-card" style="display:flex; flex-direction:column; gap:6px;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <h3 style="margin:0;">${n.title}</h3>
                         ${statusHtml}
                     </div>
+                    
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; margin: 6px 0;">
+                        <h4 style="color: #166534; margin-bottom: 6px; font-size: 0.85em;"><i class="fas fa-chart-pie"></i> Post Statistics & Finances</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8em; color: #374151;">
+                            <div><strong>Fee per user:</strong> <i class="fas fa-coins" style="color:#eab308;"></i> ${fee}</div>
+                            <div><strong>Participants:</strong> ${currentParts}</div>
+                            <div><strong>Current Collection:</strong> <i class="fas fa-coins" style="color:#eab308;"></i> ${currentCollection}</div>
+                            <div><strong>Total Prize Out:</strong> <i class="fas fa-coins" style="color:#eab308;"></i> ${tPrize}</div>
+                            <div style="grid-column: span 2; border-top: 1px solid #bbf7d0; padding-top: 6px; margin-top: 2px; font-size: 0.9em;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span><strong>Current Profit:</strong> <span style="color:${currentProfit >= 0 ? '#059669' : '#dc2626'}; font-weight: bold;">${currentProfit >= 0 ? '+' : ''}${currentProfit} Coins</span></span>
+                                    <span style="font-size: 0.85em; color: #6b7280;">(Expected: ${expCollection})</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button onclick="openMCQEditor('${id}')" class="admin-btn-blue"><i class="fas fa-list-ol"></i> Set Questions</button>
             `;
 
             if(isClosed && !isResolved) {
                 html += `
                     <div class="admin-resolve-box">
-                        <h4>Resolve Match (Confirm Prizes & Distribute):</h4>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
-                            <div><label style="font-size:0.8em;">1st Prize:</label> <input type="number" id="res_1st_${id}" value="${n.prize1||0}" class="admin-input" style="padding:6px;"></div>
-                            <div><label style="font-size:0.8em;">2nd Prize:</label> <input type="number" id="res_2nd_${id}" value="${n.prize2||0}" class="admin-input" style="padding:6px;"></div>
-                            <div><label style="font-size:0.8em;">3rd Prize:</label> <input type="number" id="res_3rd_${id}" value="${n.prize3||0}" class="admin-input" style="padding:6px;"></div>
+                        <h4>Resolve Match:</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+                            <div><label style="font-size:0.75em;">1st Prize:</label> <input type="number" id="res_1st_${id}" value="${n.prize1||0}" class="admin-input" style="padding:4px;"></div>
+                            <div><label style="font-size:0.75em;">2nd Prize:</label> <input type="number" id="res_2nd_${id}" value="${n.prize2||0}" class="admin-input" style="padding:4px;"></div>
+                            <div><label style="font-size:0.75em;">3rd Prize:</label> <input type="number" id="res_3rd_${id}" value="${n.prize3||0}" class="admin-input" style="padding:4px;"></div>
                         </div>
                         <div class="admin-resolve-row">
-                            <label style="color:#4b5563; font-size:0.85rem;"><i class="fas fa-info-circle"></i> Ties are automatically resolved by submission time (Earlier predictions win).</label>
+                            <label style="color:#4b5563; font-size:0.75rem;"><i class="fas fa-info-circle"></i> Ties resolved by submission time.</label>
                         </div>
-                        <button onclick="resolveNews('${id}')" class="admin-btn-danger" style="width:100%; margin-top:5px; padding:10px;">Calculate & Distribute Prizes</button>
+                        <button onclick="resolveNews('${id}')" class="admin-btn-danger" style="width:100%; margin-top:4px; padding:8px;">Calculate & Distribute Prizes</button>
                     </div>
                 `;
             }
@@ -2780,6 +3050,10 @@
         const n = allNewsData[id];
         if(!n) return;
         document.getElementById('mcq-target-news-id').value = id;
+        
+        document.getElementById('mcq-upload-mode').value = 'manual';
+        toggleMCQUploadMode();
+
         const container = document.getElementById('mcq-builder-container');
         container.innerHTML = ''; mcqEditorCount = 0;
 
@@ -2801,19 +3075,19 @@
         const div = document.createElement('div');
         div.className = "mcq-q-box"; div.id = `mcq_box_${mcqEditorCount}`;
         div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                 <strong>Question ${mcqEditorCount + 1}</strong>
                 <button type="button" onclick="document.getElementById('mcq_box_${mcqEditorCount}').remove()" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
-            <input type="text" id="emcq_q_${mcqEditorCount}" value="${qText}" placeholder="Question text..." class="admin-input" style="margin-bottom:8px;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                <input type="text" id="emcq_o_${mcqEditorCount}_0" value="${o0}" placeholder="Option A" class="admin-input" style="font-size:0.9em;">
-                <input type="text" id="emcq_o_${mcqEditorCount}_1" value="${o1}" placeholder="Option B" class="admin-input" style="font-size:0.9em;">
-                <input type="text" id="emcq_o_${mcqEditorCount}_2" value="${o2}" placeholder="Option C" class="admin-input" style="font-size:0.9em;">
-                <input type="text" id="emcq_o_${mcqEditorCount}_3" value="${o3}" placeholder="Option D" class="admin-input" style="font-size:0.9em;">
+            <input type="text" id="emcq_q_${mcqEditorCount}" value="${qText}" placeholder="Question text..." class="admin-input" style="margin-bottom:6px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_0" value="${o0}" placeholder="Option A" class="admin-input" style="font-size:0.85em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_1" value="${o1}" placeholder="Option B" class="admin-input" style="font-size:0.85em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_2" value="${o2}" placeholder="Option C" class="admin-input" style="font-size:0.85em;">
+                <input type="text" id="emcq_o_${mcqEditorCount}_3" value="${o3}" placeholder="Option D" class="admin-input" style="font-size:0.85em;">
             </div>
             <div>
-                <label style="font-size:0.85em; font-weight:bold; margin-bottom:4px; display:block;">Correct Answer:</label>
+                <label style="font-size:0.8em; font-weight:bold; margin-bottom:4px; display:block;">Correct Answer:</label>
                 <select id="emcq_c_${mcqEditorCount}" class="admin-resolve-select">
                     <option value="">-- Select Correct --</option>
                     <option value="0" ${correctAns===0?'selected':''}>Option A</option>
@@ -2941,7 +3215,7 @@
                             <a href="upi://pay?pa=${req.upi}&pn=SinthaShorts&am=${req.amount}&cu=INR" target="_blank" class="btn-pay">
                                 <i class="fas fa-qrcode"></i> Pay Now via UPI
                             </a>
-                            <div style="display:flex; gap:8px; margin-top:8px;">
+                            <div style="display:flex; gap:6px; margin-top:6px;">
                                 <button onclick="resolveWithdrawal('${id}', 'paid')" class="admin-btn-blue" style="background:#059669; flex:1;">Mark Paid</button>
                                 <button onclick="resolveWithdrawal('${id}', 'rejected', '${req.uid}', ${req.amount})" class="admin-btn-danger" style="flex:1;">Reject/Refund</button>
                             </div>
@@ -2949,14 +3223,13 @@
                     </div>`;
                 }
             });
-            if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.85rem;">No pending requests.</p>';
+            if(!hasPending) list.innerHTML = '<p style="color: #6b7280; font-size: 0.8rem;">No pending requests.</p>';
         });
     }
 
     async function resolveWithdrawal(id, status, uid = null, amount = 0) {
         if (await customConfirm(`Are you sure you want to mark this withdrawal as ${status.toUpperCase()}?`)) {
             if (status === 'rejected' && uid && amount) {
-                // Refund the amount back to user's wallet
                 const snap = await db.ref(`users/${uid}/wallet`).once('value');
                 const bal = snap.val() || 0;
                 await db.ref(`users/${uid}`).update({ wallet: bal + amount });
@@ -2998,7 +3271,7 @@
                 <div class="user-manage-card">
                     <div class="user-manage-header">
                         <div class="user-manage-info">
-                            <h4>${u.name} ${isBanned ? '<span style="color:#dc2626; font-size:0.8rem; border:1px solid #dc2626; padding:2px 4px; border-radius:4px;">BANNED</span>' : ''}</h4>
+                            <h4>${u.name} ${isBanned ? '<span style="color:#dc2626; font-size:0.7rem; border:1px solid #dc2626; padding:2px 4px; border-radius:4px;">BANNED</span>' : ''}</h4>
                             <p><strong>Email:</strong> ${u.email}</p>
                             <p><strong>Phone:</strong> ${phoneTxt}</p>
                             <p><strong>Wallet:</strong> ${u.wallet || 0} Coins</p>
@@ -3015,8 +3288,8 @@
             });
             
             document.getElementById('stat-wallets').innerText = totalWallets;
-            if(adminContainer.innerHTML === '') adminContainer.innerHTML = '<p>No Admin users found.</p>';
-            if(normalContainer.innerHTML === '') normalContainer.innerHTML = '<p>No Normal users found.</p>';
+            if(adminContainer.innerHTML === '') adminContainer.innerHTML = '<p style="font-size:0.85rem;">No Admin users found.</p>';
+            if(normalContainer.innerHTML === '') normalContainer.innerHTML = '<p style="font-size:0.85rem;">No Normal users found.</p>';
         });
     }
 
@@ -3042,12 +3315,34 @@
 
         const usersSnap = await db.ref(`users`).once('value');
         const allU = usersSnap.val() || {};
-
+        
+        const news = allNewsData[id];
+        
         let html = `<div class="lb-header">
             <h3>Prize Pool Distributed</h3>
             <p><i class="fas fa-coins" style="color: #facc15;"></i> ${data.prizePool}</p>
-        </div>
-        <div class="lb-table-wrap">
+        </div>`;
+        
+        if (news && news.questions && data.correctAnswers) {
+            html += `<div style="background: rgba(31, 41, 55, 0.8); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #374151;">
+                <h4 style="color:#60a5fa; margin-bottom: 8px; font-size:0.9rem;"><i class="fas fa-question-circle"></i> Questions & Correct Answers</h4>
+                <ul style="list-style:none; padding:0; margin:0; font-size:0.8rem; color:#d1d5db;">`;
+            
+            let safeQues = Array.isArray(news.questions) ? news.questions : Object.values(news.questions || {});
+            safeQues.forEach((q, i) => {
+                let correctIdx = data.correctAnswers[i];
+                let opts = Array.isArray(q.options) ? q.options : Object.values(q.options || {});
+                let ansText = opts[correctIdx] || 'N/A';
+                let optLabel =['A','B','C','D'][correctIdx] || '?';
+                html += `<li style="margin-bottom: 6px; border-bottom: 1px solid #4b5563; padding-bottom: 6px;">
+                    <strong>Q${i+1}:</strong> ${q.question}<br>
+                    <span style="color:#4ade80; display:inline-block; margin-top:2px;"><i class="fas fa-check"></i> Correct: <strong>${optLabel}. ${ansText}</strong></span>
+                </li>`;
+            });
+            html += `</ul></div>`;
+        }
+
+        html += `<div class="lb-table-wrap">
             <table class="lb-table">
                 <tr><th>Rank</th><th>User & Answers</th><th>Score</th><th>Won</th></tr>`;
         
@@ -3068,13 +3363,13 @@
             }).join('<br>');
 
             html += `<tr>
-                <td style="font-weight: bold; vertical-align:top; padding-top:14px;">${i+1} ${badge}</td>
+                <td style="font-weight: bold; vertical-align:top; padding-top:10px;">${i+1} ${badge}</td>
                 <td>
-                    <strong style="color:#e5e7eb; font-size:1rem;">${uName}</strong><br>
-                    <span style="font-size:0.75rem; color:#9ca3af;">${rAnsText}</span>
+                    <strong style="color:#e5e7eb; font-size:0.9rem;">${uName}</strong><br>
+                    <span style="font-size:0.7em; color:#9ca3af;">${rAnsText}</span>
                 </td>
-                <td style="vertical-align:top; font-weight:bold; padding-top:14px;">${r.score}</td>
-                <td style="font-weight: bold; color: #4ade80; vertical-align:top; padding-top:14px;">${r.won ? '+'+r.won : '-'}</td>
+                <td style="vertical-align:top; font-weight:bold; padding-top:10px;">${r.score}</td>
+                <td style="font-weight: bold; color: #4ade80; vertical-align:top; padding-top:10px;">${r.won ? '+'+r.won : '-'}</td>
             </tr>`;
         });
         html += `</table></div>`;
