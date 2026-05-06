@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,11 +22,11 @@
             --border-color: #2f2f2f;
             --menu-bg-color: rgba(20, 20, 20, 0.85);
             --font-main: 'Inter', system-ui, sans-serif;
-            --media-container-height: 180px;
-            --app-header-height: 50px;
-            --search-bar-height: 40px;
-            --top-menu-height: 35px;
-            --bottom-nav-height: 60px;
+            --media-container-height: 165px; 
+            --app-header-height: 45px; 
+            --search-bar-height: 36px; 
+            --top-menu-height: 32px; 
+            --bottom-nav-height: 55px; 
             --upcoming-banner-height: 0px; 
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -44,9 +43,9 @@
         .splash-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.6s ease-out, visibility 0.6s; }
         .splash-content { text-align: center; animation: splashFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .splash-logo { font-size: 3rem; color: #60a5fa; margin-bottom: 10px; animation: splashFloat 3s ease-in-out infinite; }
-        .splash-title { font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 4px; letter-spacing: 1px; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .splash-subtitle { font-size: 0.9rem; color: #b0b0b0; font-weight: 500; margin-bottom: 20px; }
-        .splash-loader { width: 30px; height: 30px; border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid var(--accent-color-1); border-radius: 50%; margin: 0 auto; animation: splashSpin 1s linear infinite; }
+        .splash-title { font-size: 1.6rem; font-weight: 800; color: white; margin-bottom: 4px; letter-spacing: 1px; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .splash-subtitle { font-size: 0.8rem; color: #b0b0b0; font-weight: 500; margin-bottom: 20px; }
+        .splash-loader { width: 25px; height: 25px; border: 2px solid rgba(255, 255, 255, 0.1); border-top: 2px solid var(--accent-color-1); border-radius: 50%; margin: 0 auto; animation: splashSpin 1s linear infinite; }
         @keyframes splashFadeUp { 0% { opacity: 0; transform: translateY(30px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes splashFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         @keyframes splashSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -54,16 +53,16 @@
 
         /* AUTH UI */
         .welcome-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1a1a1d 0%, #121212 100%); padding: 15px; position: fixed; top: 0; left: 0; z-index: 500; overflow-y: auto; }
-        .welcome-brand { font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
-        .welcome-subtitle { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 15px; }
-        .auth-container { width: 100%; max-width: 320px; background: #1f2937; padding: 15px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
+        .welcome-brand { font-size: 1.4rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+        .welcome-subtitle { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 15px; }
+        .auth-container { width: 100%; max-width: 300px; background: #1f2937; padding: 12px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #374151; }
         .auth-view { display: none; } .auth-view.active { display: block; }
-        .auth-title { font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 10px; text-align: left; }
-        .auth-input { width: 100%; background: #111827; color: white; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #4b5563; outline: none; font-size: 0.85rem; }
+        .auth-title { font-size: 1rem; font-weight: 600; color: white; margin-bottom: 10px; text-align: left; }
+        .auth-input { width: 100%; background: #111827; color: white; padding: 6px 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #4b5563; outline: none; font-size: 0.8rem; }
         .auth-input:focus { border-color: #3b82f6; }
-        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 8px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 8px; font-size: 0.9rem; transition: 0.2s; }
+        .auth-btn { width: 100%; background: #3b82f6; color: white; font-weight: bold; padding: 6px; border-radius: 8px; border: none; cursor: pointer; margin-bottom: 8px; font-size: 0.85rem; transition: 0.2s; }
         .auth-btn:hover { background: #2563eb; }
-        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.8rem; text-decoration: none; display: block; text-align: center; margin-top: 10px; background: none; border: none; width: 100%; }
+        .auth-link { color: #60a5fa; cursor: pointer; font-size: 0.75rem; text-decoration: none; display: block; text-align: center; margin-top: 10px; background: none; border: none; width: 100%; }
         .auth-link:hover { text-decoration: underline; }
         .auth-close-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; }
         .auth-error { color: #f87171; font-size: 0.8rem; margin-top: 8px; text-align: center; }
@@ -71,20 +70,20 @@
         /* APP HEADER */
         .app-container { width: 100%; height: 100%; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .app-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-header-height); background-color: var(--header-bg-color); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 160; backdrop-filter: blur(10px); gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header-title { font-size: 1rem; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
+        .header-title { font-size: 0.95rem; font-weight: 700; background: -webkit-linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;}
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 5px; }
-        .admin-nav-btn { background: #3b82f6; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer; }
+        .wallet-badge { background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 6px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; color: #93c5fd; display: flex; align-items: center; gap: 5px; }
+        .admin-nav-btn { background: #3b82f6; color: white; padding: 3px 6px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; border: none; cursor: pointer; }
 
         /* SEARCH & MENU ROW */
         .search-container { position: fixed; top: var(--app-header-height); left: 0; width: 100%; height: var(--search-bar-height); background-color: var(--header-bg-color); display: flex; align-items: center; padding: 0 10px; z-index: 155; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
-        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 15px; padding: 5px 10px; outline: none; transition: 0.3s; font-size: 0.85em; }
+        .search-input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 12px; padding: 4px 10px; outline: none; transition: 0.3s; font-size: 0.75em; }
         .search-input:focus { background: rgba(255,255,255,0.2); border-color: var(--accent-color-1); }
         .top-menu { position: fixed; top: calc(var(--app-header-height) + var(--search-bar-height)); left: 0; width: 100%; height: var(--top-menu-height); background-color: var(--menu-bg-color); backdrop-filter: blur(10px); display: flex; align-items: center; overflow-x: auto; white-space: nowrap; z-index: 150; scrollbar-width: none; border-bottom: 1px solid var(--border-color); scroll-behavior: smooth;}
         .top-menu::-webkit-scrollbar { display: none; }
         .top-menu ul { list-style: none; padding: 0 10px; }
         .top-menu li { display: inline-block; margin-right: 4px; }
-        .top-menu li a { display: block; padding: 4px 10px; color: var(--primary-text-color); text-decoration: none; font-size: 0.8em; border-radius: 15px; transition: 0.2s ease; text-transform: capitalize; }
+        .top-menu li a { display: block; padding: 3px 10px; color: var(--primary-text-color); text-decoration: none; font-size: 0.75em; border-radius: 12px; transition: 0.2s ease; text-transform: capitalize; }
         .top-menu li a.active { background-color: var(--accent-color-1); color: #fff; }
         
         #upcoming-banner { position: fixed; top: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height)); left: 0; width: 100%; height: var(--upcoming-banner-height); background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); color: #fff; z-index: 145; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); overflow: hidden; transition: height 0.3s ease; }
@@ -94,20 +93,20 @@
         .main-view { width: 100%; height: 100%; position: relative; }
         .news-stream { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; will-change: transform; }
         .news-card { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: var(--card-bg-color); overflow: hidden; position: relative; z-index: 1; flex-shrink: 0; }
-        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + var(--upcoming-banner-height) + 10px) 10px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 10px) 10px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; transition: padding 0.3s ease; }
-        .card-media { width: 100%; height: var(--media-container-height); border-radius: 8px; overflow: hidden; margin-bottom: 8px; background: #000; flex-shrink: 0; position: relative; }
+        .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + var(--upcoming-banner-height) + 8px) 8px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 8px) 8px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; transition: padding 0.3s ease; }
+        .card-media { width: 100%; height: var(--media-container-height); border-radius: 6px; overflow: hidden; margin-bottom: 6px; background: #000; flex-shrink: 0; position: relative; }
         .card-media img, .card-media video { width: 100%; height: 100%; object-fit: cover; }
-        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; margin-bottom: 8px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
-        .card-title { font-size: 1.05em; font-weight: 700; line-height: 1.3; margin-bottom: 4px; flex-shrink: 0; }
-        .card-meta { font-size: 0.75em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
-        .cat-badge { background: #374151; padding: 2px 5px; border-radius: 4px; color: #e5e7eb; }
-        .card-snippet { font-size: 0.85em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
+        .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 8px; margin-bottom: 6px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
+        .card-title { font-size: 0.95em; font-weight: 700; line-height: 1.3; margin-bottom: 3px; flex-shrink: 0; }
+        .card-meta { font-size: 0.7em; color: var(--secondary-text-color); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; text-transform: uppercase; flex-shrink: 0; flex-wrap: wrap; }
+        .cat-badge { background: #374151; padding: 2px 4px; border-radius: 3px; color: #e5e7eb; }
+        .card-snippet { font-size: 0.8em; line-height: 1.4; color: #ddd; white-space: pre-line; text-align: justify; } 
         .text-clamped { display: -webkit-box; -webkit-line-clamp: 14; -webkit-box-orient: vertical; overflow: hidden; }
         .text-expanded { display: block !important; overflow-y: auto; max-height: 60vh; padding-right: 5px; }
-        .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.85em; cursor: pointer; padding: 0; text-align: left; }
+        .read-more-btn { background: none; border: none; color: var(--accent-color-1); font-weight: bold; font-size: 0.8em; cursor: pointer; padding: 0; text-align: left; }
         
-        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; padding-bottom: 4px; flex-shrink: 0; margin-top: auto; }
-        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; font-weight: 600;}
+        .inline-actions { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; padding-bottom: 2px; flex-shrink: 0; margin-top: auto; }
+        .inline-action-btn { background: none; border: none; color: var(--secondary-text-color); display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer; font-weight: 600;}
         .inline-action-btn.liked i { color: #ef4444; }
 
         .swipe-indicator { position: fixed; bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 20px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.8em; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
@@ -122,22 +121,22 @@
 
         /* GLOBAL BOTTOM NAVIGATION */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); background: #1f2937; border-top: 1px solid #374151; display: flex; justify-content: space-around; align-items: center; z-index: 900; padding-bottom: env(safe-area-inset-bottom); }
-        .b-nav-btn { background: none; border: none; color: #9ca3af; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25%; height: 100%; font-size: 0.7rem; cursor: pointer; transition: 0.2s; gap: 4px; }
-        .b-nav-btn i { font-size: 1.25rem; }
+        .b-nav-btn { background: none; border: none; color: #9ca3af; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25%; height: 100%; font-size: 0.65rem; cursor: pointer; transition: 0.2s; gap: 2px; }
+        .b-nav-btn i { font-size: 1.15rem; }
         .b-nav-btn.active { color: #3b82f6; }
         .b-nav-btn:hover { color: #e5e7eb; }
 
         /* DASHBOARDS & MCQ LIST VIEW SETTINGS */
-        #mcq-view, #dashboard-view { padding: calc(var(--app-header-height) + 15px) 15px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 20px) 15px; overflow-y: auto; background: var(--bg-color); }
-        .mcq-list-item { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        #mcq-view, #dashboard-view { padding: calc(var(--app-header-height) + 12px) 12px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 15px) 12px; overflow-y: auto; background: var(--bg-color); }
+        .mcq-list-item { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
 
         /* MODALS */
         .overlay-modal { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 10px; }
-        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 450px; max-height: 95vh; border-radius: 10px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 10px 14px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
-        .modal-title { font-weight: bold; font-size: 1em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.6em; cursor: pointer; line-height: 1; }
-        .modal-body { padding: 12px; flex-grow: 1; }
+        .modal-content { background: #1f2937; color: white; width: 100%; max-width: 400px; max-height: 95vh; border-radius: 8px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .modal-header { position: sticky; top: 0; background: #1f2937; padding: 8px 12px; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; border-radius: inherit; z-index: 10; }
+        .modal-title { font-weight: bold; font-size: 0.95em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-close { background: none; border: none; color: #9ca3af; font-size: 1.4em; cursor: pointer; line-height: 1; }
+        .modal-body { padding: 10px; flex-grow: 1; }
         .modal-countdown { text-align: center; font-weight: bold; color: #facc15; margin-bottom: 10px; background: rgba(113, 63, 18, 0.3); padding: 4px; border-radius: 4px; font-size: 0.85rem;}
         
         /* Prediction / MCQ Quiz Questions */
@@ -156,12 +155,12 @@
         .submit-pred-btn { width: 100%; background: linear-gradient(to right, #3b82f6, #2dd4bf); color: white; padding: 10px; border-radius: 20px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
         /* Comments CSS */
-        .comment-item { background: #1f2937; padding: 8px; border-radius: 8px; margin-bottom: 6px; }
-        .comment-header { display: flex; justify-content: space-between; font-size: 0.75em; color: #9ca3af; margin-bottom: 4px; }
-        .comment-body { font-size: 0.85em; color: #e5e7eb; margin-bottom: 6px; line-height: 1.4; word-break: break-word; }
-        .comment-actions { display: flex; gap: 12px; font-size: 0.75em; color: #6b7280; }
+        .comment-item { background: #1f2937; padding: 6px; border-radius: 6px; margin-bottom: 6px; }
+        .comment-header { display: flex; justify-content: space-between; font-size: 0.7em; color: #9ca3af; margin-bottom: 4px; }
+        .comment-body { font-size: 0.8em; color: #e5e7eb; margin-bottom: 6px; line-height: 1.4; word-break: break-word; }
+        .comment-actions { display: flex; gap: 10px; font-size: 0.7em; color: #6b7280; }
         .comment-action-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold;}
-        .reply-list { margin-left: 15px; border-left: 2px solid #374151; padding-left: 8px; margin-top: 8px; }
+        .reply-list { margin-left: 12px; border-left: 2px solid #374151; padding-left: 6px; margin-top: 6px; }
 
         /* DASHBOARDS (ADMIN & PROFILE) */
         .admin-layout { position: absolute; inset: 0; background: #f3f4f6; overflow-y: auto; z-index: 950; color: #1f2937; }
@@ -366,13 +365,18 @@
 
 <!-- COMMENT MODAL FULL PAGE -->
 <div id="comment-modal" class="overlay-modal hidden-panel" style="z-index: 1050; padding:0;">
-    <div class="modal-content" style="max-height: 100vh; height: 100vh; border-radius: 0; width: 100%; max-width: 100%;">
-        <div class="modal-header">
-            <h2 class="modal-title">Comments</h2>
-            <button onclick="closeModal('comment-modal')" class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 10px; background: #111827;">
-            <div id="comment-list" style="flex-grow: 1;"></div>
+    <div class="modal-content" style="max-height: 100vh; height: 100vh; border-radius: 0; width: 100%; max-width: 100%; position: relative;">
+        <!-- Floating Close Button -->
+        <button onclick="closeModal('comment-modal')" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+        
+        <div class="modal-body" style="overflow-y: auto; display: flex; flex-direction: column; flex-grow: 1; padding: 0; background: #111827;">
+            <!-- Post Preview -->
+            <div id="comment-post-preview" style="background: var(--card-bg-color); border-bottom: 1px solid #374151; margin-bottom: 8px;"></div>
+            
+            <div style="padding: 0 10px; flex-grow: 1;">
+                <h3 style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 10px; font-weight: 600;">Comments (<span id="comment-modal-count">0</span>)</h3>
+                <div id="comment-list" style="flex-grow: 1;"></div>
+            </div>
         </div>
         <div style="padding: 6px 10px; background: #1f2937; border-top: 1px solid #374151; margin-bottom: env(safe-area-inset-bottom);">
             <div id="comment-reply-preview" class="hidden-panel" style="font-size: 0.75em; color: #9ca3af; margin-bottom: 4px; display:flex; justify-content:space-between;"></div>
@@ -380,7 +384,7 @@
             <input type="hidden" id="comment-reply-id">
             <input type="hidden" id="comment-edit-id">
             <div style="display:flex; gap:8px;">
-                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:6px 10px;" onkeypress="if(event.key === 'Enter') postComment();">
+                <input type="text" id="comment-input" class="modern-input" placeholder="Add a comment..." style="margin-bottom:0; flex-grow:1; padding:6px 10px; font-size: 0.8rem;" onkeypress="if(event.key === 'Enter') postComment();">
                 <button onclick="postComment()" style="background:#3b82f6; border:none; color:white; padding:0 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1342,8 +1346,8 @@
             let mType = news.mediaType || 'image'; let mUrls = news.mediaUrls ||[];
             let mediaHtml = '';
             if (mUrls.length > 0) {
-                if(mType === 'video') mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;"></video>`;
-                else mediaHtml = `<img src="${mUrls[0]}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;">`;
+                if(mType === 'video') mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:120px; object-fit:cover; border-radius:6px; margin-bottom:8px;"></video>`;
+                else mediaHtml = `<img src="${mUrls[0]}" style="width:100%; height:120px; object-fit:cover; border-radius:6px; margin-bottom:8px;">`;
             }
             
             let startDateStr = news.startTime ? new Date(news.startTime).toLocaleString() : 'Immediate';
@@ -1353,17 +1357,17 @@
                 <div class="mcq-list-item">
                     ${mediaHtml}
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-                        <h3 style="font-size:1.1rem; color:#fff; font-weight:bold;">${news.title}</h3>
+                        <h3 style="font-size:1rem; color:#fff; font-weight:bold;">${news.title}</h3>
                         <div style="font-size:0.75rem; font-weight:bold; white-space:nowrap; margin-left:10px;">${statusText}</div>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--secondary-text-color); margin-bottom: 12px; line-height: 1.4;">${news.desc || 'No description provided.'}</p>
+                    <p style="font-size:0.8rem; color:var(--secondary-text-color); margin-bottom: 10px; line-height: 1.4;">${news.desc || 'No description provided.'}</p>
                     
-                    <div style="font-size: 0.8rem; color: #a7f3d0; margin-bottom: 10px; background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 0.75rem; color: #a7f3d0; margin-bottom: 8px; background: rgba(16, 185, 129, 0.1); padding: 6px; border-radius: 6px;">
                         <div style="margin-bottom: 4px;"><i class="far fa-calendar-alt" style="width: 15px; text-align: center;"></i> Start: <strong style="color: #fff;">${startDateStr}</strong></div>
                         <div><i class="far fa-calendar-times" style="width: 15px; text-align: center;"></i> End: <strong style="color: #fff;">${endDateStr}</strong></div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px; font-size:0.8rem; color:#d1d5db; background: rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px; font-size:0.75rem; color:#d1d5db; background: rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
                         <div><i class="fas fa-coins" style="color:#facc15; width:15px; text-align:center;"></i> Entry: <strong>${news.fee}</strong></div>
                         <div><i class="fas fa-trophy" style="color:#facc15; width:15px; text-align:center;"></i> 1st Prize: <strong>${news.prize1 || 0}</strong></div>
                         <div><i class="fas fa-check-circle" style="color:#3b82f6; width:15px; text-align:center;"></i> Correct: <strong>+${news.markCorrect || 10}</strong></div>
@@ -1372,7 +1376,7 @@
                         <div><i class="fas fa-award" style="color:#b45309; width:15px; text-align:center;"></i> 3rd Prize: <strong>${news.prize3 || 0}</strong></div>
                     </div>
                     
-                    <div id="mcq-timer-${news.id}" style="margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; text-align: center; color: #facc15; background: rgba(250, 204, 21, 0.1); padding: 6px; border-radius: 6px;"></div>
+                    <div id="mcq-timer-${news.id}" style="margin-bottom: 10px; font-size: 0.8rem; font-weight: bold; text-align: center; color: #facc15; background: rgba(250, 204, 21, 0.1); padding: 6px; border-radius: 6px;"></div>
 
                     ${btnHtml}
                 </div>
@@ -1511,6 +1515,43 @@
 
     function openComments(newsId) {
         currentCommentsNewsId = newsId; document.getElementById('comment-news-id').value = newsId;
+        
+        const news = allNewsData[newsId];
+        const previewContainer = document.getElementById('comment-post-preview');
+        if(news && previewContainer) {
+            let mType = news.mediaType || 'image'; let mUrls = news.mediaUrls ||[getDefaultImageForCategory(news.category)];
+            let mediaHtml = '';
+            if(mType === 'video') mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; max-height:220px; object-fit:cover;"></video>`;
+            else if(mType === 'audio') mediaHtml = `<div style="width:100%; padding:20px; background:#1f2937; text-align:center;"><audio src="${mUrls[0]}" controls style="width:90%;"></audio></div>`;
+            else if(mType === 'carousel' && mUrls.length > 1) mediaHtml = `<img src="${mUrls[0]}" style="width:100%; max-height:220px; object-fit:cover;">`;
+            else mediaHtml = `<img src="${mUrls[0]}" style="width:100%; max-height:220px; object-fit:cover;">`;
+            
+            previewContainer.innerHTML = `
+                ${mediaHtml}
+                <div style="padding: 10px 12px;">
+                    <h2 style="font-size: 0.95rem; font-weight: bold; margin-bottom: 6px; color: #fff; line-height: 1.3;">${news.title || "No Title"}</h2>
+                    <div id="comment-desc-container" style="max-height: 5.6em; overflow: hidden; position: relative; font-size: 0.8rem; color: #d1d5db; line-height: 1.4;">
+                        <p style="white-space: pre-line; margin: 0; padding-bottom: 5.6em;">${news.desc || ''}</p>
+                    </div>
+                </div>
+            `;
+            
+            clearInterval(commentTextScrollInterval);
+            setTimeout(() => {
+                const descContainer = document.getElementById('comment-desc-container');
+                if (descContainer && descContainer.scrollHeight > descContainer.clientHeight) {
+                    let scrollPos = 0;
+                    commentTextScrollInterval = setInterval(() => {
+                        scrollPos += 1;
+                        if (scrollPos >= descContainer.scrollHeight - descContainer.clientHeight) {
+                            scrollPos = 0;
+                        }
+                        descContainer.scrollTop = scrollPos;
+                    }, 50);
+                }
+            }, 100);
+        }
+
         document.getElementById('comment-modal').classList.remove('hidden-panel');
         renderCommentsModal();
     }
@@ -1521,7 +1562,10 @@
         let cArr = Object.keys(commentsObj).map(id => ({ id, ...commentsObj[id] })).sort((a,b) => a.timestamp - b.timestamp);
         let parents = cArr.filter(c => !c.parentId), replies = cArr.filter(c => c.parentId);
 
-        if(cArr.length === 0) list.innerHTML = `<p style="color:#9ca3af; text-align:center; margin-top:20px;">No comments yet. Be the first!</p>`;
+        const countSpan = document.getElementById('comment-modal-count');
+        if(countSpan) countSpan.innerText = cArr.length;
+
+        if(cArr.length === 0) list.innerHTML = `<p style="color:#9ca3af; text-align:center; margin-top:20px; font-size: 0.85rem;">No comments yet. Be the first!</p>`;
 
         parents.forEach(p => {
             let pLiked = currentUser && p.likes && p.likes[currentUser.uid] ? 'liked' : '', isMine = currentUser && p.uid === currentUser.uid;
@@ -1624,7 +1668,11 @@
         DOM.newsStream.style.transform = `translate3d(0, ${-currentNewsIndex * 100}%, 0)`;
     }
 
-    function closeModal(id) { document.getElementById(id).classList.add('hidden-panel'); if(id === 'prediction-modal' && window.modalCountdownInterval) clearInterval(window.modalCountdownInterval); }
+    function closeModal(id) { 
+        document.getElementById(id).classList.add('hidden-panel'); 
+        if(id === 'prediction-modal' && window.modalCountdownInterval) clearInterval(window.modalCountdownInterval); 
+        if(id === 'comment-modal' && commentTextScrollInterval) clearInterval(commentTextScrollInterval);
+    }
 
     async function openPredictionModal(newsId) {
         if(!currentUser) { showPanel('auth'); return; }
