@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,10 +91,14 @@
         .banner-content { display: flex; align-items: center; gap: 6px; animation: swipeInRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         /* POST FEED SWIPING */
-        .main-view { width: 100%; height: 100%; position: relative; }
+        .main-view { width: 100%; height: 100%; position: relative; overflow: hidden; background: var(--bg-color); }
         .news-stream { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; will-change: transform; }
         .news-card { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: var(--card-bg-color); overflow: hidden; position: relative; z-index: 1; flex-shrink: 0; }
+        
         .card-content-wrapper { padding: calc(var(--app-header-height) + var(--search-bar-height) + var(--top-menu-height) + var(--upcoming-banner-height) + 8px) 8px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 8px) 8px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; transition: padding 0.3s ease; }
+        
+        .mcq-card-wrapper { padding: calc(var(--app-header-height) + 8px) 8px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 8px) 8px; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; position: relative; transition: padding 0.3s ease; }
+
         .card-media { width: 100%; height: var(--media-container-height); border-radius: 6px; overflow: hidden; margin-bottom: 6px; background: #000; flex-shrink: 0; position: relative; }
         .card-media img, .card-media video { width: 100%; height: 100%; object-fit: cover; }
         .glass-text-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 8px; margin-bottom: 6px; flex-grow: 1; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2); position: relative; width: 100%; display: flex; flex-direction: column; }
@@ -126,9 +131,8 @@
         .b-nav-btn.active { color: #3b82f6; }
         .b-nav-btn:hover { color: #e5e7eb; }
 
-        /* DASHBOARDS & MCQ LIST VIEW SETTINGS */
-        #mcq-view, #dashboard-view { padding: calc(var(--app-header-height) + 12px) 12px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 15px) 12px; overflow-y: auto; background: var(--bg-color); }
-        .mcq-list-item { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        /* DASHBOARDS SETTINGS */
+        #dashboard-view { padding: calc(var(--app-header-height) + 12px) 12px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 15px) 12px; overflow-y: auto; background: var(--bg-color); }
 
         /* MODALS */
         .overlay-modal { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; padding: 10px; }
@@ -300,10 +304,9 @@
         
     </div>
 
-    <!-- MCQ VIEW (QUIZZES LIST) -->
+    <!-- MCQ VIEW (SWIPE FEED) -->
     <div id="mcq-view" class="main-view hidden-panel">
-        <h2 style="margin-bottom: 15px; color: #fff; font-size: 1.3rem;"><i class="fas fa-list-alt" style="color:var(--accent-color-1);"></i> Active MCQs</h2>
-        <div id="mcq-list-container"></div>
+        <div class="news-stream" id="mcqStream"></div>
     </div>
 
     <!-- DASHBOARD VIEW -->
@@ -312,7 +315,7 @@
         
         <div class="admin-panel-card" onclick="showPanel('profile')" style="cursor:pointer; margin-bottom: 15px; background: #1f2937; border-left: 4px solid #3b82f6;">
             <h3 style="color: #fff; margin-bottom: 5px;"><i class="fas fa-user-circle" style="color:#60a5fa;"></i> User Profile Panel</h3>
-            <p style="font-size: 0.85rem; color: #9ca3af;">View profile details, wallet balance, and withdrawal history</p>
+            <p style="font-size: 0.85rem; color: #9ca3af;">View profile details, edit account info, wallet balance, and withdrawal history</p>
         </div>
         
         <div class="admin-panel-card hidden-panel" id="dash-admin-card" onclick="showPanel('admin')" style="cursor:pointer; background: #1f2937; border-left: 4px solid #dc2626;">
@@ -423,8 +426,17 @@
     <div class="admin-content">
         <div class="admin-panel-card">
             <h2 class="admin-card-title"><i class="fas fa-id-badge"></i> Account Details</h2>
-            <p style="margin-bottom: 8px; color: #4b5563; font-size: 0.85rem;"><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
             <p style="margin-bottom: 8px; color: #4b5563; font-size: 0.85rem;"><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+            <div style="margin-bottom: 10px;">
+                <label style="font-weight: bold; font-size: 0.85rem;">Name</label>
+                <input type="text" id="profile-edit-name" class="modern-input" placeholder="Your Name">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-weight: bold; font-size: 0.85rem;">Mobile Number</label>
+                <input type="text" id="profile-edit-phone" class="modern-input" placeholder="Your Mobile">
+            </div>
+            <button onclick="updateUserProfile()" class="admin-btn-blue" style="margin-bottom: 10px;">Save Profile Updates</button>
+            
             <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0;">
             <h3 style="font-size: 0.9rem; margin-bottom: 6px;">Change Password</h3>
             <input type="password" id="profile-new-pass" placeholder="Enter new password" class="modern-input">
@@ -752,6 +764,13 @@
     let currentCommentsNewsId = null;
     let isSwipeDisabled = false; 
 
+    // MCQ SWIPE GLOBALS
+    let currentMcqIndex = 0;
+    let mcqTouchStartX = 0;
+    let mcqTouchStartY = 0;
+    let isMcqDragging = false;
+    let isMcqSwipeDisabled = false; 
+
     // Dynamically rebuild user predictions anytime DB or auth state changes
     function rebuildUserPredictions() {
         if (currentUser && allPredictions) {
@@ -786,6 +805,7 @@
     let DEFAULT_NEWS_IMAGE = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80';
 
     let initialPostId = new URLSearchParams(window.location.search).get('post');
+    let initialMcqId = new URLSearchParams(window.location.search).get('mcq');
 
     let currentUploadedBase64 = null;
     let currentUploadedMediaType = null;
@@ -863,6 +883,7 @@
         headerGuest: document.getElementById('header-actions-guest'),
         headerUser: document.getElementById('header-actions-user'),
         newsStream: document.getElementById('newsStream'),
+        mcqStream: document.getElementById('mcqStream'),
         wallet: document.getElementById('user-wallet'),
         catList: document.getElementById('category-list'),
         search: document.getElementById('news-search')
@@ -935,7 +956,8 @@
                         DOM.wallet.innerText = data.wallet || 0; isAdmin = (data.role === 'admin');
                     }
                     updateHeaderUI(true, isAdmin);
-                    document.getElementById('profile-name').innerText = data?.name || user.email.split('@')[0];
+                    document.getElementById('profile-edit-name').value = data?.name || user.email.split('@')[0];
+                    document.getElementById('profile-edit-phone').value = data?.phone || '';
                     document.getElementById('profile-email').innerText = user.email;
                     document.getElementById('profile-withdraw-bal').innerText = data?.wallet || 0;
 
@@ -952,7 +974,8 @@
             } else {
                 currentUser = null; isAdmin = false; userPredictions = {};
                 updateHeaderUI(false, false);
-                switchMainTab('post');
+                if (initialMcqId) switchMainTab('mcq');
+                else switchMainTab('post');
                 if (window.rssIntervals) { Object.values(window.rssIntervals).forEach(clearInterval); window.rssIntervals = {}; }
             }
         };
@@ -963,6 +986,7 @@
                 splash.classList.add('splash-hidden');
                 setTimeout(() => splash.style.display = 'none', 600); 
                 handleAuthChange(); isAppInitialized = true; calcMCQPrizes(); 
+                if (initialMcqId) switchMainTab('mcq');
             }, 2500); 
         } else { handleAuthChange(); }
     });
@@ -987,6 +1011,18 @@
         if(!e) return showAuthError("Please enter your email.");
         try { await auth.sendPasswordResetEmail(e); showNotification("Reset email sent!", "success"); switchAuthView('login-view'); } 
         catch (err) { showAuthError(err.message); }
+    }
+
+    async function updateUserProfile() {
+        const newName = document.getElementById('profile-edit-name').value.trim();
+        const newPhone = document.getElementById('profile-edit-phone').value.trim();
+        if(!newName || !newPhone) return showNotification("Name and Phone cannot be empty.", "error");
+        try {
+            await db.ref(`users/${currentUser.uid}`).update({ name: newName, phone: newPhone });
+            showNotification("Profile details updated successfully!", "success");
+        } catch (err) {
+            showNotification("Error updating profile.", "error");
+        }
     }
 
     async function changeUserPassword() {
@@ -1036,7 +1072,7 @@
         if(bal < amt) return showNotification("Insufficient balance.", "error");
 
         await db.ref(`users/${currentUser.uid}`).update({ wallet: bal - amt });
-        await db.ref('withdrawals').push({ uid: currentUser.uid, name: document.getElementById('profile-name').innerText, email: currentUser.email, upi: upi, amount: amt, status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP });
+        await db.ref('withdrawals').push({ uid: currentUser.uid, name: document.getElementById('profile-edit-name').value, email: currentUser.email, upi: upi, amount: amt, status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP });
         showNotification("Withdrawal requested!", "success");
         document.getElementById('withdraw-upi').value = ''; document.getElementById('withdraw-amt').value = '';
     }
@@ -1216,6 +1252,14 @@
         } else if (currentMainTab === 'mcq') {
             activeNewsArray = fullArr.filter(n => n.isPredictionMode === true || n.isPredictionMode === "true");
             activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
+            
+            if (initialMcqId) {
+                const targetIdx = activeNewsArray.findIndex(n => n.id === initialMcqId);
+                if (targetIdx > -1) { const targetPost = activeNewsArray.splice(targetIdx, 1)[0]; activeNewsArray.unshift(targetPost); }
+                window.history.replaceState({}, document.title, window.location.pathname); initialMcqId = null;
+            }
+
+            currentMcqIndex = 0;
             renderMCQList();
         }
     }
@@ -1234,9 +1278,11 @@
         e.stopPropagation(); 
         const snippet = document.getElementById(`snippet-${id}`), btn = document.getElementById(`rm-btn-${id}`), fullBtn = document.getElementById(`full-btn-${id}`);
         if(snippet.classList.contains('text-clamped')) {
-            snippet.classList.remove('text-clamped'); snippet.classList.add('text-expanded'); btn.innerText = 'Read less'; if (fullBtn) fullBtn.classList.remove('hidden-panel'); isSwipeDisabled = true; 
+            snippet.classList.remove('text-clamped'); snippet.classList.add('text-expanded'); btn.innerText = 'Read less'; if (fullBtn) fullBtn.classList.remove('hidden-panel'); 
+            if(id.startsWith('mcq-')) isMcqSwipeDisabled = true; else isSwipeDisabled = true; 
         } else {
-            snippet.classList.remove('text-expanded'); snippet.classList.add('text-clamped'); snippet.scrollTop = 0; btn.innerText = 'Read more'; if (fullBtn) fullBtn.classList.add('hidden-panel'); isSwipeDisabled = false; 
+            snippet.classList.remove('text-expanded'); snippet.classList.add('text-clamped'); snippet.scrollTop = 0; btn.innerText = 'Read more'; if (fullBtn) fullBtn.classList.add('hidden-panel'); 
+            if(id.startsWith('mcq-')) isMcqSwipeDisabled = false; else isSwipeDisabled = false; 
         }
     };
 
@@ -1297,20 +1343,21 @@
     }
 
     function renderMCQList() {
-        const container = document.getElementById('mcq-list-container');
+        const container = DOM.mcqStream;
+        isMcqSwipeDisabled = false;
         
         mcqListCountdownIntervals.forEach(clearInterval);
         mcqListCountdownIntervals =[];
 
         if(activeNewsArray.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#9ca3af; margin-top:20px;">No active MCQs found.</p>';
+            container.innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#9ca3af;">No active MCQs found.</div>';
             return;
         }
         
         const now = new Date().getTime();
-        let htmlContent = '';
+        container.innerHTML = '';
         
-        activeNewsArray.forEach(news => {
+        activeNewsArray.forEach((news, idx) => {
             const hasStartTime = news.startTime && news.startTime !== "";
             const hasStarted = !hasStartTime || now >= new Date(news.startTime).getTime();
             const hasDeadline = news.deadline && news.deadline !== "";
@@ -1346,48 +1393,54 @@
             let mType = news.mediaType || 'image'; let mUrls = news.mediaUrls ||[];
             let mediaHtml = '';
             if (mUrls.length > 0) {
-                if(mType === 'video') mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:120px; object-fit:cover; border-radius:6px; margin-bottom:8px;"></video>`;
-                else mediaHtml = `<img src="${mUrls[0]}" style="width:100%; height:120px; object-fit:cover; border-radius:6px; margin-bottom:8px;">`;
+                if(mType === 'video') mediaHtml = `<video src="${mUrls[0]}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
+                else mediaHtml = `<img src="${mUrls[0]}" style="width:100%; height:100%; object-fit:cover;">`;
             }
             
             let startDateStr = news.startTime ? new Date(news.startTime).toLocaleString() : 'Immediate';
             let endDateStr = news.deadline ? new Date(news.deadline).toLocaleString() : 'No limit';
             
-            htmlContent += `
-                <div class="mcq-list-item">
-                    ${mediaHtml}
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-                        <h3 style="font-size:1rem; color:#fff; font-weight:bold;">${news.title}</h3>
-                        <div style="font-size:0.75rem; font-weight:bold; white-space:nowrap; margin-left:10px;">${statusText}</div>
-                    </div>
-                    <p style="font-size:0.8rem; color:var(--secondary-text-color); margin-bottom: 10px; line-height: 1.4;">${news.desc || 'No description provided.'}</p>
-                    
-                    <div style="font-size: 0.75rem; color: #a7f3d0; margin-bottom: 8px; background: rgba(16, 185, 129, 0.1); padding: 6px; border-radius: 6px;">
-                        <div style="margin-bottom: 4px;"><i class="far fa-calendar-alt" style="width: 15px; text-align: center;"></i> Start: <strong style="color: #fff;">${startDateStr}</strong></div>
-                        <div><i class="far fa-calendar-times" style="width: 15px; text-align: center;"></i> End: <strong style="color: #fff;">${endDateStr}</strong></div>
-                    </div>
+            const card = document.createElement('div');
+            card.className = "news-card";
+            card.innerHTML = `
+                <div class="mcq-card-wrapper" onscroll="handleCardScroll(event)">
+                    <div class="card-media">${mediaHtml}</div>
+                    <div class="glass-text-container">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
+                            <h3 class="card-title">${news.title}</h3>
+                            <div style="font-size:0.75rem; font-weight:bold; white-space:nowrap; margin-left:10px;">${statusText}</div>
+                        </div>
+                        <div class="card-snippet-container">
+                            <p class="card-snippet text-clamped" id="snippet-mcq-${news.id}">${news.desc || 'No description provided.'}</p>
+                            ${news.desc && news.desc.length > 100 ? `<button class="read-more-btn" id="rm-btn-mcq-${news.id}" onclick="toggleReadMore(event, 'mcq-${news.id}')" style="margin-top: 5px;">Read more</button>` : ''}
+                        </div>
+                        
+                        <div style="font-size: 0.75rem; color: #a7f3d0; margin-bottom: 8px; margin-top:8px; background: rgba(16, 185, 129, 0.1); padding: 6px; border-radius: 6px;">
+                            <div style="margin-bottom: 4px;"><i class="far fa-calendar-alt" style="width: 15px; text-align: center;"></i> Start: <strong style="color: #fff;">${startDateStr}</strong></div>
+                            <div><i class="far fa-calendar-times" style="width: 15px; text-align: center;"></i> End: <strong style="color: #fff;">${endDateStr}</strong></div>
+                        </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px; font-size:0.75rem; color:#d1d5db; background: rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
-                        <div><i class="fas fa-coins" style="color:#facc15; width:15px; text-align:center;"></i> Entry: <strong>${news.fee}</strong></div>
-                        <div><i class="fas fa-trophy" style="color:#facc15; width:15px; text-align:center;"></i> 1st Prize: <strong>${news.prize1 || 0}</strong></div>
-                        <div><i class="fas fa-check-circle" style="color:#3b82f6; width:15px; text-align:center;"></i> Correct: <strong>+${news.markCorrect || 10}</strong></div>
-                        <div><i class="fas fa-medal" style="color:#94a3b8; width:15px; text-align:center;"></i> 2nd Prize: <strong>${news.prize2 || 0}</strong></div>
-                        <div><i class="fas fa-times-circle" style="color:#ef4444; width:15px; text-align:center;"></i> Wrong: <strong>-${news.markWrong || 5}</strong></div>
-                        <div><i class="fas fa-award" style="color:#b45309; width:15px; text-align:center;"></i> 3rd Prize: <strong>${news.prize3 || 0}</strong></div>
-                    </div>
-                    
-                    <div id="mcq-timer-${news.id}" style="margin-bottom: 10px; font-size: 0.8rem; font-weight: bold; text-align: center; color: #facc15; background: rgba(250, 204, 21, 0.1); padding: 6px; border-radius: 6px;"></div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px; font-size:0.75rem; color:#d1d5db; background: rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
+                            <div><i class="fas fa-coins" style="color:#facc15; width:15px; text-align:center;"></i> Entry: <strong>${news.fee}</strong></div>
+                            <div><i class="fas fa-trophy" style="color:#facc15; width:15px; text-align:center;"></i> 1st Prize: <strong>${news.prize1 || 0}</strong></div>
+                            <div><i class="fas fa-check-circle" style="color:#3b82f6; width:15px; text-align:center;"></i> Correct: <strong>+${news.markCorrect || 10}</strong></div>
+                            <div><i class="fas fa-medal" style="color:#94a3b8; width:15px; text-align:center;"></i> 2nd Prize: <strong>${news.prize2 || 0}</strong></div>
+                            <div><i class="fas fa-times-circle" style="color:#ef4444; width:15px; text-align:center;"></i> Wrong: <strong>-${news.markWrong || 5}</strong></div>
+                            <div><i class="fas fa-award" style="color:#b45309; width:15px; text-align:center;"></i> 3rd Prize: <strong>${news.prize3 || 0}</strong></div>
+                        </div>
+                        
+                        <div id="mcq-timer-${news.id}" style="margin-bottom: 10px; font-size: 0.8rem; font-weight: bold; text-align: center; color: #facc15; background: rgba(250, 204, 21, 0.1); padding: 6px; border-radius: 6px;"></div>
 
-                    ${btnHtml}
+                        <div style="margin-top:auto;">
+                            ${btnHtml}
+                            <div class="inline-actions" style="margin-top: 10px; justify-content: center;">
+                                <button onclick="shareMCQ('${news.id}')" class="inline-action-btn"><i class="fas fa-share-alt"></i><span>Share Quiz</span></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
-        });
-        
-        container.innerHTML = htmlContent;
-
-        activeNewsArray.forEach(news => {
-            const hasDeadline = news.deadline && news.deadline !== "";
-            const isClosed = (hasDeadline && now > new Date(news.deadline).getTime()) || news.status === 'resolved';
+            container.appendChild(card);
 
             const timerEl = document.getElementById(`mcq-timer-${news.id}`);
             if (timerEl && !isClosed && news.status !== 'resolved') {
@@ -1438,6 +1491,7 @@
                 timerEl.style.backgroundColor = news.status === 'resolved' ? "rgba(168, 85, 247, 0.1)" : "rgba(239, 68, 68, 0.1)";
             }
         });
+        updateMcqStreamPosition(false);
     }
 
     async function handlePredictClick(newsId) {
@@ -1493,6 +1547,28 @@
         shareText += `📖 Read more please visit website: `;
 
         let shareData = { title: news.title, text: shareText, url: window.location.origin + window.location.pathname + "?post=" + newsId };
+
+        if (news.mediaUrls && news.mediaUrls.length > 0) {
+            try {
+                const response = await fetch(news.mediaUrls[0]); const blob = await response.blob();
+                let ext = blob.type === 'image/png' ? 'png' : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'video/mp4' ? 'mp4' : 'jpg'));
+                const file = new File([blob], `media.${ext}`, { type: blob.type || 'image/jpeg' });
+                if (navigator.canShare && navigator.canShare({ files:[file] })) shareData.files =[file];
+            } catch (e) { console.log('Error attaching media file', e); }
+        }
+        try { await navigator.share(shareData); } catch(err) { console.log('Share failed:', err); }
+    }
+
+    async function shareMCQ(newsId) {
+        const news = allNewsData[newsId];
+        if (!navigator.share) return showNotification("Share not supported on this browser.", "warning");
+        
+        let shareText = `🎯 Join my MCQ Quiz: ${news.title}\n\n`;
+        if (news.desc) shareText += `${news.desc.length > 100 ? news.desc.substring(0, 100) + '...' : news.desc}\n\n`;
+        shareText += `🏆 Prizes up to ${news.prize1 || 0} Coins!\n`;
+        shareText += `👉 Play here: `;
+
+        let shareData = { title: news.title, text: shareText, url: window.location.origin + window.location.pathname + "?mcq=" + newsId };
 
         if (news.mediaUrls && news.mediaUrls.length > 0) {
             try {
@@ -1587,7 +1663,7 @@
         
         if(!text) return;
         
-        let name = document.getElementById('profile-name').innerText;
+        let name = document.getElementById('profile-edit-name').value;
         if (!name || name === "Loading...") {
             name = currentUser.email.split('@')[0];
         }
@@ -1634,7 +1710,7 @@
     function replyCommentInit(id, name) { document.getElementById('comment-reply-id').value = id; document.getElementById('comment-input').focus(); document.getElementById('comment-reply-preview').innerHTML = `Replying to ${name} <button onclick="cancelCommentReplyEdit()" style="background:none; border:none; color:white; cursor:pointer;">x</button>`; document.getElementById('comment-reply-preview').classList.remove('hidden-panel'); }
     function cancelCommentReplyEdit() { document.getElementById('comment-reply-id').value = ''; document.getElementById('comment-edit-id').value = ''; document.getElementById('comment-reply-preview').classList.add('hidden-panel'); document.getElementById('comment-input').value = ''; }
 
-    /* SWIPE GESTURE LOGIC */
+    /* SWIPE GESTURE LOGIC FOR POSTS */
     function handleCardScroll(e) { if(e.target.scrollTop > 0) e.stopPropagation(); }
     DOM.newsStream.addEventListener('touchstart', e => { if (isSwipeDisabled || e.touches.length > 1) return; isDragging = true; touchStartY = e.touches[0].clientY; touchStartX = e.touches[0].clientX; DOM.newsStream.style.transition = 'none'; });
     DOM.newsStream.addEventListener('touchmove', e => {
@@ -1666,6 +1742,39 @@
     function updateStreamPosition(animate) {
         if (animate) DOM.newsStream.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)'; else DOM.newsStream.style.transition = 'none';
         DOM.newsStream.style.transform = `translate3d(0, ${-currentNewsIndex * 100}%, 0)`;
+    }
+
+    /* SWIPE GESTURE LOGIC FOR MCQs */
+    DOM.mcqStream.addEventListener('touchstart', e => { if (isMcqSwipeDisabled || e.touches.length > 1) return; isMcqDragging = true; mcqTouchStartY = e.touches[0].clientY; mcqTouchStartX = e.touches[0].clientX; DOM.mcqStream.style.transition = 'none'; });
+    DOM.mcqStream.addEventListener('touchmove', e => {
+        if (isMcqSwipeDisabled || !isMcqDragging) return; 
+        const dragDeltaY = e.touches[0].clientY - mcqTouchStartY, dragDeltaX = e.touches[0].clientX - mcqTouchStartX;
+        if(Math.abs(dragDeltaY) > Math.abs(dragDeltaX)) {
+            let targetPercent = (-currentMcqIndex * 100) + ((dragDeltaY / window.innerHeight) * 100);
+            if ((currentMcqIndex === 0 && dragDeltaY > 0) || (currentMcqIndex === activeNewsArray.length - 1 && dragDeltaY < 0)) targetPercent = (-currentMcqIndex * 100) + (((dragDeltaY / window.innerHeight) * 100) * 0.3);
+            DOM.mcqStream.style.transform = `translate3d(0, ${targetPercent}%, 0)`;
+        }
+    });
+    DOM.mcqStream.addEventListener('touchend', e => {
+        if (isMcqSwipeDisabled || !isMcqDragging) return; isMcqDragging = false;
+        const finalDragDeltaY = e.changedTouches[0].clientY - mcqTouchStartY, finalDragDeltaX = e.changedTouches[0].clientX - mcqTouchStartX;
+        
+        if (Math.abs(finalDragDeltaY) > (window.innerHeight / 6)) {
+            if (finalDragDeltaY < 0 && currentMcqIndex < activeNewsArray.length - 1) currentMcqIndex++;
+            else if (finalDragDeltaY > 0 && currentMcqIndex > 0) currentMcqIndex--;
+        }
+        updateMcqStreamPosition(true);
+    });
+    DOM.mcqStream.addEventListener('wheel', e => { 
+        if(isMcqSwipeDisabled || isMcqDragging) return; 
+        if(e.deltaY > 0 && currentMcqIndex < activeNewsArray.length - 1) { currentMcqIndex++; updateMcqStreamPosition(true); } 
+        else if(e.deltaY < 0 && currentMcqIndex > 0) { currentMcqIndex--; updateMcqStreamPosition(true); } 
+    });
+    
+    function updateMcqStreamPosition(animate) {
+        if (animate) DOM.mcqStream.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)'; 
+        else DOM.mcqStream.style.transition = 'none';
+        DOM.mcqStream.style.transform = `translate3d(0, ${-currentMcqIndex * 100}%, 0)`;
     }
 
     function closeModal(id) { 
