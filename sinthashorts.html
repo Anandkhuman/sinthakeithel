@@ -14,12 +14,12 @@
     <style>
         :root {
             --bg-color: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            --card-bg-color: #1e1e1e;
+            --card-bg-color:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             --primary-text-color: #f0f0f0;
             --secondary-text-color: #b0b0b0;
             --accent-color-1: #00aeff; 
             --accent-color-2: #00e0c4; 
-            --header-bg-color: rgba(24, 24, 24, 0.95);
+            --header-bg-color: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             --border-color: #2f2f2f;
             --menu-bg-color: rgba(20, 20, 20, 0.85);
             --font-main: 'Inter', system-ui, sans-serif;
@@ -168,7 +168,7 @@
 
         /* DASHBOARDS (ADMIN & PROFILE) */
         .admin-layout { position: absolute; inset: 0; background: #f3f4f6; overflow-y: auto; z-index: 950; color: #1f2937; }
-        .admin-topbar { background: #3b82f6; padding: 10px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
+        .admin-topbar { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);; padding: 10px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 20; color: white; }
         .admin-topbar.yellow { background: #111827; color: white; border-bottom: 3px solid #eab308; }
         .admin-topbar h1 { font-size: 1.05em; font-weight: bold; color: #eab308;}
         .admin-back-btn { background: #374151; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 0.8em;}
@@ -219,6 +219,26 @@
         .toast-info { border-left: 3px solid #3b82f6; } .toast-info i { color: #3b82f6; }
         @keyframes slideDownFade { to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUpFade { to { opacity: 0; transform: translateY(-20px); } }
+
+        /* History Items CSS */
+        .history-list { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #4b5563 transparent;}
+        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .history-item { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #9ca3af; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
+        .history-item.status-paid { border-left-color: #10b981; }
+        .history-item.status-rejected { border-left-color: #ef4444; }
+        .history-item.status-pending { border-left-color: #facc15; }
+        .history-item-info { display: flex; flex-direction: column; gap: 4px; }
+        .history-amt { font-weight: bold; color: #f3f4f6; font-size: 0.95rem; }
+        .history-upi { font-size: 0.75rem; color: #9ca3af; }
+        .history-date { font-size: 0.7rem; color: #6b7280; }
+        .history-remarks { font-size: 0.75rem; color: #fca5a5; margin-top: 4px; padding: 4px; background: rgba(239, 68, 68, 0.1); border-radius: 4px; border-left: 2px solid #ef4444;}
+        .status-badge { font-size: 0.65rem; padding: 3px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; text-align: center;}
+        .status-badge.status-paid { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-badge.status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-badge.status-pending { background: rgba(250, 204, 21, 0.2); color: #facc15; }
+        .history-delete-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; cursor: pointer; padding: 6px; border-radius: 6px; font-size: 0.85rem; transition: 0.2s;}
+        .history-delete-btn:hover { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
@@ -456,6 +476,11 @@
         <div class="admin-panel-card yellow">
             <h2 class="admin-card-title"><i class="fas fa-history"></i> Withdrawal History</h2>
             <div id="profile-withdrawal-history" class="history-list"><p style="font-size: 0.8rem; color: #6b7280;">Loading history...</p></div>
+        </div>
+
+        <div class="admin-panel-card purple">
+            <h2 class="admin-card-title"><i class="fas fa-list-alt"></i> MCQ / Prediction History</h2>
+            <div id="profile-mcq-history" class="history-list"><p style="font-size: 0.8rem; color: #6b7280;">Loading history...</p></div>
         </div>
 
         <div class="admin-panel-card purple">
@@ -785,6 +810,7 @@
         } else {
             userPredictions = {};
         }
+        renderUserMCQHistory();
     }
     
     let dynamicCategories =["Headlines", "Sports", "Jobs", "Editorial", "Announcement", "Education", "Snippets", "Press", "Tech", "Politics", "Crypto"]; 
@@ -1081,14 +1107,90 @@
         db.ref('withdrawals').orderByChild('uid').equalTo(uid).on('value', snap => {
             const data = snap.val() || {}; const container = document.getElementById('profile-withdrawal-history');
             if(!container) return; container.innerHTML = '';
-            const historyArr = Object.keys(data).map(id => ({ id, ...data[id] })).sort((a,b) => b.timestamp - a.timestamp);
+            
+            const historyArr = Object.keys(data).map(id => ({ id, ...data[id] })).filter(r => !r.deletedByUser).sort((a,b) => b.timestamp - a.timestamp);
+            
             if(historyArr.length === 0) { container.innerHTML = '<p style="font-size: 0.8rem; color: #6b7280;">No withdrawal history found.</p>'; return; }
             
             historyArr.forEach(req => {
                 let statusClass = req.status === 'paid' ? 'status-paid' : (req.status === 'rejected' ? 'status-rejected' : 'status-pending');
-                container.innerHTML += `<div class="history-item"><div class="history-item-info"><span class="history-amt"><i class="fas fa-coins" style="color: #facc15; font-size: 0.8em;"></i> ${req.amount}</span><span class="history-upi">UPI: ${req.upi}</span><span class="history-date">${new Date(req.timestamp).toLocaleString()}</span></div><span class="status-badge ${statusClass}">${req.status}</span></div>`;
+                let remarksHtml = (req.status === 'rejected' && req.remarks) ? `<div class="history-remarks">Reason: ${req.remarks}</div>` : '';
+                container.innerHTML += `
+                    <div class="history-item ${statusClass}">
+                        <div class="history-item-info" style="flex-grow:1;">
+                            <span class="history-amt"><i class="fas fa-coins" style="color: #facc15; font-size: 0.8em;"></i> ${req.amount}</span>
+                            <span class="history-upi">UPI: ${req.upi}</span>
+                            <span class="history-date">${new Date(req.timestamp).toLocaleString()}</span>
+                            ${remarksHtml}
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; gap:8px;">
+                            <span class="status-badge ${statusClass}">${req.status}</span>
+                            <button onclick="deleteWithdrawalHistory('${req.id}')" class="history-delete-btn" title="Delete History"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
             });
         });
+    }
+
+    function renderUserMCQHistory() {
+        if(!currentUser) return;
+        const container = document.getElementById('profile-mcq-history');
+        if(!container) return;
+        
+        let historyArr =[];
+        for (let newsId in userPredictions) {
+            const pred = userPredictions[newsId];
+            if (pred.deletedByUser) continue; 
+            
+            const news = allNewsData[newsId];
+            if (news && (news.isPredictionMode === true || news.isPredictionMode === "true")) {
+                historyArr.push({ newsId, pred, news });
+            }
+        }
+        
+        historyArr.sort((a,b) => b.pred.timestamp - a.pred.timestamp);
+        
+        if(historyArr.length === 0) {
+            container.innerHTML = '<p style="font-size: 0.8rem; color: #6b7280;">No MCQ history found.</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        historyArr.forEach(item => {
+            let statusText = item.news.status === 'resolved' ? 'Resolved' : 'Active/Pending';
+            let statusColor = item.news.status === 'resolved' ? '#a855f7' : '#3b82f6';
+            let btnHtml = item.news.status === 'resolved' ? 
+                `<button onclick="showLeaderboard('${item.newsId}')" style="background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">View Results</button>` : 
+                `<button onclick="openPredictionModal('${item.newsId}')" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">View Answers</button>`;
+
+            container.innerHTML += `
+                <div class="history-item" style="border-left-color: ${statusColor};">
+                    <div class="history-item-info" style="flex-grow:1; padding-right:10px;">
+                        <span style="font-weight:bold; font-size:0.85rem; color:#f3f4f6; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${item.news.title}</span>
+                        <span class="history-date">Joined: ${new Date(item.pred.timestamp).toLocaleString()}</span>
+                        <span style="font-size:0.75rem; color:${statusColor}; font-weight:bold;">${statusText}</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; gap:8px;">
+                        ${btnHtml}
+                        <button onclick="deleteMCQHistoryLocal('${item.newsId}')" class="history-delete-btn" title="Remove from view"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function deleteWithdrawalHistory(id) {
+        if(await customConfirm("Are you sure you want to delete this from your history?")) {
+            await db.ref(`withdrawals/${id}`).update({ deletedByUser: true });
+            showNotification("History deleted successfully.", "success");
+        }
+    }
+
+    async function deleteMCQHistoryLocal(newsId) {
+        if(await customConfirm("Are you sure you want to delete this MCQ from your history?")) {
+            await db.ref(`predictions/${newsId}/${currentUser.uid}`).update({ deletedByUser: true });
+            showNotification("History deleted successfully.", "success");
+        }
     }
 
     function showStaticInfo(type) {
@@ -1216,6 +1318,7 @@
             filterFeed(currentCategory); 
             renderAdminPostList(); 
             renderAdminMCQList();
+            renderUserMCQHistory();
         });
     }
 
@@ -2247,9 +2350,23 @@
     }
 
     async function resolveWithdrawal(id, status, uid = null, amount = 0) {
+        let remarks = "";
+        if (status === 'rejected') {
+            remarks = await customPrompt("Enter reason for rejection (Remarks for user):");
+            if (remarks === null) return; 
+        }
+        
         if (await customConfirm(`Mark this withdrawal as ${status.toUpperCase()}?`)) {
-            if (status === 'rejected' && uid && amount) { const snap = await db.ref(`users/${uid}/wallet`).once('value'); await db.ref(`users/${uid}`).update({ wallet: (snap.val() || 0) + amount }); }
-            await db.ref(`withdrawals/${id}`).update({ status: status }); showNotification(`Marked as ${status}`, "success");
+            if (status === 'rejected' && uid && amount) { 
+                const snap = await db.ref(`users/${uid}/wallet`).once('value'); 
+                await db.ref(`users/${uid}`).update({ wallet: (snap.val() || 0) + amount }); 
+            }
+            
+            let updatePayload = { status: status };
+            if (remarks) updatePayload.remarks = remarks;
+            
+            await db.ref(`withdrawals/${id}`).update(updatePayload); 
+            showNotification(`Marked as ${status}`, "success");
         }
     }
 
