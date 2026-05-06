@@ -867,7 +867,7 @@
     document.getElementById('mcq-media-file').addEventListener('change', fileHandler);
 
     function timeAgo(timestamp) {
-        if (!timestamp) return '';
+        if (!timestamp || typeof timestamp === 'object') return 'Just now';
         const now = new Date();
         const past = new Date(timestamp);
         const diffMs = now - past;
@@ -1335,10 +1335,10 @@
                 activeNewsArray.sort((a,b) => {
                     let aScore = (allLikes[a.id] ? Object.keys(allLikes[a.id]).length : 0) + (allComments[a.id] ? Object.keys(allComments[a.id]).length : 0);
                     let bScore = (allLikes[b.id] ? Object.keys(allLikes[b.id]).length : 0) + (allComments[b.id] ? Object.keys(allComments[b.id]).length : 0);
-                    return (bScore - aScore) || (b.createdAt - a.createdAt);
+                    return (bScore - aScore) || ((b.createdAt||0) - (a.createdAt||0));
                 });
             } else {
-                activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
+                activeNewsArray.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
                 if(category !== 'all') activeNewsArray = activeNewsArray.filter(n => n.category && n.category.toLowerCase() === category);
             }
 
@@ -1354,7 +1354,7 @@
             
         } else if (currentMainTab === 'mcq') {
             activeNewsArray = fullArr.filter(n => n.isPredictionMode === true || n.isPredictionMode === "true");
-            activeNewsArray.sort((a,b) => b.createdAt - a.createdAt);
+            activeNewsArray.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
             
             if (initialMcqId) {
                 const targetIdx = activeNewsArray.findIndex(n => n.id === initialMcqId);
@@ -2011,45 +2011,90 @@
     }
 
     // AUTO RSS
-    window.rssIntervals = {};
-    function manageAutoRssService() {
-        if (!isAdmin) return;
-        if (window.rssIntervals) Object.values(window.rssIntervals).forEach(clearInterval);
-        window.rssIntervals = {};
-        Object.keys(allRssFeeds).forEach(feedId => {
-            const feed = allRssFeeds[feedId], intervalMs = (feed.intervalMins || 30) * 60 * 1000, now = Date.now();
-            if (!feed.lastChecked || (now - feed.lastChecked) > intervalMs) checkSingleRssFeed(feedId, feed);
-            window.rssIntervals[feedId] = setInterval(() => checkSingleRssFeed(feedId, feed), intervalMs);
-        });
-    }
-
     function extractTextFromHTML(htmlString) {
         if(!htmlString) return "";
-        let text = htmlString.replace(/<br\s*[\/]?>/gi, "\n").replace(/<\/p>/gi, "\n\n").replace(/<\/div>/gi, "\n").replace(/<[^>]+>/g, ""); 
+        let text = String(htmlString).replace(/<br\s*[\/]?>/gi, "\n").replace(/<\/p>/gi, "\n\n").replace(/<\/div>/gi, "\n").replace(/<[^>]+>/g, ""); 
         let tmp = document.createElement("textarea"); tmp.innerHTML = text; return tmp.value.trim();
     }
 
     async function checkSingleRssFeed(feedId, feed) {
         if(!feed || !feed.url) return;
         try {
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`), data = await res.json();
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`);
+            const data = await res.json();
             if(data.status === 'ok') {
                 let count = 0;
                 for(let item of data.items) {
-                    if(!Object.values(allNewsData).some(n => (n.rssLink && n.rssLink === item.link) || n.title === item.title)) {
-                        let cleanText = extractTextFromHTML(item.content).length > extractTextFromHTML(item.description).length ? extractTextFromHTML(item.content) : extractTextFromHTML(item.description);
-                        let imgUrl = item.thumbnail || (item.enclosure ? item.enclosure.link : "");
-                        if (!imgUrl && item.content) { let tmp = document.createElement("DIV"); tmp.innerHTML = item.content; let img = tmp.querySelector("img"); if (img && img.src) imgUrl = img.src; }
-                        if (!imgUrl || imgUrl.trim() === "") imgUrl = getDefaultImageForCategory(feed.category);
+                    let exists = Object.values(allNewsData).some(n => 
+                        (n.rssLink && n.rssLink === item.link) || 
+                        (n.title && n.title === item.title)
+                    );
+                    
+                    if(!exists) {
+                        let contentStr = item.content || item.description || "";
+                        let descStr = item.description || item.content || "";
+                        let cleanText = extractTextFromHTML(contentStr).length > extractTextFromHTML(descStr).length ? extractTextFromHTML(contentStr) : extractTextFromHTML(descStr);
                         if(cleanText.length > 50000) cleanText = cleanText.substring(0, 50000) + "...";
                         
-                        await db.ref('news').push({ title: item.title, desc: cleanText, mediaUrls:[imgUrl], mediaType: 'image', category: feed.category, createdAt: firebase.database.ServerValue.TIMESTAMP, status: 'active', isPredictionMode: false, rssLink: item.link });
+                        let imgUrl = item.thumbnail || (item.enclosure ? item.enclosure.link : "");
+                        if (!imgUrl && item.content) { 
+                            let tmp = document.createElement("DIV"); 
+                            tmp.innerHTML = item.content; 
+                            let img = tmp.querySelector("img"); 
+                            if (img && img.src) imgUrl = img.src; 
+                        }
+                        if (!imgUrl && item.description) { 
+                            let tmp = document.createElement("DIV"); 
+                            tmp.innerHTML = item.description; 
+                            let img = tmp.querySelector("img"); 
+                            if (img && img.src) imgUrl = img.src; 
+                        }
+                        if (!imgUrl || imgUrl.trim() === "") imgUrl = getDefaultImageForCategory(feed.category);
+                        
+                        await db.ref('news').push({ 
+                            title: item.title, 
+                            desc: cleanText, 
+                            mediaUrls:[imgUrl], 
+                            mediaType: 'image', 
+                            category: feed.category || "headlines", 
+                            createdAt: firebase.database.ServerValue.TIMESTAMP, 
+                            status: 'active', 
+                            isPredictionMode: false, 
+                            rssLink: item.link 
+                        });
                         count++;
                     }
                 }
                 await db.ref(`rss_feeds/${feedId}`).update({ lastChecked: firebase.database.ServerValue.TIMESTAMP });
+                if(count > 0 && isAdmin) {
+                    showNotification(`Auto RSS: Fetched ${count} new posts for category '${feed.category}'.`, "info");
+                }
+            } else {
+                console.error("RSS Fetch Failed:", data.message);
             }
         } catch(e) { console.error("Auto RSS Fetch Error:", e); }
+    }
+
+    window.rssIntervals = {};
+    function manageAutoRssService() {
+        if (!isAdmin) return;
+        if (window.rssIntervals) Object.values(window.rssIntervals).forEach(clearInterval);
+        window.rssIntervals = {};
+        Object.keys(allRssFeeds).forEach(feedId => {
+            const feed = allRssFeeds[feedId];
+            const intervalMs = (feed.intervalMins || 30) * 60 * 1000;
+            const now = Date.now();
+            const lastCheckedMs = (typeof feed.lastChecked === 'number') ? feed.lastChecked : 0;
+            
+            if (!lastCheckedMs || (now - lastCheckedMs) > intervalMs) {
+                checkSingleRssFeed(feedId, feed);
+            }
+            
+            window.rssIntervals[feedId] = setInterval(() => {
+                const latestFeed = allRssFeeds[feedId];
+                if(latestFeed) checkSingleRssFeed(feedId, latestFeed);
+            }, intervalMs);
+        });
     }
 
     async function addAutoRssFeed() {
@@ -2078,7 +2123,7 @@
         const ids = Object.keys(allRssFeeds); if (ids.length === 0) return list.innerHTML = '<p style="font-size:0.8rem; color:#6b7280;">No auto feeds active.</p>';
         ids.forEach(id => {
             const feed = allRssFeeds[id];
-            list.innerHTML += `<div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><div style="overflow: hidden; padding-right: 10px;"><strong style="font-size: 0.85em; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.url}</strong><span style="font-size: 0.75em; color: #6b7280;">Cat: ${feed.category} | Every ${feed.intervalMins}m | Last Check: ${feed.lastChecked ? new Date(feed.lastChecked).toLocaleTimeString() : 'Never'}</span></div><div style="display: flex; gap: 5px;"><button onclick="checkSingleRssFeed('${id}', allRssFeeds['${id}'])" class="admin-sm-btn" style="background:#3b82f6;" title="Force Check Now"><i class="fas fa-sync-alt"></i></button><button onclick="editAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#eab308; color:#111827;" title="Edit Feed"><i class="fas fa-edit"></i></button><button onclick="removeAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete Feed"><i class="fas fa-trash"></i></button></div></div>`;
+            list.innerHTML += `<div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><div style="overflow: hidden; padding-right: 10px;"><strong style="font-size: 0.85em; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.url}</strong><span style="font-size: 0.75em; color: #6b7280;">Cat: ${feed.category} | Every ${feed.intervalMins}m | Last Check: ${feed.lastChecked && typeof feed.lastChecked === 'number' ? new Date(feed.lastChecked).toLocaleTimeString() : 'Never'}</span></div><div style="display: flex; gap: 5px;"><button onclick="checkSingleRssFeed('${id}', allRssFeeds['${id}'])" class="admin-sm-btn" style="background:#3b82f6;" title="Force Check Now"><i class="fas fa-sync-alt"></i></button><button onclick="editAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#eab308; color:#111827;" title="Edit Feed"><i class="fas fa-edit"></i></button><button onclick="removeAutoRssFeed('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete Feed"><i class="fas fa-trash"></i></button></div></div>`;
         });
     }
 
@@ -2189,11 +2234,33 @@
 
     function renderAdminPostList() {
         const container = document.getElementById('admin-all-posts-list'); if(!container) return; container.innerHTML = '';
-        const ids = Object.keys(allNewsData).reverse().filter(id => !(allNewsData[id].isPredictionMode === true || allNewsData[id].isPredictionMode === "true"));
+        const ids = Object.keys(allNewsData).filter(id => !(allNewsData[id].isPredictionMode === true || allNewsData[id].isPredictionMode === "true"));
+        ids.sort((a,b) => (allNewsData[b].createdAt || 0) - (allNewsData[a].createdAt || 0));
+        
         if(ids.length === 0) return container.innerHTML = "<p style='font-size:0.8rem; color:#6b7280;'>No posts available.</p>"; 
+        
         ids.forEach(id => {
             const n = allNewsData[id];
-            container.innerHTML += `<div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><div style="overflow: hidden; padding-right: 10px; flex-grow: 1;"><strong style="font-size: 0.85em; color: #1f2937; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title || 'Untitled'}</strong><span style="font-size: 0.75em; color: #6b7280;">Cat: ${n.category || 'N/A'}</span></div><div style="display: flex; gap: 5px; flex-shrink: 0;"><button onclick="editPost('${id}')" class="admin-sm-btn" style="background:#3b82f6;" title="Edit"><i class="fas fa-edit"></i></button><button onclick="deletePost('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button></div></div>`;
+            let dateStr = 'Unknown Time';
+            if (n.createdAt) {
+                if (typeof n.createdAt === 'object') dateStr = 'Just now';
+                else dateStr = new Date(n.createdAt).toLocaleString();
+            }
+            
+            container.innerHTML += `
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="overflow: hidden; padding-right: 10px; flex-grow: 1;">
+                    <strong style="font-size: 0.85em; color: #1f2937; display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title || 'Untitled'}</strong>
+                    <span style="font-size: 0.75em; color: #6b7280; display:block; margin-top:2px;">
+                        Cat: ${n.category || 'N/A'} <br> 
+                        Uploaded: <span style="color:#3b82f6; font-weight:600;">${dateStr}</span>
+                    </span>
+                </div>
+                <div style="display: flex; gap: 5px; flex-shrink: 0;">
+                    <button onclick="editPost('${id}')" class="admin-sm-btn" style="background:#3b82f6;" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePost('${id}')" class="admin-sm-btn" style="background:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
         });
     }
 
