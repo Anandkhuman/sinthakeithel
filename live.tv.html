@@ -1,0 +1,3765 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintha Live TV & Radio Streaming App</title>
+    
+    <!-- External Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- NEW: HLS.js for M3U8 video streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- NEW: Vimeo Player API for Vimeo support and sync -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
+
+
+    <!-- CSS Styles -->
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #f1f3f6;
+            --header-color: #ffffff;
+            --bottom-nav-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #e50914;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+            --admin-color: #007bff;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #121212;
+            --secondary-color: #1e1e1e;
+            --header-color: #1e1e1e;
+            --bottom-nav-color: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-color: #e50914;
+            --border-color: #333333;
+            --shadow-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding-top: 58px; /* Header height */
+            padding-bottom: 58px; /* Bottom nav height */
+            font-size: 14px; /* Slightly reduced base font size */
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* General Button Style */
+        .btn {
+            width: 100%;
+            padding: 10px; /* Slightly decreased padding */
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px; /* Slightly decreased font size */
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Improved Loading Spinner */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(var(--primary-color), 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .spinner-container {
+            position: relative;
+            width: 65px;
+            height: 65px;
+        }
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--accent-color);
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+        .spinner-ring:nth-child(2) {
+            border-top-color: transparent;
+            border-bottom-color: var(--text-color);
+            animation: spin-reverse 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spin-reverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(-360deg); }
+        }
+
+        /* --- Authentication Panel --- */
+        #auth-container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 10px; /* Slightly decreased padding */
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 11px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        
+        .auth-form p {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .auth-form a {
+            color: var(--accent-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* --- User App Panel --- */
+        #user-app-container {
+            max-height: 100vh;
+        }
+
+        /* Header */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 58px;
+            background-color: var(--header-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 1.7em;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Spacing between icons/buttons */
+        }
+        
+        #header-admin-btn {
+            background-color: var(--admin-color);
+            color: white;
+            padding: 7px 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #header-admin-btn:hover {
+             background-color: #0056b3;
+        }
+
+        .header-actions .theme-switcher {
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px; /* Width of the switch */
+            height: 26px; /* Height of the switch */
+        }
+        .header-actions .switch input { display: none; }
+        .header-actions .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+        .header-actions .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; /* Size of the circle */
+            width: 18px;
+            left: 4px; /* Padding from left */
+            bottom: 4px; /* Padding from bottom */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            /* NEW: Adding icons inside */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            font-size: 11px;
+            color: #ffc107;
+            content: "\f185"; /* Sun icon */
+        }
+        .header-actions input:checked + .slider { background-color: var(--accent-color); }
+        .header-actions input:checked + .slider:before {
+            transform: translateX(22px); /* How much the circle moves */
+            color: #90c0f0;
+            content: "\f186"; /* Moon icon */
+        }
+
+        .profile-icon-wrapper {
+            position: relative;
+        }
+
+        #header-profile-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 10px; /* Slightly decreased padding */
+        }
+
+        .page {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Category Section */
+        .category-section {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .category-section::-webkit-scrollbar {
+            display: none; /* Safari and Chrome */
+        }
+
+        .category-item {
+            background-color: var(--secondary-color);
+            padding: 8px 16px; /* Slightly decreased padding */
+            border-radius: 20px;
+            margin-right: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 13px;
+        }
+        .category-item.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Live TV Player & Floating Player Logic */
+        .live-tv-container {
+            margin-bottom: 18px;
+            position: relative;
+            background-color: #000;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .live-tv-container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 9998;
+            margin-bottom: 0;
+        }
+        .live-tv-container.fullscreen-mode #live-player,
+        .live-tv-container.fullscreen-mode #youtube-player-container,
+        .live-tv-container.fullscreen-mode #youtube-player,
+        .live-tv-container.fullscreen-mode #vimeo-player-container,
+        .live-tv-container.fullscreen-mode #vimeo-player {
+            height: 100%;
+            border-radius: 0;
+        }
+
+        .live-tv-container.mini-player-mode {
+            position: fixed;
+            bottom: 68px; /* Above bottom nav */
+            right: 12px;
+            width: 170px;
+            margin-bottom: 0;
+            z-index: 1050;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 2px solid var(--accent-color);
+            cursor: move; /* Indicate it can be dragged */
+            touch-action: none; /* Prevent scroll on mobile during drag */
+        }
+
+        .live-tv-container.mini-player-mode #live-player,
+        .live-tv-container.mini-player-mode .modern-audio-player,
+        .live-tv-container.mini-player-mode #youtube-player-container,
+        .live-tv-container.mini-player-mode #vimeo-player-container,
+        .live-tv-container.mini-player-mode #custom-video-controls {
+            pointer-events: none;
+        }
+
+        #video-overlay-container {
+            position: relative;
+            width: 100%;
+            height: 0; /* Height is set by padding-top */
+            line-height: 0; 
+            background-color: #000;
+            padding-top: 56.25%; /* Default 16:9 aspect ratio */
+        }
+        #youtube-player-container iframe,
+#vimeo-player-container iframe {
+    width: 100%;
+    height: 100%;
+}
+        #video-overlay-container > * {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #video-overlay-logo {
+            width: 75px;
+            height: auto;
+            max-height: 45px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        #live-player {
+            display: block;
+            border-radius: 12px;
+            background-color: #000;
+        }
+        
+        #custom-video-controls {
+            z-index: 20;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            /* Override absolute styles to position it correctly */
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            height: auto; 
+            width: auto;
+            top: auto;
+            left: auto;
+        }
+        #video-overlay-container:hover #custom-video-controls {
+            opacity: 1;
+        }
+        .control-btn {
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            padding: 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .control-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .modern-audio-player {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #121212, #2b2b2b);
+            padding: 14px;
+            color: white;
+            gap: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            position: static; /* Let it flow normally */
+        }
+        .audio-artwork {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 3px solid var(--accent-color);
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+        .audio-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .rotating-artwork {
+            animation: spin-record 4s linear infinite;
+        }
+        .rotating-artwork.paused {
+            animation-play-state: paused;
+        }
+        @keyframes spin-record {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .audio-ui {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        
+        .audio-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 22px;
+            margin-bottom: 2px;
+        }
+        .audio-visualizer .bar {
+            width: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            animation: bounce 1s infinite alternate;
+        }
+        .audio-visualizer .bar:nth-child(1) { height: 8px; animation-delay: 0.1s; }
+        .audio-visualizer .bar:nth-child(2) { height: 13px; animation-delay: 0.3s; }
+        .audio-visualizer .bar:nth-child(3) { height: 22px; animation-delay: 0.5s; }
+        .audio-visualizer .bar:nth-child(4) { height: 16px; animation-delay: 0.2s; }
+        .audio-visualizer .bar:nth-child(5) { height: 10px; animation-delay: 0.4s; }
+        .audio-visualizer.paused .bar {
+            animation-play-state: paused;
+            height: 4px !important;
+            transition: height 0.3s;
+        }
+
+        .audio-controls-modern {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #audio-play-pause {
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        #audio-play-pause:hover { transform: scale(1.1); }
+        
+        .audio-progress-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        #audio-progress-bar {
+            width: 100%;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+            height: 4px;
+        }
+        #audio-time {
+            font-size: 11px;
+            font-family: monospace;
+            opacity: 0.8;
+            min-width: 42px;
+            text-align: right;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .live-tv-container.mini-player-mode .modern-audio-player {
+            padding: 8px;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .live-tv-container.mini-player-mode .audio-artwork {
+            width: 45px;
+            height: 45px;
+        }
+        .live-tv-container.mini-player-mode .audio-visualizer {
+            display: none;
+        }
+        .live-tv-container.mini-player-mode #audio-time {
+            display: none;
+        }
+        .live-tv-container.mini-player-mode .audio-controls-modern {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .close-mini-player {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 13px;
+            cursor: pointer;
+            z-index: 1060;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .live-tv-container.mini-player-mode .close-mini-player {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .streaming-tabs {
+            display: flex;
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .tab-btn {
+            flex-grow: 1;
+            padding: 11px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            font-size: 13px;
+        }
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .swipe-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+        .swipe-container {
+            display: flex;
+            width: 200%; 
+            transition: transform 0.3s ease-in-out;
+            will-change: transform;
+        }
+        .swipe-page {
+            width: 50%; 
+            flex-shrink: 0;
+        }
+
+        .live-quiz-container {
+            background-color: var(--secondary-color);
+            padding: 18px;
+            border-radius: 12px;
+        }
+        .live-quiz-container h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        #quiz-question { font-size: 1.05em; margin-bottom: 14px; }
+        #quiz-options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+        }
+        #leaderboard h4 { margin-top: 18px; }
+        #leaderboard-list { list-style: none; padding: 0; }
+        #leaderboard-list li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border-color); }
+        #leaderboard-list li:last-child { border-bottom: none; }
+
+
+        .comments-container {
+            background-color: var(--secondary-color);
+            padding: 18px;
+            border-radius: 12px;
+        }
+        .comments-container h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .comment-input-area {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .comment-input-area input {
+            flex-grow: 1;
+            padding: 9px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        .comment-input-area button {
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+        }
+        .comment-item {
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .comment-item strong { color: var(--accent-color); }
+        .comment-item .time { font-size: 0.75em; opacity: 0.6; margin-left: 8px; }
+        .comment-actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+        .comment-actions span { cursor: pointer; opacity: 0.8; }
+        .comment-actions span:hover { opacity: 1; color: var(--accent-color); }
+        .replies-list {
+            margin-left: 18px;
+            margin-top: 8px;
+            border-left: 2px solid var(--border-color);
+            padding-left: 8px;
+        }
+        .reply-input-area { display: flex; gap: 8px; margin-top: 8px; }
+        .reply-input-area input {
+            flex-grow: 1; padding: 4px 8px; border-radius: 15px;
+            border: 1px solid var(--border-color); font-size: 0.85em;
+            background: var(--primary-color); color: var(--text-color);
+        }
+        .reply-input-area button {
+            padding: 4px 8px; border-radius: 15px;
+            background: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 0.85em;
+        }
+
+        .search-bar { margin-bottom: 18px; }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        #livetv-grid, #radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .livetv-item, .radio-item {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .livetv-item:hover, .radio-item:hover { transform: translateY(-4px); }
+        .livetv-item img, .radio-item img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            display: block;
+        }
+        .livetv-item-name, .radio-item-name { 
+            padding: 7px;
+            font-weight: bold; 
+            font-size: 13px;
+        }
+
+        #matches-grid { display: grid; gap: 18px; }
+        .match-card {
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            position: relative;
+        }
+        .match-card img { width: 100%; display: block; }
+        .match-card-content { padding: 14px; }
+        .match-card h3 { margin: 0 0 8px 0; font-size: 1.1em; }
+        .match-card p { margin: 4px 0; opacity: 0.8; font-size: 13px; }
+        .match-timer { font-size: 1.1em; font-weight: bold; color: var(--accent-color); margin: 8px 0; }
+        
+        .match-stats {
+            display: flex;
+            gap: 14px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85em;
+            color: #8e8e93;
+        }
+        .match-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .match-actions { display: flex; gap: 8px; margin-top: 14px; }
+        .match-actions button {
+            flex-grow: 1;
+            padding: 9px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .watch-match-btn { background-color: var(--accent-color); color: white; }
+        .join-competition-btn { background-color: #333; color: white; }
+        .join-competition-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* NEW: Share Icon Style */
+        .share-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 6px 7px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 5;
+            transition: background-color 0.2s;
+        }
+        .share-icon:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        
+        /* Profile Page */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #profile-page-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            color: var(--accent-color);
+            border: 3px solid var(--accent-color);
+        }
+        #profile-page h2 { margin-top: 0; }
+        .profile-info { 
+            background: var(--secondary-color);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .profile-info p { margin: 8px 0; }
+        
+        /* Wallet Page & Components */
+        .wallet-card {
+            background: linear-gradient(45deg, var(--accent-color), #ff4d4d);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .wallet-card h3 { margin: 0; font-size: 1.1em; opacity: 0.8;}
+        .wallet-balance { font-size: 2.3em; font-weight: bold; margin: 8px 0;}
+        .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .wallet-actions button {
+             background: var(--secondary-color);
+             color: var(--text-color);
+             padding: 14px;
+             border-radius: 8px;
+             border: none;
+             cursor: pointer;
+             font-weight: bold;
+             font-size: 0.95em;
+        }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input {
+             width: 100%;
+             padding: 10px;
+             border: 1px solid var(--border-color);
+             border-radius: 8px;
+             box-sizing: border-box;
+             background-color: var(--primary-color);
+             color: var(--text-color);
+        }
+        .transaction-list .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .transaction-list .item:last-child { border-bottom: none; }
+        .transaction-list .item .details p { margin: 0; }
+        .transaction-list .item .details .type { font-weight: bold; }
+        .transaction-list .item .details .date { font-size: 0.75em; opacity: 0.7; }
+        .transaction-list .item .amount { font-weight: bold; }
+        .transaction-list .item .amount.credit { color: var(--success-color); }
+        .transaction-list .item .amount.debit { color: var(--accent-color); }
+
+        /* Payment & Modern Alert Modal */
+        .modal {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--secondary-color);
+            margin: auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        .modal.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h3 { 
+            margin-top: 0; 
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .modal-content h3 .icon { display: inline-block; }
+        .modal-content h3 .icon.success { color: var(--success-color); }
+        .modal-content h3 .icon.warning { color: var(--warning-color); }
+        .modal-content h3 .icon.error { color: var(--error-color); }
+        .modal-content h3 .icon.confirm { color: var(--admin-color); }
+        
+        .modal-content p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-buttons button {
+            flex-grow: 1;
+            margin: 0;
+        }
+        .modal-content button { margin-top: 5px; }
+        #close-modal, .popup-cancel-btn { background-color: #6c757d; }
+        #pay-with-wallet-btn { background-color: var(--success-color); }
+        #pay-with-razorpay-btn { background-color: #007bff; }
+        .popup-ok-btn, .popup-confirm-btn { background-color: var(--accent-color); }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 58px;
+            background-color: var(--bottom-nav-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 5px var(--shadow-color);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #8e8e93;
+            text-decoration: none;
+            flex-grow: 1;
+            height: 100%;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .nav-item.active { 
+            color: var(--accent-color); 
+            transform: translateY(-2px);
+        }
+        .nav-item i, .nav-item svg { 
+            font-size: 20px; 
+            margin-bottom: 2px;
+        }
+        .nav-item span { 
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .nav-item.active span {
+            font-weight: bold;
+        }
+
+
+        /* --- Admin Panel --- */
+        #admin-panel-container {
+            padding: 10px;
+            padding-bottom: 70px;
+        }
+        
+        #admin-panel-container h1 { text-align: center; font-size: 1.6em; }
+
+        .admin-section {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        .admin-form-group { margin-bottom: 14px; }
+        .admin-form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select, .admin-form-group button {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        .admin-form-group .image-upload-options { margin-top: 5px; font-size: 0.85em; }
+        .admin-form-group .image-upload-options span { cursor: pointer; padding: 5px; border-radius: 5px;}
+        .admin-form-group .image-upload-options span.active { background-color: var(--accent-color); color: white; }
+        
+        .admin-form-group textarea { min-height: 90px; font-family: inherit; }
+
+        .admin-form-group button {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .admin-form-group .sync-options {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .admin-form-group .sync-options label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .data-list-item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .data-list-item .info { flex-basis: 100%; margin-bottom: 8px; }
+        .data-list-item .actions { margin-left: auto; }
+        .data-list-item button {
+            padding: 4px 9px;
+            margin-left: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+        }
+        .edit-btn { background-color: #007bff; }
+        .delete-btn { background-color: #dc3545; }
+        .approve-btn { background-color: var(--success-color); }
+        .reject-btn { background-color: var(--warning-color); color: #000; }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOADER -->
+    <div id="loader" class="hidden">
+        <div class="spinner-container">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+    </div>
+
+    <!-- MODERN ALERT/CONFIRM POPUP -->
+    <div id="modern-popup" class="modal">
+        <div class="modal-content">
+            <h3 id="popup-title"><span id="popup-icon" class="icon"></span><span id="popup-title-text"></span></h3>
+            <p id="popup-message"></p>
+            <div id="popup-buttons" class="modal-buttons">
+                <!-- Buttons will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <h3>Join Competition</h3>
+            <p>Select a payment method to pay the entry fee of <strong id="modal-fee"></strong>.</p>
+            <p>Your wallet balance: <strong id="modal-wallet-balance"></strong></p>
+            <button id="pay-with-wallet-btn" class="btn">Pay from Wallet</button>
+            <button id="pay-with-razorpay-btn" class="btn">Pay with Razorpay</button>
+            <button id="close-modal" class="btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION PANEL -->
+    <div id="auth-container" class="page hidden">
+        <div id="login-form" class="auth-form">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button id="login-btn">Login</button>
+            <p>Don't have an account? <a id="show-signup">Sign up</a></p>
+        </div>
+        <div id="signup-form" class="auth-form hidden">
+            <h2>Sign Up</h2>
+            <input type="text" id="signup-name" placeholder="Full Name" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="tel" id="signup-phone" placeholder="Phone Number" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button id="signup-btn">Sign Up</button>
+            <p>Already have an account? <a id="show-login">Login</a></p>
+        </div>
+    </div>
+
+    <!-- USER APP / PUBLIC PANEL -->
+    <div id="user-app-container">
+        <header class="fixed-header">
+            <div class="logo">Sintha Live</div>
+            <div class="header-actions">
+                <div class="theme-switcher">
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button id="header-admin-btn" class="hidden">Admin</button>
+                <div id="profile-icon-container" class="profile-icon-wrapper">
+                     <div id="header-profile-icon" data-nav="profile-page">
+                         <i class="fas fa-user"></i>
+                     </div>
+                </div>
+            </div>
+        </header>
+        
+        <div id="player-wrapper" class="hidden">
+            <div class="live-tv-container" id="live-tv-container">
+                <button id="close-mini-btn" class="close-mini-player"><i class="fas fa-times"></i></button>
+                
+                <div id="video-overlay-container">
+                    <img id="video-overlay-logo" src="" alt="Brand Logo" class="hidden">
+                    
+                    <video id="live-player" poster="https://i.ibb.co/ryj8vG1/placeholder-video.jpg" playsinline></video>
+                    
+                    <div id="youtube-player-container" class="hidden">
+                        <iframe id="youtube-player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+
+                    <!-- NEW: Vimeo player container -->
+                    <div id="vimeo-player-container" class="hidden">
+                         <iframe id="vimeo-player" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    
+                    <div id="custom-video-controls">
+                        <button id="reload-btn" class="control-btn"><i class="fas fa-redo"></i></button>
+                        <button id="fullscreen-btn" class="control-btn"><i class="fas fa-expand"></i></button>
+                    </div>
+                </div>
+                
+                <div id="modern-audio-player" class="modern-audio-player hidden">
+                    <div class="audio-artwork">
+                        <img id="audio-poster" src="https://i.ibb.co/ryj8vG1/placeholder-video.jpg" alt="Radio Poster" class="rotating-artwork paused">
+                    </div>
+                    <div class="audio-ui">
+                        <div class="audio-visualizer paused" id="audio-visualizer">
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        </div>
+                        <div class="audio-controls-modern">
+                            <button id="audio-play-pause"><i class="fas fa-play"></i></button>
+                            <div class="audio-progress-container">
+                                <input type="range" id="audio-progress-bar" value="0" min="0" max="100">
+                            </div>
+                            <div id="audio-time">LIVE</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <audio id="live-audio" style="display: none;"></audio>
+            </div>
+        </div>
+
+        <main class="main-content">
+
+            <div id="streaming-page" class="page hidden">
+                
+                <div id="streaming-content-wrapper">
+                    <div id="streaming-tabs" class="streaming-tabs hidden">
+                        <button id="tab-quiz" class="tab-btn active">Live Quiz</button>
+                        <button id="tab-comments" class="tab-btn">Comments</button>
+                    </div>
+                    
+                    <div id="swipe-wrapper" class="swipe-wrapper">
+                        <div id="swipe-container" class="swipe-container">
+                            
+                            <div id="quiz-section" class="swipe-page">
+                                <div class="live-quiz-container">
+                                    <h3>Live Quiz</h3>
+                                    <div id="quiz-question">No active quiz at the moment.</div>
+                                    <div id="quiz-options"></div>
+                                    <div id="leaderboard">
+                                        <h4>Leaderboard</h4>
+                                        <ul id="leaderboard-list"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="comments-section" class="swipe-page">
+                                <div class="comments-container">
+                                    <h3>Live Chat</h3>
+                                    <div class="comment-input-area">
+                                        <input type="text" id="comment-input" placeholder="Say something...">
+                                        <button id="send-comment-btn"><i class="fas fa-paper-plane"></i></button>
+                                    </div>
+                                    <div id="comments-list"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="livetv-page" class="page">
+                <div class="category-section" id="livetv-categories"></div>
+                <div class="search-bar">
+                    <input type="text" id="search-input-livetv" class="search-input" placeholder="Search for channels...">
+                </div>
+                <div id="livetv-grid"></div>
+            </div>
+            
+            <div id="radio-page" class="page hidden">
+                <h2>Radio</h2>
+                <div class="category-section" id="radio-categories"></div>
+                <div class="search-bar">
+                    <input type="text" id="search-input-radio" class="search-input" placeholder="Search for radio stations...">
+                </div>
+                <div id="radio-grid"></div>
+            </div>
+
+            <div id="matches-page" class="page hidden">
+                <div id="matches-grid"></div>
+            </div>
+
+            <div id="wallet-page" class="page hidden">
+                <h2>My Wallet</h2>
+                <div class="wallet-card">
+                    <h3>Available Balance</h3>
+                    <div class="wallet-balance" id="wallet-balance-display">₹0.00</div>
+                </div>
+                <div class="wallet-actions">
+                    <button id="show-topup-btn"><i class="fas fa-plus-circle"></i> Top Up</button>
+                    <button id="show-withdraw-btn"><i class="fas fa-paper-plane"></i> Withdraw</button>
+                </div>
+                 <button id="show-history-btn" class="btn" style="margin-top: 20px; background: var(--secondary-color); color: var(--text-color);">
+                     <i class="fas fa-history"></i> Transaction History
+                 </button>
+            </div>
+
+            <div id="topup-page" class="page hidden">
+                <h2>Top Up Wallet</h2>
+                <div class="form-group">
+                    <label for="topup-amount">Amount (INR)</label>
+                    <input type="number" id="topup-amount" placeholder="Enter amount to add">
+                </div>
+                <button id="proceed-to-pay-btn" class="btn">Proceed to Pay</button>
+                <button class="nav-back-btn btn" data-nav="wallet-page" style="background: #6c757d;">Back to Wallet</button>
+            </div>
+
+            <div id="withdraw-page" class="page hidden">
+                <h2>Request Withdrawal</h2>
+                <div class="form-group">
+                    <label for="withdraw-amount">Amount (INR)</label>
+                    <input type="number" id="withdraw-amount" placeholder="Enter amount to withdraw">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-upi">UPI ID</label>
+                    <input type="text" id="withdraw-upi" placeholder="Enter your UPI ID">
+                </div>
+                <button id="submit-withdrawal-request-btn" class="btn">Submit Request</button>
+                <button class="nav-back-btn btn" data-nav="wallet-page" style="background: #6c757d;">Back to Wallet</button>
+            </div>
+            
+            <div id="history-page" class="page hidden">
+                <h2>Transaction History</h2>
+                <div id="transaction-history-list" class="transaction-list">
+                    <p>No transactions yet.</p>
+                </div>
+                 <button class="nav-back-btn btn" data-nav="wallet-page" style="background: #6c757d;">Back to Wallet</button>
+            </div>
+
+            <div id="profile-page" class="page hidden">
+                <div class="profile-header">
+                     <div id="profile-page-image">
+                         <i class="fas fa-user"></i>
+                     </div>
+                     <input type="file" id="profile-image-upload" accept="image/*" class="hidden">
+                    <h2 id="user-name-display">Your Name</h2>
+                </div>
+
+                <div class="profile-info">
+                    <p><strong>Email:</strong> <span id="user-email">Not Logged In</span></p>
+                    <p><strong>Phone:</strong> <span id="user-phone">N/A</span></p>
+                </div>
+                
+                <div class="profile-update-form" style="margin-top: 20px; background: var(--secondary-color); padding: 15px; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">Update Profile</h3>
+                    <div class="form-group">
+                        <label for="update-name">Full Name</label>
+                        <input type="text" id="update-name" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="update-phone">Phone Number</label>
+                        <input type="tel" id="update-phone" placeholder="Your phone number">
+                    </div>
+                    <button id="update-profile-btn" class="btn">Save Changes</button>
+                </div>
+        
+                <div class="password-update-form" style="margin-top: 20px; background: var(--secondary-color); padding: 15px; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">Change Password</h3>
+                    <div class="form-group">
+                        <label for="update-password">New Password</label>
+                        <input type="password" id="update-password" placeholder="Enter new password (min. 6 characters)">
+                    </div>
+                    <button id="change-password-btn" class="btn">Update Password</button>
+                </div>
+
+                <button id="logout-btn" class="btn hidden" style="background-color: #dc3545; font-size: 15px; margin-top: 30px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <!-- ADMIN PANEL (now as a page) -->
+            <div id="admin-panel-container" class="page hidden">
+                <h1>Admin Panel</h1>
+
+                <div id="admin-streams-page" class="admin-section">
+                    <h2>Manage Live TV Streams</h2>
+                    <div class="admin-form-group">
+                        <label>Stream Name</label>
+                        <input type="text" id="stream-name" placeholder="e.g., Sports Channel 1">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Category</label>
+                        <select id="stream-category"></select>
+                    </div>
+                    <div class="admin-form-group hidden" id="new-stream-category-container">
+                        <label>New Category Name</label>
+                        <input type="text" id="new-stream-category-input" placeholder="e.g., Entertainment">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Video URLs (M3U8, YouTube, Vimeo, MP4 etc. - one per line)</label>
+                        <textarea id="stream-video-urls" placeholder="https://.../stream1.m3u8"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Separate Audio URL (Optional)</label>
+                        <input type="text" id="stream-audio-url" placeholder="https://.../audio.mp3">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Channel Image/Thumbnail</label>
+                        <div class="image-upload-options">
+                            <span class="img-opt-btn active" data-target="stream-upload-container">Upload</span>
+                            <span class="img-opt-btn" data-target="stream-link-container">Link</span>
+                        </div>
+                        <div id="stream-upload-container">
+                            <input type="file" id="stream-image-upload" accept="image/*" style="margin-top: 10px;">
+                            <input type="hidden" id="stream-image-base64">
+                        </div>
+                        <div id="stream-link-container" class="hidden">
+                            <input type="text" id="stream-image-url" placeholder="https://.../image.png" style="margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Video Overlay Logo (Optional)</label>
+                        <input type="file" id="stream-overlay-upload" accept="image/*,image/gif">
+                        <button type="button" id="remove-stream-overlay-btn" class="hidden" style="background-color: #6c757d; margin-top: 5px; width: auto; padding: 5px 10px;">Remove Overlay</button>
+                        <input type="hidden" id="stream-overlay-base64">
+                    </div>
+                     <!-- NEW: Global Sync Options -->
+                    <div class="admin-form-group">
+                        <label>Sync Options (for MP4/Vimeo)</label>
+                        <div class="sync-options">
+                            <label><input type="checkbox" id="stream-sync-enabled"> Enable Global Sync</label>
+                            <button id="reset-sync-btn" type="button" style="width: auto; padding: 5px 10px; background-color: var(--warning-color); color: #000;">Reset Sync Time</button>
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <input type="hidden" id="stream-edit-id">
+                        <button id="add-stream-btn">Add Stream</button>
+                        <button id="update-stream-btn" class="hidden">Update Stream</button>
+                    </div>
+                    <div id="streams-list"></div>
+                </div>
+                
+                <div id="admin-radio-page" class="admin-section hidden">
+                    <h2>Manage Radio Streams</h2>
+                    <div class="admin-form-group">
+                        <label>Radio Station Name</label>
+                        <input type="text" id="radio-name" placeholder="e.g., Radio City">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Category</label>
+                        <select id="radio-category"></select>
+                    </div>
+                    <div class="admin-form-group hidden" id="new-radio-category-container">
+                        <label>New Category Name</label>
+                        <input type="text" id="new-radio-category-input" placeholder="e.g., News & Talk">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Audio Stream URL</label>
+                        <input type="text" id="radio-audio-url" placeholder="https://.../stream.mp3">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Image</label>
+                        <div class="image-upload-options">
+                            <span class="img-opt-btn active" data-target="radio-upload-container">Upload</span>
+                            <span class="img-opt-btn" data-target="radio-link-container">Link</span>
+                        </div>
+                        <div id="radio-upload-container">
+                            <input type="file" id="radio-image-upload" accept="image/*" style="margin-top: 10px;">
+                            <input type="hidden" id="radio-image-base64">
+                        </div>
+                        <div id="radio-link-container" class="hidden">
+                            <input type="text" id="radio-image-url" placeholder="https://.../image.png" style="margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <input type="hidden" id="radio-edit-id">
+                        <button id="add-radio-btn">Add Radio</button>
+                        <button id="update-radio-btn" class="hidden">Update Radio</button>
+                    </div>
+                    <div id="radio-list"></div>
+                </div>
+
+                <div id="admin-matches-page" class="admin-section hidden">
+                    <h2>Manage Matches</h2>
+                    <div class="admin-form-group">
+                        <label>Match Name</label>
+                        <input type="text" id="match-name" placeholder="e.g., Final Championship">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Start Time</label>
+                        <input type="datetime-local" id="match-time">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Description</label>
+                        <textarea id="match-description"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Prize</label>
+                        <input type="text" id="match-prize" placeholder="e.g., 1000">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Location</label>
+                        <input type="text" id="match-location" placeholder="e.g., Virtual Stadium">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Entry Fee (in INR)</label>
+                        <input type="number" id="match-fee" placeholder="e.g., 10">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Link to a Live TV Stream</label>
+                        <select id="match-stream-link"></select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Match Image</label>
+                        <div class="image-upload-options">
+                            <span class="img-opt-btn active" data-target="match-upload-container">Upload</span>
+                            <span class="img-opt-btn" data-target="match-link-container">Link</span>
+                        </div>
+                        <div id="match-upload-container">
+                            <input type="file" id="match-image-upload" accept="image/*" style="margin-top: 10px;">
+                            <input type="hidden" id="match-image-base64">
+                        </div>
+                        <div id="match-link-container" class="hidden">
+                            <input type="text" id="match-image-url" placeholder="https://.../image.png" style="margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <input type="hidden" id="match-edit-id">
+                        <button id="add-match-btn">Add Match</button>
+                        <button id="update-match-btn" class="hidden">Update Match</button>
+                    </div>
+                    <hr>
+                    <h3 style="margin-top:20px;">Existing Matches</h3>
+                    <div id="matches-list"></div>
+                </div>
+                
+                <div id="admin-quiz-page" class="admin-section hidden">
+                    <h2>Manage Live Quiz</h2>
+                    <div class="admin-form-group">
+                        <label>Link Quiz to a Live TV Stream</label>
+                        <select id="quiz-stream-link"></select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Question</label>
+                        <input type="text" id="quiz-question-input" placeholder="e.g., Who scored the first goal?">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Options (comma-separated)</label>
+                        <input type="text" id="quiz-options-input" placeholder="e.g., Player A,Player B,Player C">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Correct Answer (must match one option exactly)</label>
+                        <input type="text" id="quiz-answer-input" placeholder="e.g., Player B">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Points</label>
+                        <input type="number" id="quiz-points-input" placeholder="e.g., 10">
+                    </div>
+                    <div class="admin-form-group">
+                        <button id="set-quiz-btn">Set Live Quiz</button>
+                        <button id="clear-quiz-btn">Clear Quiz</button>
+                    </div>
+                </div>
+
+                <div id="admin-withdrawals-page" class="admin-section hidden">
+                    <h2>Withdrawal Requests</h2>
+                    <div id="withdrawal-requests-list"></div>
+                </div>
+            </div>
+        </main>
+        
+        <nav id="user-bottom-nav" class="bottom-nav">
+            <a href="#" class="nav-item active" data-nav="livetv-page"><i class="fas fa-tv"></i><span>Live TV</span></a>
+            <a href="#" class="nav-item" data-nav="radio-page"><i class="fas fa-broadcast-tower"></i><span>Radio</span></a>
+            <a href="#" class="nav-item" data-nav="matches-page"><i class="fas fa-trophy"></i><span>Matches</span></a>
+            <a href="#" class="nav-item" data-nav="wallet-page"><i class="fas fa-wallet"></i><span>Wallet</span></a>
+            <a href="#" class="nav-item" data-nav="profile-page"><i class="fas fa-user"></i><span>Profile</span></a>
+        </nav>
+        
+        <nav id="admin-bottom-nav" class="bottom-nav hidden">
+             <a href="#" class="nav-item active" data-admin-nav="admin-streams-page"><i class="fas fa-tv"></i><span>TV Streams</span></a>
+             <a href="#" class="nav-item" data-admin-nav="admin-radio-page"><i class="fas fa-broadcast-tower"></i><span>Radio</span></a>
+            <a href="#" class="nav-item" data-admin-nav="admin-matches-page"><i class="fas fa-trophy"></i><span>Matches</span></a>
+            <a href="#" class="nav-item" data-admin-nav="admin-quiz-page"><i class="fas fa-question-circle"></i><span>Quiz</span></a>
+            <a href="#" class="nav-item" data-admin-nav="admin-withdrawals-page"><i class="fas fa-hand-holding-usd"></i><span>Withdrawals</span></a>
+            <a href="#" id="admin-view-public-btn" class="nav-item"><i class="fas fa-eye"></i><span>View Public</span></a>
+        </nav>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- IMPORTANT: FIREBASE CONFIGURATION ---
+            const firebaseConfig = {
+              apiKey: "AIzaSyAxIhQX9htS_58dAU9_SfxCSVm6JBXSEgI",
+              authDomain: "sinthahousiev3.firebaseapp.com",
+              databaseURL: "https://sinthahousiev3-default-rtdb.firebaseio.com",
+              projectId: "sinthahousiev3",
+              storageBucket: "sinthahousiev3.firebasestorage.app",
+              messagingSenderId: "751684650132",
+              appId: "1:751684650132:web:0fd82331aef282dc04e081",
+              measurementId: "G-WSYLY0XGGH"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.database();
+
+            // --- DOM ELEMENT REFERENCES ---
+            const loader = document.getElementById('loader');
+
+            // --- GLOBAL STATE ---
+            let currentUserData = null; 
+            let currentUserId = null;
+            let isAdmin = false;
+            let competitionJoinData = {};
+            let allStreamsData = {};
+            let allRadioData = {};
+            let allCommentsData = {}; 
+            let joinedCompetitions = {};
+            let currentMediaActive = false;
+            let currentStreamId = null;
+            let currentStreamData = null; // Holds all data for the currently playing stream
+            let isQuizActive = false;
+            let hls = null;
+            let vimeoPlayer = null; // Vimeo player instance
+            let videoUrlSources = []; 
+            let currentVideoUrlIndex = 0;
+            let allCategories = new Set();
+            let serverTimeOffset = 0; // For time synchronization
+
+            // --- HELPER FUNCTIONS ---
+            const showLoader = () => loader.classList.remove('hidden');
+            const hideLoader = () => loader.classList.add('hidden');
+
+            // --- MODERN POPUP FUNCTIONS ---
+            const popup = document.getElementById('modern-popup');
+            const popupTitleText = document.getElementById('popup-title-text');
+            const popupIcon = document.getElementById('popup-icon');
+            const popupMessage = document.getElementById('popup-message');
+            const popupButtons = document.getElementById('popup-buttons');
+
+            const hidePopup = () => {
+                popup.classList.remove('visible');
+            };
+            
+            const showModernAlert = (message, type = 'info') => { // types: info, success, warning, error
+                popupButtons.innerHTML = '';
+                popupMessage.textContent = message;
+
+                let title = 'Information';
+                let iconClass = 'fas fa-info-circle';
+                popupIcon.className = 'icon';
+
+                switch(type) {
+                    case 'success':
+                        title = 'Success';
+                        iconClass = 'fas fa-check-circle';
+                        popupIcon.classList.add('success');
+                        break;
+                    case 'warning':
+                        title = 'Warning';
+                        iconClass = 'fas fa-exclamation-triangle';
+                        popupIcon.classList.add('warning');
+                        break;
+                    case 'error':
+                        title = 'Error';
+                        iconClass = 'fas fa-times-circle';
+                        popupIcon.classList.add('error');
+                        break;
+                }
+                popupTitleText.textContent = title;
+                popupIcon.innerHTML = `<i class="${iconClass}"></i>`;
+                
+                const okButton = document.createElement('button');
+                okButton.textContent = 'OK';
+                okButton.className = 'btn popup-ok-btn';
+                okButton.onclick = hidePopup;
+                popupButtons.appendChild(okButton);
+                
+                popup.classList.add('visible');
+            };
+
+            const showModernConfirm = (message, callback) => {
+                popupButtons.innerHTML = '';
+                popupMessage.textContent = message;
+                popupTitleText.textContent = 'Confirmation';
+                popupIcon.className = 'icon confirm';
+                popupIcon.innerHTML = `<i class="fas fa-question-circle"></i>`;
+
+                const confirmButton = document.createElement('button');
+                confirmButton.textContent = 'Confirm';
+                confirmButton.className = 'btn popup-confirm-btn';
+                confirmButton.onclick = () => {
+                    hidePopup();
+                    callback(true);
+                };
+
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Cancel';
+                cancelButton.className = 'btn popup-cancel-btn';
+                cancelButton.onclick = () => {
+                    hidePopup();
+                    callback(false);
+                };
+
+                popupButtons.appendChild(cancelButton);
+                popupButtons.appendChild(confirmButton);
+                popup.classList.add('visible');
+            };
+            // --- END MODERN POPUP FUNCTIONS ---
+
+            const handleImageUpload = (fileInputId, inputId) => {
+                const fileInput = document.getElementById(fileInputId);
+                const hiddenInput = document.getElementById(inputId);
+                if (fileInput) {
+                    fileInput.addEventListener('change', (event) => {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                hiddenInput.value = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            };
+            
+            // --- AUTHENTICATION & INITIALIZATION ---
+            initPublicPanel();
+
+            auth.onAuthStateChanged(user => {
+                showLoader();
+                if (user) {
+                    currentUserId = user.uid;
+                    db.ref('users/' + user.uid).on('value', snapshot => {
+                        if (snapshot.exists()) {
+                            currentUserData = { uid: user.uid, email: user.email, ...snapshot.val() };
+                            isAdmin = currentUserData.role === 'admin';
+                            initUserPanel();
+                            if (isAdmin) {
+                                initAdminPanel();
+                            }
+                        }
+                        db.ref('userCompetitions/' + user.uid).on('value', compSnapshot => {
+                            joinedCompetitions = compSnapshot.val() || {};
+                            if (document.getElementById('matches-page').offsetParent !== null) {
+                                loadMatches();
+                            }
+                            hideLoader();
+                        });
+                    });
+                } else {
+                    currentUserData = null;
+                    currentUserId = null;
+                    isAdmin = false;
+                    joinedCompetitions = {};
+                    initGuestPanel();
+                    hideLoader();
+                }
+            });
+
+            document.getElementById('show-signup').addEventListener('click', () => {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('signup-form').classList.remove('hidden');
+            });
+            document.getElementById('show-login').addEventListener('click', () => {
+                document.getElementById('signup-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+            });
+
+            document.getElementById('signup-btn').addEventListener('click', () => {
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const phone = document.getElementById('signup-phone').value;
+                const password = document.getElementById('signup-password').value;
+                if (!name || !email || !phone || !password) {
+                    showModernAlert('Please fill all fields.', 'warning'); return;
+                }
+                showLoader();
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        db.ref('users/' + userCredential.user.uid).set({
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            role: 'user',
+                            walletBalance: 0,
+                            profileImage: ''
+                        });
+                        switchPage('livetv-page');
+                    })
+                    .catch(error => {
+                        showModernAlert(error.message, 'error');
+                        hideLoader();
+                    });
+            });
+
+            document.getElementById('login-btn').addEventListener('click', () => {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                 if (!email || !password) {
+                    showModernAlert('Please enter email and password.', 'warning'); return;
+                }
+                showLoader();
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        switchPage('livetv-page');
+                    })
+                    .catch(error => {
+                        showModernAlert(error.message, 'error');
+                        hideLoader();
+                    });
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    window.location.reload(); // Reload to clear all state
+                });
+            });
+            
+            // --- NEW SHARE & DEEP LINK FUNCTIONS ---
+            async function handleShare(e) {
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                const name = e.target.dataset.name;
+
+                if (!type || !id || !name) return;
+
+                const shareUrl = `${window.location.origin}${window.location.pathname}?type=${type}&id=${id}`;
+                const shareData = {
+                    title: `Check out ${name} on Sintha Live`,
+                    text: `Watch, listen, or join: ${name} on Sintha Live!`,
+                    url: shareUrl,
+                };
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else {
+                        // Fallback for desktop
+                        await navigator.clipboard.writeText(shareUrl);
+                        showModernAlert('Link copied to clipboard!', 'success');
+                    }
+                } catch (err) {
+                    // Don't show an error if the user cancels the share dialog
+                    if (err.name !== 'AbortError') {
+                        showModernAlert(`Could not share: ${err.message}`, 'error');
+                    }
+                }
+            }
+
+            async function handleDeepLink() {
+                const params = new URLSearchParams(window.location.search);
+                const type = params.get('type');
+                const id = params.get('id');
+
+                if (!type || !id) return;
+
+                showLoader();
+
+                try {
+                    let path;
+                    let playFunction;
+
+                    if (type === 'livetv') {
+                        path = `streams/${id}`;
+                        playFunction = playStream;
+                    } else if (type === 'radio') {
+                        path = `radioStreams/${id}`;
+                        playFunction = playRadio;
+                    } else if (type === 'match') {
+                        // For matches, just navigate to the page.
+                        switchPage('matches-page');
+                        hideLoader();
+                        // Clean the URL
+                        if (window.history.replaceState) {
+                           const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+                           window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+                        }
+                        return;
+                    } else {
+                        hideLoader();
+                        return;
+                    }
+
+                    const snapshot = await db.ref(path).once('value');
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        playFunction(id, data);
+                    } else {
+                        showModernAlert('The shared content could not be found.', 'error');
+                    }
+                } catch (error) {
+                    console.error("Error handling deep link:", error);
+                    showModernAlert('Could not load the shared content.', 'error');
+                } finally {
+                    hideLoader();
+                    // Clean the URL so a refresh doesn't trigger the deep link again
+                    if (window.history.replaceState) {
+                        const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+                        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+                    }
+                }
+            }
+            
+            // --- PUBLIC/GUEST/USER PANEL INITIALIZATION ---
+            function initPublicPanel() {
+                // Get server time offset for synchronization
+                db.ref('/.info/serverTimeOffset').on('value', snap => {
+                    serverTimeOffset = snap.val();
+                });
+            
+                db.ref('streamComments').on('value', snapshot => {
+                    allCommentsData = snapshot.val() || {};
+                    if(document.getElementById('matches-page').offsetParent !== null) {
+                         loadMatches();
+                    }
+                });
+
+                loadCategories('streams', 'livetv-categories', renderStreams, () => allStreamsData);
+                loadLiveTvStreams();
+                loadCategories('radioStreams', 'radio-categories', renderRadio, () => allRadioData);
+                loadRadioStreams();
+                loadMatches();
+                loadLiveQuizAndLeaderboard();
+                setupNav();
+                setupDarkMode();
+                setupProfileUpdateListeners(); 
+                setupFloatingPlayerListeners(); 
+                setupModernAudioPlayer();
+                setupSwipeAndTabs(); 
+                setupCommentsLogic();
+                setupVideoEventListeners();
+                setupCustomVideoControls();
+            }
+
+            function initUserPanel() {
+                document.getElementById('profile-icon-container').classList.remove('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+
+                document.getElementById('user-name-display').textContent = currentUserData.name;
+                document.getElementById('user-email').textContent = currentUserData.email;
+                document.getElementById('user-phone').textContent = currentUserData.phone;
+                
+                document.getElementById('update-name').value = currentUserData.name || '';
+                document.getElementById('update-phone').value = currentUserData.phone || '';
+
+                const profileImageB64 = currentUserData.profileImage;
+                const headerProfileIcon = document.getElementById('header-profile-icon');
+                const pageProfileImage = document.getElementById('profile-page-image');
+                
+                if (profileImageB64) {
+                    headerProfileIcon.innerHTML = '';
+                    headerProfileIcon.style.backgroundImage = `url(${profileImageB64})`;
+                    pageProfileImage.innerHTML = '';
+                    pageProfileImage.style.backgroundImage = `url(${profileImageB64})`;
+                } else {
+                    headerProfileIcon.style.backgroundImage = 'none';
+                    headerProfileIcon.innerHTML = '<i class="fas fa-user"></i>';
+                    pageProfileImage.style.backgroundImage = 'none';
+                    pageProfileImage.innerHTML = '<i class="fas fa-user"></i>';
+                }
+                
+                document.getElementById('wallet-balance-display').textContent = `₹${(currentUserData.walletBalance || 0).toFixed(2)}`;
+
+                if (isAdmin) {
+                    document.getElementById('header-admin-btn').classList.remove('hidden');
+                }
+            }
+
+            function initGuestPanel() {
+                document.getElementById('profile-icon-container').classList.remove('hidden'); // Show for login
+                document.getElementById('logout-btn').classList.add('hidden');
+                document.getElementById('header-admin-btn').classList.add('hidden');
+                document.getElementById('user-name-display').textContent = 'Guest';
+                document.getElementById('user-email').textContent = 'Not Logged In';
+                document.getElementById('user-phone').textContent = 'N/A';
+                document.getElementById('wallet-balance-display').textContent = '₹0.00';
+            }
+
+
+            // --- NAVIGATION & PAGE SWITCHING ---
+            function setupNav(){
+                const userNavItems = document.querySelectorAll('#user-bottom-nav .nav-item, #header-profile-icon, .nav-back-btn');
+                userNavItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const pageId = item.dataset.nav;
+                        const protectedPages = ['profile-page', 'wallet-page', 'topup-page', 'withdraw-page', 'history-page'];
+                        // If not logged in and trying to access profile, show auth. Wallet etc handled inside their functions.
+                        if (!currentUserData && pageId === 'profile-page') {
+                             switchPage('auth-container');
+                             return;
+                        }
+                        switchPage(pageId);
+                    });
+                });
+
+                document.getElementById('show-topup-btn').addEventListener('click', () => switchPage('topup-page'));
+                document.getElementById('show-withdraw-btn').addEventListener('click', () => switchPage('withdraw-page'));
+                document.getElementById('show-history-btn').addEventListener('click', () => {
+                    loadTransactionHistory();
+                    switchPage('history-page');
+                });
+                
+                document.querySelectorAll('#admin-bottom-nav .nav-item').forEach(item => {
+                    item.addEventListener('click', e => {
+                        e.preventDefault();
+                        const adminPageId = item.dataset.adminNav;
+                        if(adminPageId) switchAdminSubPage(adminPageId);
+                    });
+                });
+
+                document.getElementById('admin-view-public-btn').addEventListener('click', () => {
+                    switchPage('livetv-page');
+                });
+                document.getElementById('header-admin-btn').addEventListener('click', () => {
+                    switchPage('admin-panel-container');
+                });
+            }
+
+            function switchPage(pageId) {
+                handleMiniPlayerForPage(pageId);
+
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                const pageToShow = document.getElementById(pageId);
+                if(pageToShow) pageToShow.classList.remove('hidden');
+
+                if (pageId === 'admin-panel-container') {
+                    document.getElementById('user-bottom-nav').classList.add('hidden');
+                    document.getElementById('admin-bottom-nav').classList.remove('hidden');
+                    if (!document.querySelector('.admin-section:not(.hidden)')) {
+                        switchAdminSubPage('admin-streams-page');
+                    }
+                } else {
+                    document.getElementById('admin-bottom-nav').classList.add('hidden');
+                    document.getElementById('user-bottom-nav').classList.remove('hidden');
+                }
+                
+                document.querySelectorAll('#user-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+                const activeUserNavItem = document.querySelector(`#user-bottom-nav .nav-item[data-nav="${pageId}"]`);
+                if(activeUserNavItem) activeUserNavItem.classList.add('active');
+            }
+
+            function handleMiniPlayerForPage(pageId) {
+                const playerWrapper = document.getElementById('player-wrapper');
+                const playerContainer = document.getElementById('live-tv-container');
+                
+                if (!currentMediaActive) {
+                    playerWrapper.classList.add('hidden');
+                    return;
+                }
+
+                playerWrapper.classList.remove('hidden');
+
+                if (pageId === 'streaming-page') {
+                    playerContainer.classList.remove('mini-player-mode');
+                    playerContainer.style.left = '';
+                    playerContainer.style.top = '';
+                    playerContainer.style.right = '';
+                    playerContainer.style.bottom = '';
+                    playerContainer.style.transition = 'all 0.3s ease';
+                } 
+                else {
+                    playerContainer.classList.add('mini-player-mode');
+                    if (!playerContainer.style.left && !playerContainer.style.top) {
+                        playerContainer.style.right = '12px';
+                        playerContainer.style.bottom = '68px';
+                    }
+                }
+            }
+
+            function setupDarkMode() {
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                
+                const prefersDark = localStorage.getItem('theme') === 'dark';
+                darkModeToggle.checked = prefersDark;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+
+                darkModeToggle.addEventListener('change', () => {
+                    const theme = darkModeToggle.checked ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                });
+            }
+
+            document.getElementById('profile-page-image').addEventListener('click', () => {
+                if(currentUserData) document.getElementById('profile-image-upload').click();
+            });
+            document.getElementById('profile-image-upload').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64 = e.target.result;
+                        db.ref(`users/${currentUserId}/profileImage`).set(base64)
+                          .then(() => showModernAlert("Profile image updated!", 'success'))
+                          .catch(err => showModernAlert(err.message, 'error'));
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            function setupProfileUpdateListeners() {
+                document.getElementById('update-profile-btn').addEventListener('click', () => {
+                    if (!currentUserId) {
+                        showModernAlert("You must be logged in to update your profile.", 'warning');
+                        return;
+                    }
+            
+                    const newName = document.getElementById('update-name').value;
+                    const newPhone = document.getElementById('update-phone').value;
+            
+                    if (!newName || !newPhone) {
+                        showModernAlert('Please fill in both name and phone number.', 'warning');
+                        return;
+                    }
+                    
+                    showLoader();
+                    db.ref('users/' + currentUserId).update({
+                        name: newName,
+                        phone: newPhone
+                    }).then(() => {
+                        hideLoader();
+                        showModernAlert('Profile updated successfully!', 'success');
+                    }).catch(error => {
+                        hideLoader();
+                        showModernAlert('Error updating profile: ' + error.message, 'error');
+                    });
+                });
+            
+                document.getElementById('change-password-btn').addEventListener('click', () => {
+                    const newPassword = document.getElementById('update-password').value;
+            
+                    if (!newPassword || newPassword.length < 6) {
+                        showModernAlert('Password must be at least 6 characters long.', 'warning');
+                        return;
+                    }
+            
+                    showModernConfirm('Are you sure you want to change your password?', (confirmed) => {
+                        if (confirmed) {
+                            showLoader();
+                            auth.currentUser.updatePassword(newPassword).then(() => {
+                                hideLoader();
+                                document.getElementById('update-password').value = '';
+                                showModernAlert('Password updated successfully!', 'success');
+                            }).catch((error) => {
+                                hideLoader();
+                                showModernAlert('Error changing password: ' + error.message + '\n\nThis can happen if you have not logged in recently. Please try logging out and back in again.', 'error');
+                            });
+                        }
+                    });
+                });
+            }
+
+            function setupFloatingPlayerListeners() {
+                const playerContainer = document.getElementById('live-tv-container');
+                const closeBtn = document.getElementById('close-mini-btn');
+
+                let isDragging = false;
+                let dragStartX, dragStartY;
+                let initialLeft, initialTop;
+                let hasMoved = false;
+
+                playerContainer.addEventListener('mousedown', dragStart);
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', dragEnd);
+                playerContainer.addEventListener('touchstart', dragStart, {passive: false});
+                document.addEventListener('touchmove', drag, {passive: false});
+                document.addEventListener('touchend', dragEnd);
+
+                function dragStart(e) {
+                    if (!playerContainer.classList.contains('mini-player-mode')) return;
+                    if (e.target.closest('#close-mini-btn')) return;
+                    isDragging = true;
+                    hasMoved = false;
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                    dragStartX = clientX;
+                    dragStartY = clientY;
+                    const rect = playerContainer.getBoundingClientRect();
+                    initialLeft = rect.left;
+                    initialTop = rect.top;
+                    playerContainer.style.transition = 'none';
+                    playerContainer.style.right = 'auto';
+                    playerContainer.style.bottom = 'auto';
+                    playerContainer.style.left = initialLeft + 'px';
+                    playerContainer.style.top = initialTop + 'px';
+                }
+
+                function drag(e) {
+                    if (!isDragging) return;
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                    const dx = clientX - dragStartX;
+                    const dy = clientY - dragStartY;
+                    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                        hasMoved = true;
+                        if(e.cancelable) e.preventDefault();
+                    }
+                    let newLeft = initialLeft + dx;
+                    let newTop = initialTop + dy;
+                    const rect = playerContainer.getBoundingClientRect();
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 0) newTop = 0;
+                    if (newLeft + rect.width > screenWidth) newLeft = screenWidth - rect.width;
+                    if (newTop + rect.height > screenHeight) newTop = screenHeight - rect.height;
+                    playerContainer.style.left = newLeft + 'px';
+                    playerContainer.style.top = newTop + 'px';
+                }
+
+                function dragEnd(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    playerContainer.style.transition = 'all 0.3s ease';
+                }
+
+                playerContainer.addEventListener('click', (e) => {
+                    if (playerContainer.classList.contains('mini-player-mode')) {
+                        if (hasMoved) return; 
+                        if (!e.target.closest('#close-mini-btn')) {
+                            switchPage('streaming-page');
+                        }
+                    }
+                });
+
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    stopAllMedia();
+                });
+            }
+            
+            function stopAllMedia() {
+                 const videoPlayer = document.getElementById('live-player');
+                 const audioPlayer = document.getElementById('live-audio');
+                 const youtubePlayer = document.getElementById('youtube-player');
+                 const vimeoIframe = document.getElementById('vimeo-player');
+                 const modernAudioPlayer = document.getElementById('modern-audio-player');
+                 const playerContainer = document.getElementById('live-tv-container');
+
+                 currentMediaActive = false;
+                 currentStreamId = null;
+                 currentStreamData = null;
+
+                 videoPlayer.pause();
+                 audioPlayer.pause();
+                 videoPlayer.removeAttribute('src');
+                 audioPlayer.removeAttribute('src');
+                 youtubePlayer.src = 'about:blank';
+                 vimeoIframe.src = 'about:blank';
+                 
+                 if (hls) {
+                     hls.destroy();
+                     hls = null;
+                 }
+                 if (vimeoPlayer) {
+                     vimeoPlayer.destroy();
+                     vimeoPlayer = null;
+                 }
+                 
+                 document.getElementById('video-overlay-logo').classList.add('hidden');
+                 document.getElementById('player-wrapper').classList.add('hidden');
+                 playerContainer.classList.remove('mini-player-mode');
+                 modernAudioPlayer.classList.add('hidden');
+                 
+                 playerContainer.style.left = '';
+                 playerContainer.style.top = '';
+                 playerContainer.style.right = '';
+                 playerContainer.style.bottom = '';
+            }
+
+            function setupModernAudioPlayer() {
+                const audio = document.getElementById('live-audio');
+                const playPauseBtn = document.getElementById('audio-play-pause');
+                const playPauseIcon = playPauseBtn.querySelector('i');
+                const progressBar = document.getElementById('audio-progress-bar');
+                const timeDisplay = document.getElementById('audio-time');
+                const artwork = document.getElementById('audio-poster');
+                const visualizer = document.getElementById('audio-visualizer');
+
+                playPauseBtn.addEventListener('click', () => {
+                    if (audio.paused) {
+                        audio.play();
+                    } else {
+                        audio.pause();
+                    }
+                });
+
+                audio.addEventListener('play', () => {
+                    playPauseIcon.className = 'fas fa-pause';
+                    artwork.classList.remove('paused');
+                    visualizer.classList.remove('paused');
+                });
+
+                audio.addEventListener('pause', () => {
+                    playPauseIcon.className = 'fas fa-play';
+                    artwork.classList.add('paused');
+                    visualizer.classList.add('paused');
+                });
+
+                audio.addEventListener('timeupdate', () => {
+                    if (audio.duration && audio.duration !== Infinity && !isNaN(audio.duration)) {
+                        const progressPercent = (audio.currentTime / audio.duration) * 100;
+                        progressBar.value = progressPercent;
+                        const mins = Math.floor(audio.currentTime / 60);
+                        const secs = Math.floor(audio.currentTime % 60);
+                        timeDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    } else {
+                        progressBar.value = 100;
+                        timeDisplay.textContent = 'LIVE';
+                    }
+                });
+
+                progressBar.addEventListener('input', (e) => {
+                    if (audio.duration && audio.duration !== Infinity && !isNaN(audio.duration)) {
+                        const seekTime = (e.target.value / 100) * audio.duration;
+                        audio.currentTime = seekTime;
+                    }
+                });
+            }
+            
+            function setupSwipeAndTabs() {
+                const swipeWrapper = document.getElementById('swipe-wrapper');
+                const swipeContainer = document.getElementById('swipe-container');
+                const tabQuiz = document.getElementById('tab-quiz');
+                const tabComments = document.getElementById('tab-comments');
+                
+                let startX = 0, startY = 0, endX = 0, endY = 0;
+
+                swipeWrapper.addEventListener('touchstart', e => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                });
+
+                swipeWrapper.addEventListener('touchend', e => {
+                    endX = e.changedTouches[0].clientX;
+                    endY = e.changedTouches[0].clientY;
+                    let diffX = startX - endX;
+                    let diffY = startY - endY;
+                    if (isQuizActive && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                        if (diffX > 0) switchToStreamingTab('comments');
+                        else switchToStreamingTab('quiz');
+                    }
+                });
+
+                tabQuiz.addEventListener('click', () => switchToStreamingTab('quiz'));
+                tabComments.addEventListener('click', () => switchToStreamingTab('comments'));
+            }
+
+            function switchToStreamingTab(tabName) {
+                const swipeContainer = document.getElementById('swipe-container');
+                const tabQuiz = document.getElementById('tab-quiz');
+                const tabComments = document.getElementById('tab-comments');
+                if (!isQuizActive) return;
+                if (tabName === 'comments') {
+                    swipeContainer.style.transform = 'translateX(-50%)';
+                    tabQuiz.classList.remove('active');
+                    tabComments.classList.add('active');
+                } else {
+                    swipeContainer.style.transform = 'translateX(0)';
+                    tabComments.classList.remove('active');
+                    tabQuiz.classList.add('active');
+                }
+            }
+
+            function loadCategories(dbNode, containerId, renderFunction, dataGetter) {
+                const categorySection = document.getElementById(containerId);
+                db.ref(dbNode).on('value', snapshot => {
+                    if (!snapshot.exists()) return;
+                    const items = snapshot.val();
+                    const categories = ['All', ...new Set(Object.values(items).map(s => s.category).filter(Boolean))];
+                    categorySection.innerHTML = '';
+                    categories.forEach(category => {
+                        const el = document.createElement('div');
+                        el.className = 'category-item';
+                        if (category === 'All') el.classList.add('active');
+                        el.textContent = category;
+                        el.addEventListener('click', () => {
+                            categorySection.querySelectorAll('.category-item').forEach(c => c.classList.remove('active'));
+                            el.classList.add('active');
+                            renderFunction(dataGetter(), category);
+                        });
+                        categorySection.appendChild(el);
+                    });
+                });
+            }
+            
+            function loadLiveTvStreams(category = 'All') {
+                const grid = document.getElementById('livetv-grid');
+                db.ref('streams').on('value', snapshot => {
+                    if (!snapshot.exists()) {
+                        grid.innerHTML = '<p>No TV streams available.</p>';
+                        return;
+                    }
+                    allStreamsData = snapshot.val();
+                    renderStreams(allStreamsData, category);
+                });
+            }
+
+            function renderStreams(streams, category) {
+                 const grid = document.getElementById('livetv-grid');
+                 grid.innerHTML = '';
+                 let filteredStreams = Object.entries(streams);
+                 if (category !== 'All') {
+                     filteredStreams = filteredStreams.filter(([id, stream]) => stream.category === category);
+                 }
+                 if (filteredStreams.length === 0) {
+                      grid.innerHTML = '<p>No streams in this category.</p>';
+                      return;
+                 }
+                 filteredStreams.forEach(([id, stream]) => {
+                    const el = document.createElement('div');
+                    el.className = 'livetv-item';
+                    const imgSrc = stream.imageBase64 || stream.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
+                    el.innerHTML = `
+                        <img src="${imgSrc}" alt="${stream.name}">
+                        <div class="livetv-item-name">${stream.name}</div>
+                        <i class="fas fa-share-alt share-icon" data-type="livetv" data-id="${id}" data-name="${stream.name}"></i>
+                    `;
+                    el.addEventListener('click', () => playStream(id, stream));
+                    el.querySelector('.share-icon').addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent playStream when share is clicked
+                        handleShare(e);
+                    });
+                    grid.appendChild(el);
+                });
+            }
+            
+            function loadRadioStreams(category = 'All') {
+                const grid = document.getElementById('radio-grid');
+                db.ref('radioStreams').on('value', snapshot => {
+                    if (!snapshot.exists()) {
+                        grid.innerHTML = '<p>No radio stations available.</p>';
+                        return;
+                    }
+                    allRadioData = snapshot.val();
+                    renderRadio(allRadioData, category);
+                });
+            }
+
+            function renderRadio(radios, category) {
+                 const grid = document.getElementById('radio-grid');
+                 grid.innerHTML = '';
+                 let filteredRadios = Object.entries(radios);
+                 if (category !== 'All') {
+                     filteredRadios = filteredRadios.filter(([id, radio]) => radio.category === category);
+                 }
+                 if (filteredRadios.length === 0) {
+                      grid.innerHTML = '<p>No radio stations in this category.</p>';
+                      return;
+                 }
+                 filteredRadios.forEach(([id, radio]) => {
+                    const el = document.createElement('div');
+                    el.className = 'radio-item';
+                    const imgSrc = radio.imageBase64 || radio.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
+                    el.innerHTML = `
+                        <img src="${imgSrc}" alt="${radio.name}">
+                        <div class="radio-item-name">${radio.name}</div>
+                        <i class="fas fa-share-alt share-icon" data-type="radio" data-id="${id}" data-name="${radio.name}"></i>
+                    `;
+                    el.addEventListener('click', () => playRadio(id, radio));
+                     el.querySelector('.share-icon').addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent playRadio when share is clicked
+                        handleShare(e);
+                    });
+                    grid.appendChild(el);
+                });
+            }
+            
+            // --- VIDEO PLAYER LOGIC ---
+
+            function getYoutubeVideoId(url) {
+                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+                const match = url.match(regex);
+                return match ? match[1] : null;
+            }
+
+            function getVimeoVideoId(url) {
+                const regex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)(?:\?h=([a-zA-Z0-9]+))?/;
+                const match = url.match(regex);
+                if (!match) return null;
+                return {
+                    id: match[1],
+                    hash: match[2] || null // The hash might not be present
+                };
+            }
+            
+            function playStream(id, stream) {
+                stopAllMedia(); // Stop any previously playing media
+
+                currentStreamId = id;
+                currentStreamData = stream;
+                loadComments(id);
+                loadLiveQuizAndLeaderboard();
+                
+                const audioPlayer = document.getElementById('live-audio');
+                const modernAudioPlayer = document.getElementById('modern-audio-player');
+                const overlayLogo = document.getElementById('video-overlay-logo');
+                const videoContainer = document.getElementById('video-overlay-container');
+                const videoPlayer = document.getElementById('live-player');
+                
+                const imgSrc = stream.imageBase64 || stream.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
+                currentMediaActive = true;
+                
+                videoContainer.classList.remove('hidden');
+                modernAudioPlayer.classList.add('hidden');
+                videoPlayer.poster = imgSrc;
+
+                videoUrlSources = (stream.videoUrls || "").split('\n').map(url => url.trim()).filter(Boolean);
+                
+                if (videoUrlSources.length > 0) {
+                    playVideoAtIndex(0);
+                } else {
+                    showModernAlert("No video sources found for this stream.", 'warning');
+                }
+                
+                if (stream.audioUrl && stream.audioUrl.trim() !== '') {
+                    audioPlayer.src = stream.audioUrl;
+                    audioPlayer.play();
+                }
+                
+                if(stream.overlayLogoBase64 && stream.overlayLogoBase64.startsWith('data:image')) {
+                    overlayLogo.src = stream.overlayLogoBase64;
+                    overlayLogo.classList.remove('hidden');
+                }
+
+                switchPage('streaming-page');
+                window.scrollTo(0, 0);
+            }
+
+            function playVideoAtIndex(index) {
+                const videoPlayer = document.getElementById('live-player');
+                const youtubeContainer = document.getElementById('youtube-player-container');
+                const vimeoContainer = document.getElementById('vimeo-player-container');
+                const vimeoIframe = document.getElementById('vimeo-player');
+
+                // Hide all players initially
+                videoPlayer.classList.add('hidden');
+                youtubeContainer.classList.add('hidden');
+                vimeoContainer.classList.add('hidden');
+
+                if (index >= videoUrlSources.length) {
+                    console.log("All video URLs attempted. Looping back to first URL.");
+                    currentVideoUrlIndex = 0;
+                    if(videoUrlSources.length > 0) playVideoAtIndex(0);
+                    return;
+                }
+                
+                currentVideoUrlIndex = index;
+                const url = videoUrlSources[currentVideoUrlIndex];
+                console.log(`Playing URL at index ${index}: ${url}`);
+
+                const youtubeId = getYoutubeVideoId(url);
+                const vimeoData = getVimeoVideoId(url);
+                
+                if (youtubeId) {
+                    youtubeContainer.classList.remove('hidden');
+                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+
+                } else if (vimeoData) {
+                    vimeoContainer.classList.remove('hidden');
+                    
+                    let finalVimeoUrl = `https://player.vimeo.com/video/${vimeoData.id}?autoplay=1&loop=1&background=1&muted=1`;
+                    if (vimeoData.hash) {
+                        finalVimeoUrl += `&h=${vimeoData.hash}`;
+                    }
+
+                    vimeoIframe.src = finalVimeoUrl;
+                    vimeoPlayer = new Vimeo.Player(vimeoIframe);
+
+                    vimeoPlayer.on('loaded', () => {
+                        console.log(`Vimeo video ${vimeoData.id} loaded successfully.`);
+                        if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
+                            vimeoPlayer.getDuration().then(duration => {
+                                if (duration > 0) {
+                                    const elapsedTime = (Date.now() + serverTimeOffset - currentStreamData.syncStartTime) / 1000;
+                                    const seekTime = elapsedTime % duration;
+                                    vimeoPlayer.setCurrentTime(seekTime).catch(seekError => console.error("Vimeo seek error:", seekError));
+                                    console.log(`Vimeo Sync: Seeking to ${seekTime.toFixed(2)}s`);
+                                }
+                            });
+                        }
+                        vimeoPlayer.play().catch(e => console.warn("Vimeo autoplay was blocked. Unmuting may be required."));
+                    });
+
+                    vimeoPlayer.on('error', (error) => {
+                        console.error(`Vimeo player error for video ID ${vimeoData.id}:`, error.name, error.message);
+                        playVideoAtIndex(currentVideoUrlIndex + 1);
+                    });
+
+                } else if (url.includes('.m3u8')) {
+                    videoPlayer.classList.remove('hidden');
+                    if (Hls.isSupported()) {
+                        hls = new Hls();
+                        hls.loadSource(url);
+                        hls.attachMedia(videoPlayer);
+                        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                            videoPlayer.play().catch(e => console.error("HLS play failed:", e));
+                        });
+                         hls.on(Hls.Events.ERROR, (event, data) => {
+                             if (data.fatal) {
+                                 console.error('Fatal HLS error, trying next source.', data);
+                                 playVideoAtIndex(currentVideoUrlIndex + 1);
+                             }
+                         });
+                    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                         videoPlayer.src = url;
+                         videoPlayer.play();
+                    }
+                } else { // Assume MP4 or other direct video file
+                    videoPlayer.classList.remove('hidden');
+                    videoPlayer.src = url;
+                    videoPlayer.loop = true;
+                    
+                    if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
+                         const onLoadedMetadata = () => {
+                             if (videoPlayer.duration) {
+                                const elapsedTime = (Date.now() + serverTimeOffset - currentStreamData.syncStartTime) / 1000;
+                                const seekTime = elapsedTime % videoPlayer.duration;
+                                videoPlayer.currentTime = seekTime;
+                                console.log(`MP4 Sync: Seeking to ${seekTime.toFixed(2)}s`);
+                                videoPlayer.play().catch(e => console.warn("Autoplay was blocked", e));
+                             }
+                             videoPlayer.removeEventListener('loadedmetadata', onLoadedMetadata);
+                         };
+                         videoPlayer.addEventListener('loadedmetadata', onLoadedMetadata);
+                    } else {
+                        videoPlayer.play().catch(e => console.warn("Autoplay was blocked", e));
+                    }
+                }
+            }
+
+            function setupVideoEventListeners() {
+                const videoPlayer = document.getElementById('live-player');
+                
+                videoPlayer.addEventListener('error', (e) => {
+                    if (videoPlayer.getAttribute('src')) {
+                       console.error(`Error on HTML5 video, trying next source.`, e);
+                       setTimeout(() => playVideoAtIndex(currentVideoUrlIndex + 1), 1000);
+                    }
+                });
+            }
+
+            function setupCustomVideoControls() {
+                const reloadBtn = document.getElementById('reload-btn');
+                const fullscreenBtn = document.getElementById('fullscreen-btn');
+                const playerContainer = document.getElementById('live-tv-container');
+
+                reloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playVideoAtIndex(currentVideoUrlIndex);
+                });
+
+                fullscreenBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const fullscreenIcon = fullscreenBtn.querySelector('i');
+
+                    if (!document.fullscreenElement) {
+                        try {
+                           await playerContainer.requestFullscreen();
+                           playerContainer.classList.add('fullscreen-mode');
+                           fullscreenIcon.className = 'fas fa-compress';
+                        } catch(err) {
+                            console.error(`Error entering full-screen: ${err.message}`);
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                           await document.exitFullscreen();
+                        }
+                    }
+                });
+
+                document.addEventListener('fullscreenchange', () => {
+                    const fullscreenIcon = fullscreenBtn.querySelector('i');
+                    if (!document.fullscreenElement) {
+                        playerContainer.classList.remove('fullscreen-mode');
+                        fullscreenIcon.className = 'fas fa-expand';
+                    } else {
+                        playerContainer.classList.add('fullscreen-mode');
+                        fullscreenIcon.className = 'fas fa-compress';
+                    }
+                });
+            }
+            
+            function playRadio(id, radio) {
+                stopAllMedia();
+                
+                currentStreamId = id;
+                loadComments(id);
+                loadLiveQuizAndLeaderboard();
+
+                const audioPlayer = document.getElementById('live-audio');
+                const modernAudioPlayer = document.getElementById('modern-audio-player');
+                const videoContainer = document.getElementById('video-overlay-container');
+                const audioPoster = document.getElementById('audio-poster');
+                const imgSrc = radio.imageBase64 || radio.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
+
+                currentMediaActive = true;
+                
+                videoContainer.classList.add('hidden');
+                modernAudioPlayer.classList.remove('hidden');
+                modernAudioPlayer.style.display = 'flex';
+                audioPoster.src = imgSrc;
+
+                audioPlayer.src = radio.audioUrl || '';
+                audioPlayer.play().catch(e => console.error("Audio play failed:", e));
+                switchPage('streaming-page');
+                window.scrollTo(0, 0);
+            }
+            
+            document.getElementById('search-input-livetv').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('#livetv-categories .category-item').forEach(c=>c.classList.remove('active'));
+                const filtered = Object.fromEntries(
+                    Object.entries(allStreamsData).filter(([id, stream]) => stream.name.toLowerCase().includes(searchTerm))
+                );
+                renderStreams(filtered, 'All');
+            });
+
+            document.getElementById('search-input-radio').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('#radio-categories .category-item').forEach(c=>c.classList.remove('active'));
+                const filtered = Object.fromEntries(
+                    Object.entries(allRadioData).filter(([id, radio]) => radio.name.toLowerCase().includes(searchTerm))
+                );
+                renderRadio(filtered, 'All');
+            });
+
+            function loadMatches() {
+                const grid = document.getElementById('matches-grid');
+                db.ref('matches').on('value', snapshot => {
+                    if (!snapshot.exists()) {
+                        grid.innerHTML = '<p>No matches scheduled.</p>';
+                        return;
+                    }
+                    grid.innerHTML = '';
+                    const matches = snapshot.val();
+                    const now = new Date().getTime();
+
+                    Object.entries(matches).forEach(([id, match]) => {
+                        const imgSrc = match.imageBase64 || match.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
+                        
+                        let likeCount = 0;
+                        let commentCount = 0;
+                        if(match.streamLink && allCommentsData[match.streamLink]) {
+                            const commentsForStream = Object.values(allCommentsData[match.streamLink]);
+                            commentCount = commentsForStream.length;
+                            commentsForStream.forEach(comment => {
+                                if(comment.likes) {
+                                    likeCount += Object.keys(comment.likes).length;
+                                }
+                                if(comment.replies) {
+                                    commentCount += Object.keys(comment.replies).length;
+                                }
+                            });
+                        }
+                        
+                        const card = document.createElement('div');
+                        card.className = 'match-card';
+                        card.innerHTML = `
+                            <img src="${imgSrc}" alt="${match.name}">
+                            <i class="fas fa-share-alt share-icon" data-type="match" data-id="${id}" data-name="${match.name}"></i>
+                            <div class="match-card-content">
+                                <h3>${match.name}</h3>
+                                <div class="match-timer" id="timer-${id}"></div>
+                                <p>${match.description}</p>
+                                <p><strong>Prize:</strong> ${match.prize}</p>
+                                <p><strong>Entry Fee:</strong> ${match.entryFee > 0 ? `₹${match.entryFee}` : 'Free'}</p>
+                                <div class="match-stats">
+                                    <span><i class="fas fa-heart"></i> ${likeCount}</span>
+                                    <span><i class="fas fa-comment"></i> ${commentCount}</span>
+                                </div>
+                                <div class="match-actions">
+                                    <button class="watch-match-btn" data-stream-id="${match.streamLink}">Watch Match</button>
+                                    <button class="join-competition-btn" data-match-id="${id}" data-fee="${match.entryFee}" data-match-name="${match.name}" data-match-time="${match.startTime}">
+                                        Join Competition
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        const joinBtn = card.querySelector('.join-competition-btn');
+                        const matchTime = new Date(match.startTime).getTime();
+                        
+                        if (joinedCompetitions[id]) {
+                            joinBtn.textContent = 'Already Joined';
+                            joinBtn.disabled = true;
+                        } else if (now > matchTime) {
+                            joinBtn.textContent = 'Competition Closed';
+                            joinBtn.disabled = true;
+                        }
+                        
+                        // Add share listener
+                        card.querySelector('.share-icon').addEventListener('click', handleShare);
+
+                        grid.appendChild(card);
+                        startCountdown(`timer-${id}`, match.startTime);
+                    });
+
+                    document.querySelectorAll('.watch-match-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const streamId = e.target.dataset.streamId;
+                            if(!streamId) { showModernAlert("No stream linked to this match.", 'warning'); return; }
+                            db.ref(`streams/${streamId}`).once('value', snapshot => {
+                                if (snapshot.exists()) playStream(streamId, snapshot.val());
+                                else showModernAlert("Stream not found!", 'error');
+                            });
+                        });
+                    });
+                    document.querySelectorAll('.join-competition-btn').forEach(btn => {
+                        btn.addEventListener('click', handleJoinCompetition);
+                    });
+                });
+            }
+
+
+            function startCountdown(elementId, endTime) {
+                const timerEl = document.getElementById(elementId);
+                if (!timerEl) return;
+                const interval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = new Date(endTime).getTime() - now;
+                    if (distance < 0) {
+                        clearInterval(interval);
+                        timerEl.innerHTML = "Match Started";
+                        return;
+                    }
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    timerEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }, 1000);
+            }
+            
+            function handleJoinCompetition(event) {
+                if (!currentUserData) {
+                    switchPage('auth-container');
+                    return;
+                }
+
+                const fee = parseFloat(event.target.dataset.fee);
+                const matchTime = new Date(event.target.dataset.matchTime).getTime();
+                const now = new Date().getTime();
+                const matchId = event.target.dataset.matchId;
+
+                if (now > matchTime) {
+                    showModernAlert("This competition has already started.", 'warning');
+                    return;
+                }
+                if (joinedCompetitions[matchId]) {
+                    showModernAlert("You have already joined this competition.", 'info');
+                    return;
+                }
+
+                if (!fee || fee <= 0) {
+                    db.ref(`userCompetitions/${currentUserId}/${matchId}`).set(true)
+                        .then(() => {
+                            showModernAlert("Successfully joined the free competition!", 'success');
+                        }).catch(err => showModernAlert(err.message, 'error'));
+                    return;
+                }
+                
+                competitionJoinData = {
+                    matchId: matchId,
+                    fee: fee,
+                    matchName: event.target.dataset.matchName,
+                };
+
+                const currentBalance = currentUserData.walletBalance || 0;
+                document.getElementById('modal-fee').textContent = `₹${fee.toFixed(2)}`;
+                document.getElementById('modal-wallet-balance').textContent = `₹${currentBalance.toFixed(2)}`;
+                document.getElementById('payment-modal').classList.add('visible');
+
+                if (currentBalance < fee) {
+                    document.getElementById('pay-with-wallet-btn').disabled = true;
+                    document.getElementById('pay-with-wallet-btn').textContent = 'Insufficient Balance';
+                } else {
+                     document.getElementById('pay-with-wallet-btn').disabled = false;
+                     document.getElementById('pay-with-wallet-btn').textContent = 'Pay from Wallet';
+                }
+            }
+
+            document.getElementById('close-modal').addEventListener('click', () => {
+                document.getElementById('payment-modal').classList.remove('visible');
+            });
+
+            document.getElementById('pay-with-wallet-btn').addEventListener('click', () => {
+                const { fee, matchId, matchName } = competitionJoinData;
+                const newBalance = (currentUserData.walletBalance || 0) - fee;
+
+                db.ref(`users/${currentUserId}/walletBalance`).set(newBalance)
+                  .then(() => {
+                        recordTransaction(currentUserId, 'debit', fee, `Joined competition: ${matchName}`);
+                        db.ref(`userCompetitions/${currentUserId}/${matchId}`).set(true);
+                        showModernAlert('Successfully joined the competition using wallet balance!', 'success');
+                        document.getElementById('payment-modal').classList.remove('visible');
+                  }).catch(err => showModernAlert(err.message, 'error'));
+            });
+            
+            document.getElementById('pay-with-razorpay-btn').addEventListener('click', () => {
+                const { fee, matchId, matchName } = competitionJoinData;
+                const options = {
+                    "key": "YOUR_RAZORPAY_KEY_ID", // Replace with your key
+                    "amount": fee * 100,
+                    "currency": "INR",
+                    "name": "Sintha Live",
+                    "description": `Entry for ${matchName}`,
+                    "handler": function (response){
+                        recordTransaction(currentUserId, 'debit', fee, `Joined competition: ${matchName} (via Razorpay)`);
+                        db.ref(`userCompetitions/${currentUserId}/${matchId}`).set(true);
+                        db.ref(`payments/${currentUserId}`).push({
+                            matchId: matchId,
+                            paymentId: response.razorpay_payment_id,
+                            amount: fee,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        showModernAlert('Payment successful! You have joined the competition.', 'success');
+                    },
+                    "prefill": { "email": currentUserData.email, "contact": currentUserData.phone },
+                    "theme": { "color": "#e50914" }
+                };
+                try {
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } catch(e) {
+                    showModernAlert("Error with payment gateway. Please check the Razorpay Key.", 'error');
+                    console.error(e);
+                }
+                document.getElementById('payment-modal').classList.remove('visible');
+            });
+
+            document.getElementById('proceed-to-pay-btn').addEventListener('click', () => {
+                const amount = parseFloat(document.getElementById('topup-amount').value);
+                if (!amount || amount <= 0) {
+                    showModernAlert('Please enter a valid amount.', 'warning'); return;
+                }
+                
+                const options = {
+                    "key": "YOUR_RAZORPAY_KEY_ID", // Replace with your key
+                    "amount": amount * 100,
+                    "currency": "INR",
+                    "name": "Sintha Live",
+                    "description": `Wallet Top-up`,
+                    "handler": function (response){
+                        const newBalance = (currentUserData.walletBalance || 0) + amount;
+                         db.ref(`users/${currentUserId}/walletBalance`).set(newBalance)
+                           .then(() => {
+                                recordTransaction(currentUserId, 'credit', amount, `Wallet top-up (via Razorpay)`);
+                                showModernAlert('Top-up successful!', 'success');
+                                switchPage('wallet-page');
+                           });
+                    },
+                    "prefill": { "email": currentUserData.email, "contact": currentUserData.phone },
+                    "theme": { "color": "#e50914" }
+                };
+                 try {
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } catch(e) {
+                     showModernAlert("Error with payment gateway. Please check the Razorpay Key.", 'error');
+                    console.error(e);
+                }
+            });
+
+            document.getElementById('submit-withdrawal-request-btn').addEventListener('click', () => {
+                const amount = parseFloat(document.getElementById('withdraw-amount').value);
+                const upiId = document.getElementById('withdraw-upi').value;
+
+                if (!amount || amount <= 0) { showModernAlert('Please enter a valid amount.', 'warning'); return; }
+                if (!upiId) { showModernAlert('Please enter your UPI ID.', 'warning'); return; }
+                if (amount > (currentUserData.walletBalance || 0)) { showModernAlert('Withdrawal amount exceeds your balance.', 'warning'); return; }
+
+                db.ref('withdrawalRequests').push({
+                    userId: currentUserId,
+                    userName: currentUserData.name,
+                    email: currentUserData.email,
+                    amount: amount,
+                    upiId: upiId,
+                    status: 'pending',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                      showModernAlert('Withdrawal request submitted!', 'success');
+                      document.getElementById('withdraw-amount').value = '';
+                      document.getElementById('withdraw-upi').value = '';
+                      switchPage('wallet-page');
+                  }).catch(err => showModernAlert(err.message, 'error'));
+            });
+
+            function recordTransaction(uid, type, amount, description) {
+                db.ref(`transactions/${uid}`).push({
+                    type, amount, description,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
+            
+            function loadTransactionHistory() {
+                const listEl = document.getElementById('transaction-history-list');
+                db.ref(`transactions/${currentUserId}`).orderByChild('timestamp').limitToLast(50).on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) {
+                        listEl.innerHTML = '<p>No transactions yet.</p>'; return;
+                    }
+                    let transactions = [];
+                    snapshot.forEach(child => { transactions.push(child.val()); });
+                    transactions.reverse().forEach(tx => {
+                        const item = document.createElement('div');
+                        item.className = 'item';
+                        item.innerHTML = `
+                            <div class="details">
+                                <p class="type">${tx.description}</p>
+                                <p class="date">${new Date(tx.timestamp).toLocaleString()}</p>
+                            </div>
+                            <div class="amount ${tx.type}">${tx.type === 'credit' ? '+' : '-'} ₹${tx.amount.toFixed(2)}</div>
+                        `;
+                        listEl.appendChild(item);
+                    });
+                });
+            }
+
+            function loadLiveQuizAndLeaderboard() {
+                const questionEl = document.getElementById('quiz-question');
+                const optionsEl = document.getElementById('quiz-options');
+                const tabsContainer = document.getElementById('streaming-tabs');
+                const swipeContainer = document.getElementById('swipe-container');
+                const quizSection = document.getElementById('quiz-section');
+                const commentsSection = document.getElementById('comments-section');
+
+                db.ref('liveQuiz').on('value', snapshot => {
+                    const quiz = snapshot.val();
+                    if (snapshot.exists() && quiz.question && quiz.linkedStreamId && quiz.linkedStreamId === currentStreamId) {
+                        isQuizActive = true;
+                        tabsContainer.classList.remove('hidden');
+                        swipeContainer.style.width = '200%';
+                        quizSection.style.display = 'block';
+                        quizSection.style.width = '50%';
+                        commentsSection.style.width = '50%';
+                        switchToStreamingTab('quiz');
+                        
+                        questionEl.textContent = quiz.question;
+                        optionsEl.innerHTML = '';
+                        quiz.options.forEach((option, index) => {
+                            const button = document.createElement('button');
+                            const optionLetter = String.fromCharCode(65 + index);
+                            button.textContent = `${optionLetter}. ${option}`;
+                            button.dataset.option = option;
+                            button.onclick = () => submitQuizAnswer(quiz, option);
+                            optionsEl.appendChild(button);
+                        });
+                    } else {
+                        isQuizActive = false;
+                        tabsContainer.classList.add('hidden');
+                        swipeContainer.style.width = '100%';
+                        swipeContainer.style.transform = 'translateX(0)';
+                        quizSection.style.display = 'none';
+                        commentsSection.style.width = '100%';
+                        questionEl.textContent = 'No active quiz at the moment.';
+                        optionsEl.innerHTML = '';
+                    }
+                });
+
+                const leaderboardList = document.getElementById('leaderboard-list');
+                db.ref('leaderboard').orderByChild('score').limitToLast(10).on('value', snapshot => {
+                    leaderboardList.innerHTML = '';
+                    if(!snapshot.exists()) {
+                        leaderboardList.innerHTML = '<li>No scores yet.</li>';
+                        return;
+                    };
+                    let leaders = [];
+                    snapshot.forEach(child => { leaders.push({ id: child.key, ...child.val() }); });
+                    leaders.reverse().forEach(leader => {
+                        const li = document.createElement('li');
+                        const displayName = leader.name || leader.email || 'Anonymous';
+                        li.innerHTML = `<span>${displayName}</span><strong>${leader.score}</strong>`;
+                        leaderboardList.appendChild(li);
+                    });
+                });
+            }
+
+            function submitQuizAnswer(quiz, selectedAnswer) {
+                if (!currentUserData) {
+                    showModernAlert("Please log in to participate.", 'warning'); switchPage('auth-container'); return;
+                }
+                document.querySelectorAll('#quiz-options button').forEach(b => b.disabled = true);
+
+                if (selectedAnswer === quiz.answer) {
+                    showModernAlert(`Correct! You earned ${quiz.points} points.`, 'success');
+                    const userScoreRef = db.ref(`leaderboard/${currentUserId}`);
+                    userScoreRef.transaction(currentData => {
+                        const newScore = (currentData ? currentData.score : 0) + quiz.points;
+                        return { 
+                            score: newScore, 
+                            name: currentUserData.name, 
+                            email: currentUserData.email 
+                        };
+                    });
+                } else {
+                    showModernAlert('Wrong answer. Try again next time!', 'error');
+                }
+            }
+            
+            function setupCommentsLogic() {
+                document.getElementById('send-comment-btn').addEventListener('click', () => {
+                    const input = document.getElementById('comment-input');
+                    const text = input.value.trim();
+                    if (!text) return;
+                    if (!currentUserData) {
+                        switchPage('auth-container');
+                        return;
+                    }
+                    if (!currentStreamId) return;
+
+                    db.ref(`streamComments/${currentStreamId}`).push({
+                        userId: currentUserId,
+                        userName: currentUserData.name || 'User',
+                        text: text,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        input.value = '';
+                    }).catch(e => showModernAlert(e.message, 'error'));
+                });
+            }
+
+            function loadComments(streamId) {
+                const listEl = document.getElementById('comments-list');
+                db.ref(`streamComments/${streamId}`).on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) {
+                        listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No comments yet. Be the first!</p>';
+                        return;
+                    }
+                    
+                    const commentsData = snapshot.val();
+                    const commentsArr = Object.keys(commentsData)
+                                        .map(k => ({id: k, ...commentsData[k]}))
+                                        .sort((a,b) => b.timestamp - a.timestamp);
+                    
+                    commentsArr.forEach(comment => {
+                        const el = createCommentElement(comment);
+                        listEl.appendChild(el);
+                    });
+                });
+            }
+
+            function createCommentElement(comment) {
+                const el = document.createElement('div');
+                el.className = 'comment-item';
+                const likesCount = comment.likes ? Object.keys(comment.likes).length : 0;
+                const isLikedByMe = (currentUserData && comment.likes && comment.likes[currentUserId]) ? true : false;
+                const content = document.createElement('div');
+                content.innerHTML = `<strong>${comment.userName}</strong> <span class="time">${new Date(comment.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span><p style="margin: 5px 0;">${comment.text}</p>`;
+                const actions = document.createElement('div');
+                actions.className = 'comment-actions';
+                const likeBtn = document.createElement('span');
+                likeBtn.innerHTML = `<i class="fas fa-heart"></i> ${likesCount}`;
+                if (isLikedByMe) likeBtn.style.color = 'var(--accent-color)';
+                likeBtn.onclick = () => {
+                    if (!currentUserData) { switchPage('auth-container'); return; }
+                    const ref = db.ref(`streamComments/${currentStreamId}/${comment.id}/likes/${currentUserId}`);
+                    ref.once('value').then(snap => {
+                        if (snap.exists()) ref.remove();
+                        else ref.set(true);
+                    });
+                };
+                const replyBtn = document.createElement('span');
+                replyBtn.innerHTML = `<i class="fas fa-reply"></i> Reply`;
+                replyBtn.onclick = () => {
+                    if (!currentUserData) { switchPage('auth-container'); return; }
+                    replyBox.classList.toggle('hidden');
+                };
+                actions.appendChild(likeBtn);
+                actions.appendChild(replyBtn);
+                const replyBox = document.createElement('div');
+                replyBox.className = 'reply-input-area hidden';
+                const replyInput = document.createElement('input');
+                replyInput.type = 'text';
+                replyInput.placeholder = 'Write a reply...';
+                const submitReplyBtn = document.createElement('button');
+                submitReplyBtn.textContent = 'Reply';
+                submitReplyBtn.onclick = () => {
+                     const text = replyInput.value.trim();
+                     if(!text) return;
+                     db.ref(`streamComments/${currentStreamId}/${comment.id}/replies`).push({
+                         userId: currentUserId,
+                         userName: currentUserData.name || 'User',
+                         text: text,
+                         timestamp: firebase.database.ServerValue.TIMESTAMP
+                     });
+                     replyInput.value = '';
+                     replyBox.classList.add('hidden');
+                };
+                replyBox.appendChild(replyInput);
+                replyBox.appendChild(submitReplyBtn);
+                const repliesList = document.createElement('div');
+                repliesList.className = 'replies-list';
+                if (comment.replies) {
+                     const repliesArr = Object.keys(comment.replies)
+                                        .map(k => ({id: k, ...comment.replies[k]}))
+                                        .sort((a,b) => a.timestamp - b.timestamp);
+                     repliesArr.forEach(reply => {
+                         const repEl = document.createElement('div');
+                         repEl.style.marginBottom = '10px';
+                         repEl.innerHTML = `<strong>${reply.userName}</strong> <span class="time">${new Date(reply.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span><p style="margin: 5px 0; font-size: 0.9em;">${reply.text}</p>`;
+                         repliesList.appendChild(repEl);
+                     });
+                }
+                el.appendChild(content);
+                el.appendChild(actions);
+                el.appendChild(replyBox);
+                el.appendChild(repliesList);
+                return el;
+            }
+
+            // --- ADMIN PANEL ---
+            function initAdminPanel() {
+                loadAdminStreams();
+                loadAdminRadioStreams();
+                loadAdminMatches();
+                populateStreamLinksForMatches();
+                populateStreamLinksForQuiz();
+                loadWithdrawalRequests();
+                setupAdminImageToggles();
+                setupCategorySelectListeners();
+                populateCategoryDropdowns();
+                handleImageUpload('stream-image-upload', 'stream-image-base64');
+                handleImageUpload('radio-image-upload', 'radio-image-base64');
+                handleImageUpload('match-image-upload', 'match-image-base64');
+                handleImageUpload('stream-overlay-upload', 'stream-overlay-base64');
+
+                document.getElementById('remove-stream-overlay-btn').addEventListener('click', () => {
+                    document.getElementById('stream-overlay-base64').value = '';
+                    document.getElementById('stream-overlay-upload').value = '';
+                    document.getElementById('remove-stream-overlay-btn').classList.add('hidden');
+                    showModernAlert('Overlay image cleared. Click "Update Stream" to save.', 'info');
+                });
+                
+                document.getElementById('stream-overlay-upload').addEventListener('change', (event) => {
+                    if (event.target.files.length > 0) {
+                        document.getElementById('remove-stream-overlay-btn').classList.remove('hidden');
+                    }
+                });
+                
+                document.getElementById('reset-sync-btn').addEventListener('click', () => {
+                    const id = document.getElementById('stream-edit-id').value;
+                    if(!id) {
+                        showModernAlert('Please select a stream to edit first.', 'warning');
+                        return;
+                    }
+                    showModernConfirm('Are you sure you want to reset the sync time? This will make the video restart from the beginning for all users.', (confirmed) => {
+                        if (confirmed) {
+                            db.ref(`streams/${id}/syncStartTime`).set(firebase.database.ServerValue.TIMESTAMP)
+                              .then(() => showModernAlert('Sync time has been reset. Click "Update Stream" to save all changes.', 'success'));
+                        }
+                    });
+                });
+            }
+            
+            function setupAdminImageToggles() {
+                document.querySelectorAll('.image-upload-options .img-opt-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const parent = e.target.closest('.admin-form-group');
+                        parent.querySelectorAll('.img-opt-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const targetId = e.target.dataset.target;
+                        parent.querySelectorAll('[id$="-container"]').forEach(cont => {
+                            if(cont.id === targetId) cont.classList.remove('hidden');
+                            else cont.classList.add('hidden');
+                        });
+                    });
+                });
+            }
+
+            function switchAdminSubPage(pageId) {
+                document.querySelectorAll('.admin-section').forEach(p => p.classList.add('hidden'));
+                document.getElementById(pageId).classList.remove('hidden');
+                document.querySelectorAll('#admin-bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+                const activeNavItem = document.querySelector(`#admin-bottom-nav .nav-item[data-admin-nav="${pageId}"]`);
+                if(activeNavItem) activeNavItem.classList.add('active');
+            }
+            
+            async function populateCategoryDropdowns() {
+                allCategories = new Set();
+                const streamsSnap = await db.ref('streams').once('value');
+                if (streamsSnap.exists()) Object.values(streamsSnap.val()).forEach(item => item.category && allCategories.add(item.category));
+                const radioSnap = await db.ref('radioStreams').once('value');
+                if (radioSnap.exists()) Object.values(radioSnap.val()).forEach(item => item.category && allCategories.add(item.category));
+                
+                const streamSelect = document.getElementById('stream-category');
+                const radioSelect = document.getElementById('radio-category');
+                const sortedCategories = [...allCategories].sort();
+                
+                streamSelect.innerHTML = '<option value="">Select Category</option>';
+                radioSelect.innerHTML = '<option value="">Select Category</option>';
+
+                sortedCategories.forEach(cat => {
+                    streamSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                    radioSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+                
+                streamSelect.innerHTML += '<option value="--addNew--">Add New Category...</option>';
+                radioSelect.innerHTML += '<option value="--addNew--">Add New Category...</option>';
+            }
+            
+            function setupCategorySelectListeners() {
+                document.getElementById('stream-category').addEventListener('change', (e) => {
+                    const container = document.getElementById('new-stream-category-container');
+                    container.classList.toggle('hidden', e.target.value !== '--addNew--');
+                });
+                 document.getElementById('radio-category').addEventListener('change', (e) => {
+                    const container = document.getElementById('new-radio-category-container');
+                    container.classList.toggle('hidden', e.target.value !== '--addNew--');
+                });
+            }
+
+            document.getElementById('add-stream-btn').addEventListener('click', () => {
+                const streamData = getStreamFormData(true); // isNew = true
+                if (!streamData) return;
+                if (!streamData.name || !streamData.category || !streamData.videoUrls) {
+                    showModernAlert('Please fill required TV stream fields (Name, Category, URL).', 'warning'); return;
+                }
+                db.ref('streams').push(streamData).then(() => {
+                    showModernAlert('TV Stream added!', 'success');
+                    populateCategoryDropdowns();
+                    resetStreamForm();
+                });
+            });
+            document.getElementById('update-stream-btn').addEventListener('click', () => {
+                const streamData = getStreamFormData(false); // isNew = false
+                if (!streamData) return;
+                const id = document.getElementById('stream-edit-id').value;
+                if (!id) return;
+                db.ref(`streams/${id}`).update(streamData).then(() => {
+                    showModernAlert('TV Stream updated!', 'success');
+                    populateCategoryDropdowns();
+                    resetStreamForm();
+                });
+            });
+
+            function loadAdminStreams() {
+                const listEl = document.getElementById('streams-list');
+                db.ref('streams').on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) return;
+                    snapshot.forEach(child => {
+                        const item = document.createElement('div');
+                        item.className = 'data-list-item';
+                        item.innerHTML = `
+                            <span>${child.val().name} (${child.val().category})</span>
+                            <div class="actions">
+                                <button class="edit-btn" data-id="${child.key}">Edit</button>
+                                <button class="delete-btn" data-id="${child.key}" data-node="streams">Delete</button>
+                            </div>`;
+                        listEl.appendChild(item);
+                    });
+                    listEl.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = (e) => editStream(e.target.dataset.id));
+                    listEl.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = (e) => deleteData(e.target.dataset.node, e.target.dataset.id));
+                });
+            }
+            
+            function getStreamFormData(isNew = false) {
+                let category = document.getElementById('stream-category').value;
+                if (category === '--addNew--') {
+                    category = document.getElementById('new-stream-category-input').value.trim();
+                    if (!category) {
+                        showModernAlert("Please enter a name for the new category.", 'warning');
+                        return null;
+                    }
+                }
+
+                const base64 = document.getElementById('stream-image-base64').value;
+                const url = document.getElementById('stream-image-url').value;
+                const syncEnabled = document.getElementById('stream-sync-enabled').checked;
+
+                const data = {
+                    name: document.getElementById('stream-name').value,
+                    category: category,
+                    videoUrls: document.getElementById('stream-video-urls').value,
+                    audioUrl: document.getElementById('stream-audio-url').value,
+                    imageBase64: base64,
+                    imageUrl: base64 ? '' : url,
+                    overlayLogoBase64: document.getElementById('stream-overlay-base64').value,
+                    syncEnabled: syncEnabled
+                };
+                
+                if (isNew && syncEnabled) {
+                    data.syncStartTime = firebase.database.ServerValue.TIMESTAMP;
+                }
+
+                return data;
+            }
+
+            function resetStreamForm() {
+                document.getElementById('stream-name').value = '';
+                document.getElementById('stream-category').value = '';
+                document.getElementById('new-stream-category-container').classList.add('hidden');
+                document.getElementById('new-stream-category-input').value = '';
+                document.getElementById('stream-video-urls').value = '';
+                document.getElementById('stream-audio-url').value = '';
+                document.getElementById('stream-image-base64').value = '';
+                document.getElementById('stream-image-url').value = '';
+                document.getElementById('stream-image-upload').value = '';
+                document.getElementById('stream-overlay-base64').value = '';
+                document.getElementById('stream-overlay-upload').value = '';
+                document.getElementById('stream-edit-id').value = '';
+                document.getElementById('stream-sync-enabled').checked = false;
+                document.getElementById('add-stream-btn').classList.remove('hidden');
+                document.getElementById('update-stream-btn').classList.add('hidden');
+                document.getElementById('remove-stream-overlay-btn').classList.add('hidden');
+            }
+
+            function editStream(id) {
+                db.ref(`streams/${id}`).once('value', snapshot => {
+                    const stream = snapshot.val();
+                    document.getElementById('stream-name').value = stream.name || '';
+                    
+                    const categorySelect = document.getElementById('stream-category');
+                    if ([...categorySelect.options].some(opt => opt.value === stream.category)) {
+                        categorySelect.value = stream.category;
+                        document.getElementById('new-stream-category-container').classList.add('hidden');
+                        document.getElementById('new-stream-category-input').value = '';
+                    } else {
+                        categorySelect.value = '--addNew--';
+                        document.getElementById('new-stream-category-container').classList.remove('hidden');
+                        document.getElementById('new-stream-category-input').value = stream.category || '';
+                    }
+                    
+                    document.getElementById('stream-video-urls').value = stream.videoUrls || '';
+                    document.getElementById('stream-audio-url').value = stream.audioUrl || '';
+                    document.getElementById('stream-image-base64').value = stream.imageBase64 || '';
+                    document.getElementById('stream-image-url').value = stream.imageUrl || '';
+                    document.getElementById('stream-overlay-base64').value = stream.overlayLogoBase64 || '';
+                    document.getElementById('stream-sync-enabled').checked = stream.syncEnabled || false;
+                    document.getElementById('stream-edit-id').value = id;
+                    document.getElementById('add-stream-btn').classList.add('hidden');
+                    document.getElementById('update-stream-btn').classList.remove('hidden');
+
+                    document.getElementById('remove-stream-overlay-btn').classList.toggle('hidden', !stream.overlayLogoBase64);
+                    window.scrollTo(0, document.getElementById('admin-streams-page').offsetTop);
+                });
+            }
+
+             document.getElementById('add-radio-btn').addEventListener('click', () => {
+                const radioData = getRadioFormData();
+                if (!radioData || !radioData.name || !radioData.category || !radioData.audioUrl) {
+                    showModernAlert('Please fill required radio fields.', 'warning'); return;
+                }
+                db.ref('radioStreams').push(radioData).then(() => {
+                    showModernAlert('Radio Stream added!', 'success'); 
+                    populateCategoryDropdowns();
+                    resetRadioForm();
+                });
+            });
+            document.getElementById('update-radio-btn').addEventListener('click', () => {
+                const radioData = getRadioFormData();
+                 if (!radioData) return;
+                const id = document.getElementById('radio-edit-id').value;
+                if (!id) return;
+                db.ref(`radioStreams/${id}`).update(radioData).then(() => {
+                    showModernAlert('Radio Stream updated!', 'success');
+                    populateCategoryDropdowns();
+                    resetRadioForm();
+                });
+            });
+
+            function loadAdminRadioStreams() {
+                const listEl = document.getElementById('radio-list');
+                db.ref('radioStreams').on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) return;
+                    snapshot.forEach(child => {
+                        const item = document.createElement('div');
+                        item.className = 'data-list-item';
+                        item.innerHTML = `
+                            <span>${child.val().name} (${child.val().category})</span>
+                            <div class="actions">
+                                <button class="edit-btn" data-id="${child.key}">Edit</button>
+                                <button class="delete-btn" data-id="${child.key}" data-node="radioStreams">Delete</button>
+                            </div>`;
+                        listEl.appendChild(item);
+                    });
+                    listEl.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = (e) => editRadioStream(e.target.dataset.id));
+                    listEl.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = (e) => deleteData(e.target.dataset.node, e.target.dataset.id));
+                });
+            }
+            
+            function getRadioFormData() {
+                let category = document.getElementById('radio-category').value;
+                if (category === '--addNew--') {
+                    category = document.getElementById('new-radio-category-input').value.trim();
+                    if (!category) {
+                        showModernAlert("Please enter a name for the new category.", 'warning');
+                        return null;
+                    }
+                }
+                const base64 = document.getElementById('radio-image-base64').value;
+                const url = document.getElementById('radio-image-url').value;
+                return {
+                    name: document.getElementById('radio-name').value,
+                    category: category,
+                    audioUrl: document.getElementById('radio-audio-url').value,
+                    imageBase64: base64,
+                    imageUrl: base64 ? '' : url
+                };
+            }
+            function resetRadioForm() {
+                document.getElementById('radio-name').value = '';
+                document.getElementById('radio-category').value = '';
+                document.getElementById('new-radio-category-container').classList.add('hidden');
+                document.getElementById('new-radio-category-input').value = '';
+                document.getElementById('radio-audio-url').value = '';
+                document.getElementById('radio-image-base64').value = '';
+                document.getElementById('radio-image-url').value = '';
+                document.getElementById('radio-image-upload').value = '';
+                document.getElementById('radio-edit-id').value = '';
+                document.getElementById('add-radio-btn').classList.remove('hidden');
+                document.getElementById('update-radio-btn').classList.add('hidden');
+            }
+            function editRadioStream(id) {
+                db.ref(`radioStreams/${id}`).once('value', snapshot => {
+                    const radio = snapshot.val();
+                    document.getElementById('radio-name').value = radio.name || '';
+
+                    const categorySelect = document.getElementById('radio-category');
+                    if ([...categorySelect.options].some(opt => opt.value === radio.category)) {
+                        categorySelect.value = radio.category;
+                        document.getElementById('new-radio-category-container').classList.add('hidden');
+                        document.getElementById('new-radio-category-input').value = '';
+                    } else {
+                        categorySelect.value = '--addNew--';
+                        document.getElementById('new-radio-category-container').classList.remove('hidden');
+                        document.getElementById('new-radio-category-input').value = radio.category || '';
+                    }
+
+                    document.getElementById('radio-audio-url').value = radio.audioUrl || '';
+                    document.getElementById('radio-image-base64').value = radio.imageBase64 || '';
+                    document.getElementById('radio-image-url').value = radio.imageUrl || '';
+                    document.getElementById('radio-edit-id').value = id;
+                    document.getElementById('add-radio-btn').classList.add('hidden');
+                    document.getElementById('update-radio-btn').classList.remove('hidden');
+                    window.scrollTo(0, document.getElementById('admin-radio-page').offsetTop);
+                });
+            }
+
+            function populateStreamLinksForMatches() {
+                const selectEl = document.getElementById('match-stream-link');
+                db.ref('streams').on('value', snapshot => {
+                    const currentValue = selectEl.value;
+                    selectEl.innerHTML = '<option value="">None</option>';
+                    if(!snapshot.exists()) return;
+                    snapshot.forEach(child => {
+                        const selected = child.key === currentValue ? 'selected' : '';
+                        selectEl.innerHTML += `<option value="${child.key}" ${selected}>${child.val().name}</option>`;
+                    });
+                });
+            }
+
+            function getMatchFormData() {
+                const base64 = document.getElementById('match-image-base64').value;
+                const url = document.getElementById('match-image-url').value;
+                return {
+                    name: document.getElementById('match-name').value,
+                    startTime: document.getElementById('match-time').value,
+                    description: document.getElementById('match-description').value,
+                    prize: document.getElementById('match-prize').value,
+                    location: document.getElementById('match-location').value,
+                    entryFee: parseFloat(document.getElementById('match-fee').value) || 0,
+                    streamLink: document.getElementById('match-stream-link').value,
+                    imageBase64: base64,
+                    imageUrl: base64 ? '' : url
+                };
+            }
+
+            function resetMatchForm() {
+                document.getElementById('match-name').value = '';
+                document.getElementById('match-time').value = '';
+                document.getElementById('match-description').value = '';
+                document.getElementById('match-prize').value = '';
+                document.getElementById('match-location').value = '';
+                document.getElementById('match-fee').value = '';
+                document.getElementById('match-stream-link').value = '';
+                document.getElementById('match-image-base64').value = '';
+                document.getElementById('match-image-url').value = '';
+                document.getElementById('match-image-upload').value = '';
+                document.getElementById('match-edit-id').value = '';
+                document.getElementById('add-match-btn').classList.remove('hidden');
+                document.getElementById('update-match-btn').classList.add('hidden');
+            }
+
+            document.getElementById('add-match-btn').addEventListener('click', () => {
+                const matchData = getMatchFormData();
+                if (!matchData.name || !matchData.startTime) {
+                     showModernAlert('Please add a name and start time.', 'warning'); return;
+                }
+                db.ref('matches').push(matchData).then(() => {
+                    showModernAlert('Match added successfully!', 'success');
+                    resetMatchForm();
+                });
+            });
+
+            document.getElementById('update-match-btn').addEventListener('click', () => {
+                const matchData = getMatchFormData();
+                const id = document.getElementById('match-edit-id').value;
+                if (!id) return;
+                db.ref(`matches/${id}`).update(matchData).then(() => {
+                    showModernAlert('Match updated successfully!', 'success');
+                    resetMatchForm();
+                });
+            });
+
+            function loadAdminMatches() { 
+                const listEl = document.getElementById('matches-list');
+                db.ref('matches').on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) return;
+                    snapshot.forEach(child => {
+                        const item = document.createElement('div');
+                        item.className = 'data-list-item';
+                        item.innerHTML = `
+                            <span>${child.val().name}</span>
+                            <div class="actions">
+                                <button class="edit-btn" data-id="${child.key}">Edit</button>
+                                <button class="delete-btn" data-id="${child.key}" data-node="matches">Delete</button>
+                            </div>`;
+                        listEl.appendChild(item);
+                    });
+                    listEl.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = (e) => editMatch(e.target.dataset.id));
+                    listEl.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = (e) => deleteData(e.target.dataset.node, e.target.dataset.id));
+                });
+            }
+
+            function editMatch(id) {
+                db.ref(`matches/${id}`).once('value', snapshot => {
+                    const match = snapshot.val();
+                    document.getElementById('match-name').value = match.name || '';
+                    document.getElementById('match-time').value = match.startTime || '';
+                    document.getElementById('match-description').value = match.description || '';
+                    document.getElementById('match-prize').value = match.prize || '';
+                    document.getElementById('match-location').value = match.location || '';
+                    document.getElementById('match-fee').value = match.entryFee || 0;
+                    document.getElementById('match-stream-link').value = match.streamLink || '';
+                    document.getElementById('match-image-base64').value = match.imageBase64 || '';
+                    document.getElementById('match-image-url').value = match.imageUrl || '';
+                    document.getElementById('match-edit-id').value = id;
+                    document.getElementById('add-match-btn').classList.add('hidden');
+                    document.getElementById('update-match-btn').classList.remove('hidden');
+                    window.scrollTo(0, document.getElementById('admin-matches-page').offsetTop);
+                });
+            }
+            
+            function populateStreamLinksForQuiz() {
+                const selectEl = document.getElementById('quiz-stream-link');
+                db.ref('streams').on('value', snapshot => {
+                    selectEl.innerHTML = '<option value="">-- Select a Stream to Link --</option>';
+                    if(!snapshot.exists()) return;
+                    snapshot.forEach(child => {
+                        selectEl.innerHTML += `<option value="${child.key}">${child.val().name}</option>`;
+                    });
+                });
+            }
+            
+            document.getElementById('set-quiz-btn').addEventListener('click', () => {
+                const linkedStreamId = document.getElementById('quiz-stream-link').value;
+                if (!linkedStreamId) {
+                    showModernAlert('You must link the quiz to a specific live stream.', 'warning');
+                    return;
+                }
+                const quizData = {
+                    linkedStreamId: linkedStreamId,
+                    question: document.getElementById('quiz-question-input').value,
+                    options: document.getElementById('quiz-options-input').value.split(',').map(o => o.trim()),
+                    answer: document.getElementById('quiz-answer-input').value,
+                    points: parseInt(document.getElementById('quiz-points-input').value, 10)
+                };
+                if(!quizData.question || quizData.options.length < 2 || !quizData.answer || !quizData.points) {
+                    showModernAlert('Please fill all quiz fields.', 'warning'); return;
+                }
+                if (!quizData.options.includes(quizData.answer)) {
+                    showModernAlert('The correct answer must be one of the options.', 'warning');
+                    return;
+                }
+                db.ref('liveQuiz').set(quizData).then(()=>showModernAlert('Quiz is now live for the selected stream!', 'success'));
+            });
+            
+            document.getElementById('clear-quiz-btn').addEventListener('click', () => {
+                 db.ref('liveQuiz').set(null).then(()=>showModernAlert('Quiz cleared.', 'info'));
+            });
+
+            function loadWithdrawalRequests() {
+                const listEl = document.getElementById('withdrawal-requests-list');
+                db.ref('withdrawalRequests').orderByChild('status').equalTo('pending').on('value', snapshot => {
+                    listEl.innerHTML = '';
+                    if (!snapshot.exists()) {
+                        listEl.innerHTML = '<p>No pending withdrawal requests.</p>'; return;
+                    }
+                    snapshot.forEach(child => {
+                        const req = child.val(); const id = child.key;
+                        const item = document.createElement('div');
+                        item.className = 'data-list-item';
+                        item.innerHTML = `
+                            <div class="info">
+                                <strong>${req.userName}</strong> (${req.email})<br>
+                                Amount: <strong>₹${req.amount}</strong> | UPI: ${req.upiId}<br>
+                                <small>${new Date(req.timestamp).toLocaleString()}</small>
+                            </div>
+                            <div class="actions">
+                                <button class="approve-btn" data-id="${id}" data-uid="${req.userId}" data-amount="${req.amount}">Approve</button>
+                                <button class="reject-btn" data-id="${id}">Reject</button>
+                            </div>`;
+                        listEl.appendChild(item);
+                    });
+                    listEl.querySelectorAll('.approve-btn').forEach(btn => btn.onclick = handleApproveWithdrawal);
+                    listEl.querySelectorAll('.reject-btn').forEach(btn => btn.onclick = (e) => updateWithdrawalStatus(e.target.dataset.id, 'rejected'));
+                });
+            }
+
+            function handleApproveWithdrawal(e) {
+                const { id, uid, amount } = e.target.dataset;
+                const numericAmount = parseFloat(amount);
+                
+                showModernConfirm(`Approve withdrawal of ₹${numericAmount} for this user? This will deduct from their wallet.`, (confirmed) => {
+                     if(confirmed) {
+                         const userWalletRef = db.ref(`users/${uid}/walletBalance`);
+                         userWalletRef.transaction(currentBalance => {
+                             if (currentBalance === null || currentBalance < numericAmount) {
+                                 showModernAlert('User has insufficient funds!', 'error');
+                                 return;
+                             }
+                             return currentBalance - numericAmount;
+                         }).then(result => {
+                             if (result.committed) {
+                                updateWithdrawalStatus(id, 'approved');
+                                recordTransaction(uid, 'debit', numericAmount, `Withdrawal approved by admin`);
+                             } else {
+                                showModernAlert("Transaction failed, user balance might have changed.", 'error');
+                             }
+                         });
+                    }
+                });
+            }
+
+            function updateWithdrawalStatus(requestId, status) {
+                 db.ref(`withdrawalRequests/${requestId}/status`).set(status)
+                    .then(() => showModernAlert(`Request marked as ${status}.`, 'info'));
+            }
+            
+            function deleteData(node, id) {
+                showModernConfirm(`Are you sure you want to delete this item? This cannot be undone.`, (confirmed) => {
+                    if (confirmed) {
+                        db.ref(`${node}/${id}`).remove().then(() => {
+                            showModernAlert("Item deleted.", 'success');
+                            populateCategoryDropdowns();
+                        });
+                    }
+                });
+            }
+
+            handleDeepLink();
+        });
+    </script>
+</body>
+</html>
