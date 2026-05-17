@@ -1197,6 +1197,8 @@
                     </div>
                     
                     <div id="custom-video-controls">
+                        <!-- NEW: Volume button added here -->
+                        <button id="volume-btn" class="control-btn hidden"><i class="fas fa-volume-mute"></i></button>
                         <button id="reload-btn" class="control-btn"><i class="fas fa-redo"></i></button>
                         <button id="fullscreen-btn" class="control-btn"><i class="fas fa-expand"></i></button>
                     </div>
@@ -2241,6 +2243,7 @@
                  const vimeoIframe = document.getElementById('vimeo-player');
                  const modernAudioPlayer = document.getElementById('modern-audio-player');
                  const playerContainer = document.getElementById('live-tv-container');
+                 const volumeBtn = document.getElementById('volume-btn');
 
                  currentMediaActive = false;
                  currentStreamId = null;
@@ -2262,6 +2265,10 @@
                      vimeoPlayer = null;
                  }
                  
+                 // NEW: Reset and hide volume button when stopping media
+                 volumeBtn.classList.add('hidden');
+                 volumeBtn.querySelector('i').className = 'fas fa-volume-mute';
+
                  document.getElementById('video-overlay-logo').classList.add('hidden');
                  document.getElementById('player-wrapper').classList.add('hidden');
                  playerContainer.classList.remove('mini-player-mode');
@@ -2537,11 +2544,14 @@
                 const youtubeContainer = document.getElementById('youtube-player-container');
                 const vimeoContainer = document.getElementById('vimeo-player-container');
                 const vimeoIframe = document.getElementById('vimeo-player');
+                const volumeBtn = document.getElementById('volume-btn');
 
-                // Hide all players initially
+                // Hide all players and the volume button initially
                 videoPlayer.classList.add('hidden');
                 youtubeContainer.classList.add('hidden');
                 vimeoContainer.classList.add('hidden');
+                volumeBtn.classList.add('hidden');
+
 
                 if (index >= videoUrlSources.length) {
                     console.log("All video URLs attempted. Looping back to first URL.");
@@ -2563,7 +2573,9 @@
 
                 } else if (vimeoData) {
                     vimeoContainer.classList.remove('hidden');
+                    volumeBtn.classList.remove('hidden'); // Show volume button for Vimeo
                     
+                    // --- FIX: Re-added background=1 and muted=1 for better autoplay ---
                     let finalVimeoUrl = `https://player.vimeo.com/video/${vimeoData.id}?autoplay=1&loop=1&background=1&muted=1`;
                     if (vimeoData.hash) {
                         finalVimeoUrl += `&h=${vimeoData.hash}`;
@@ -2574,6 +2586,9 @@
 
                     vimeoPlayer.on('loaded', () => {
                         console.log(`Vimeo video ${vimeoData.id} loaded successfully.`);
+                        // Reset icon to muted state on load
+                        volumeBtn.querySelector('i').className = 'fas fa-volume-mute';
+                        
                         if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
                             vimeoPlayer.getDuration().then(duration => {
                                 if (duration > 0) {
@@ -2584,7 +2599,7 @@
                                 }
                             });
                         }
-                        vimeoPlayer.play().catch(e => console.warn("Vimeo autoplay was blocked. Unmuting may be required."));
+                        vimeoPlayer.play().catch(e => console.warn("Vimeo autoplay was blocked."));
                     });
 
                     vimeoPlayer.on('error', (error) => {
@@ -2648,7 +2663,27 @@
             function setupCustomVideoControls() {
                 const reloadBtn = document.getElementById('reload-btn');
                 const fullscreenBtn = document.getElementById('fullscreen-btn');
+                const volumeBtn = document.getElementById('volume-btn');
                 const playerContainer = document.getElementById('live-tv-container');
+
+                // NEW: Volume button logic
+                volumeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!vimeoPlayer) return;
+                    
+                    const volumeIcon = volumeBtn.querySelector('i');
+                    vimeoPlayer.getVolume().then(volume => {
+                        if (volume === 0) {
+                            vimeoPlayer.setVolume(1);
+                            volumeIcon.className = 'fas fa-volume-up';
+                        } else {
+                            vimeoPlayer.setVolume(0);
+                            volumeIcon.className = 'fas fa-volume-mute';
+                        }
+                    }).catch(err => {
+                        console.error("Failed to get/set volume:", err);
+                    });
+                });
 
                 reloadBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
