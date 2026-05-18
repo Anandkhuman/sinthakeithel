@@ -17,7 +17,6 @@
     <!-- NEW: Vimeo Player API for Vimeo support and sync -->
     <script src="https://player.vimeo.com/api/player.js"></script>
 
-
     <!-- CSS Styles -->
     <style>
         /* General Styles */
@@ -384,10 +383,10 @@
             padding-top: 56.25%; /* Default 16:9 aspect ratio */
         }
         #youtube-player-container iframe,
-#vimeo-player-container iframe {
-    width: 100%;
-    height: 100%;
-}
+        #vimeo-player-container iframe {
+            width: 100%;
+            height: 100%;
+        }
         #video-overlay-container > * {
             position: absolute;
             top: 0;
@@ -590,6 +589,29 @@
             align-items: center;
             justify-content: center;
         }
+        
+        /* NEW: Styles for video source selector */
+        .video-source-selector {
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .source-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .source-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
 
         .streaming-tabs {
             display: flex;
@@ -652,6 +674,11 @@
             cursor: pointer;
             text-align: left;
             font-size: 13px;
+        }
+        #quiz-result-message {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
         }
         #leaderboard h4 { margin-top: 18px; }
         #leaderboard-list { list-style: none; padding: 0; }
@@ -753,7 +780,7 @@
         .livetv-item img, .radio-item img {
             width: 100%;
             height: 90px;
-            object-fit: cover;
+            object-fit: fit;
             display: block;
         }
         .livetv-item-name, .radio-item-name { 
@@ -776,6 +803,12 @@
         .match-card p { margin: 4px 0; opacity: 0.8; font-size: 13px; }
         .match-timer { font-size: 1.1em; font-weight: bold; color: var(--accent-color); margin: 8px 0; }
         
+        /* NEW: Style for the colored prize text */
+        .match-prize-highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
         .match-stats {
             display: flex;
             gap: 14px;
@@ -789,6 +822,12 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            cursor: pointer;
+            transition: color 0.2s, opacity 0.2s;
+        }
+        .match-stats span:hover {
+            opacity: 0.8;
+            color: var(--accent-color);
         }
 
         .match-actions { display: flex; gap: 8px; margin-top: 14px; }
@@ -1083,6 +1122,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             margin-bottom: 8px;
+            background-color: var(--primary-color);
         }
         .data-list-item .info { flex-basis: 100%; margin-bottom: 8px; }
         .data-list-item .actions { margin-left: auto; }
@@ -1095,11 +1135,71 @@
             color: white;
             font-size: 12px;
         }
+        .stream-control-btn { background-color: #ffc107; color: #000; } /* Warning color */
         .edit-btn { background-color: #007bff; }
         .delete-btn { background-color: #dc3545; }
         .approve-btn { background-color: var(--success-color); }
         .reject-btn { background-color: var(--warning-color); color: #000; }
 
+        /* Quiz Enhancements */
+        .generic-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+        .generic-switch input { opacity: 0; width: 0; height: 0; }
+        .generic-switch .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 26px;
+        }
+        .generic-switch .slider:before {
+            position: absolute; content: "";
+            height: 18px; width: 18px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        .generic-switch input:checked + .slider { background-color: var(--accent-color); }
+        .generic-switch input:checked + .slider:before { transform: translateX(22px); }
+
+        .quiz-toast {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .quiz-toast.show { opacity: 1; }
+        .quiz-toast.success { background-color: var(--success-color); }
+        .quiz-toast.error { background-color: var(--error-color); }
+
+        .point-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffeb3b;
+            text-shadow: 0 0 10px #ff9800, 0 0 20px #ff9800;
+            z-index: 10000;
+            pointer-events: none;
+            animation: floatUpFade 2s ease-out forwards;
+        }
+        @keyframes floatUpFade {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -1132,6 +1232,43 @@
             <button id="pay-with-wallet-btn" class="btn">Pay from Wallet</button>
             <button id="pay-with-razorpay-btn" class="btn">Pay with Razorpay</button>
             <button id="close-modal" class="btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- STREAM CONTROL MODAL (NEW) -->
+    <div id="stream-control-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-sliders-h"></i> Control Stream</h3>
+            <p id="ctrl-stream-name-display" style="font-weight: bold; margin-bottom: 15px;"></p>
+            <div class="admin-form-group">
+                <label>Select Active Link</label>
+                <select id="ctrl-active-link"></select>
+            </div>
+            <div class="admin-form-group">
+                <label>Start Time (Seconds)</label>
+                <input type="number" id="ctrl-start-time" placeholder="e.g., 30" value="0">
+            </div>
+            <div class="modal-buttons">
+                 <button id="ctrl-sync-btn" class="btn popup-confirm-btn">Apply & Sync Globally</button>
+                 <button id="ctrl-close-btn" class="btn popup-cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATCH COMMENTS MODAL (NEW) -->
+    <div id="match-comments-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; padding: 15px;">
+            <h3 style="margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <i class="fas fa-comments"></i> Match Comments
+            </h3>
+            <div id="match-comments-list" style="flex-grow: 1; overflow-y: auto; text-align: left; margin-bottom: 15px; min-height: 200px;">
+                <!-- Comments injected here -->
+            </div>
+            <div class="comment-input-area" style="margin-bottom: 10px;">
+                <input type="text" id="match-comment-input" placeholder="Add a comment...">
+                <button id="send-match-comment-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <button id="close-match-comments-btn" class="btn popup-cancel-btn" style="margin-top: 0;">Close</button>
         </div>
     </div>
 
@@ -1219,6 +1356,9 @@
                 
                 <audio id="live-audio" style="display: none;"></audio>
             </div>
+            
+            <!-- NEW: CONTAINER FOR MULTIPLE VIDEO SOURCES -->
+            <div id="video-source-selector" class="video-source-selector"></div>
         </div>
 
         <main class="main-content">
@@ -1239,6 +1379,7 @@
                                     <h3>Live Quiz</h3>
                                     <div id="quiz-question">No active quiz at the moment.</div>
                                     <div id="quiz-options"></div>
+                                    <div id="quiz-result-message"></div>
                                     <div id="leaderboard">
                                         <h4>Leaderboard</h4>
                                         <ul id="leaderboard-list"></ul>
@@ -1391,8 +1532,13 @@
                         <input type="text" id="new-stream-category-input" placeholder="e.g., Entertainment">
                     </div>
                     <div class="admin-form-group">
-                        <label>Video URLs (M3U8, YouTube, Vimeo, MP4 etc. - one per line)</label>
-                        <textarea id="stream-video-urls" placeholder="https://.../stream1.m3u8"></textarea>
+                        <label>Video URLs (M3U8, YouTube, Vimeo, MP4 etc.)</label>
+                        <div id="dynamic-url-inputs">
+                            <div class="url-input-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <input type="text" class="stream-video-url-input" placeholder="https://.../stream1.m3u8" style="flex-grow: 1; margin-bottom: 0;">
+                                <button type="button" class="add-url-btn btn" style="width: auto; margin-top: 0; padding: 0 15px; background-color: var(--success-color);"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
                     </div>
                     <div class="admin-form-group">
                         <label>Separate Audio URL (Optional)</label>
@@ -1418,13 +1564,18 @@
                         <button type="button" id="remove-stream-overlay-btn" class="hidden" style="background-color: #6c757d; margin-top: 5px; width: auto; padding: 5px 10px;">Remove Overlay</button>
                         <input type="hidden" id="stream-overlay-base64">
                     </div>
-                     <!-- NEW: Global Sync Options -->
+                     <!-- Global Sync Options -->
                     <div class="admin-form-group">
                         <label>Sync Options (for MP4/Vimeo)</label>
                         <div class="sync-options">
                             <label><input type="checkbox" id="stream-sync-enabled"> Enable Global Sync</label>
                             <button id="reset-sync-btn" type="button" style="width: auto; padding: 5px 10px; background-color: var(--warning-color); color: #000;">Reset Sync Time</button>
                         </div>
+                    </div>
+                    <!-- NEW: Start Time Offset Input -->
+                    <div class="admin-form-group">
+                        <label>Start Time Offset (for MP4/Vimeo, in seconds)</label>
+                        <input type="number" id="stream-start-offset" placeholder="e.g., 30 (for 30 seconds)">
                     </div>
                     <div class="admin-form-group">
                         <input type="hidden" id="stream-edit-id">
@@ -1488,7 +1639,6 @@
                         <label>Description</label>
                         <textarea id="match-description"></textarea>
                     </div>
-                    <!-- MODIFIED: Prize inputs -->
                     <div class="admin-form-group">
                         <label>1st Prize</label>
                         <input type="text" id="match-prize-1st" placeholder="e.g., 1000">
@@ -1501,7 +1651,6 @@
                         <label>3rd Prize</label>
                         <input type="text" id="match-prize-3rd" placeholder="e.g., 250">
                     </div>
-                    <!-- END MODIFICATION -->
                     <div class="admin-form-group">
                         <label>Location</label>
                         <input type="text" id="match-location" placeholder="e.g., Virtual Stadium">
@@ -1541,6 +1690,16 @@
                 <div id="admin-quiz-page" class="admin-section hidden">
                     <h2>Manage Live Quiz</h2>
                     <div class="admin-form-group">
+                        <label>Quiz Mode</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label class="generic-switch">
+                                <input type="checkbox" id="quiz-mode-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span id="quiz-mode-label" style="font-weight: bold;">Live Mode</span>
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
                         <label>Link Quiz to a Live TV Stream</label>
                         <select id="quiz-stream-link"></select>
                     </div>
@@ -1549,20 +1708,36 @@
                         <input type="text" id="quiz-question-input" placeholder="e.g., Who scored the first goal?">
                     </div>
                     <div class="admin-form-group">
-                        <label>Options (comma-separated)</label>
-                        <input type="text" id="quiz-options-input" placeholder="e.g., Player A,Player B,Player C">
+                        <label>Options</label>
+                        <input type="text" id="quiz-option-1" class="quiz-option-input" placeholder="Option 1 (e.g., Player A)" style="margin-bottom: 8px;">
+                        <input type="text" id="quiz-option-2" class="quiz-option-input" placeholder="Option 2 (e.g., Player B)" style="margin-bottom: 8px;">
+                        <input type="text" id="quiz-option-3" class="quiz-option-input" placeholder="Option 3 (e.g., Player C)" style="margin-bottom: 8px;">
+                        <input type="text" id="quiz-option-4" class="quiz-option-input" placeholder="Option 4 (e.g., Player D)">
                     </div>
                     <div class="admin-form-group">
-                        <label>Correct Answer (must match one option exactly)</label>
-                        <input type="text" id="quiz-answer-input" placeholder="e.g., Player B">
+                        <label>Correct Answer</label>
+                        <select id="quiz-answer-input">
+                            <option value="">-- Announce Later --</option>
+                            <option value="0">Option 1</option>
+                            <option value="1">Option 2</option>
+                            <option value="2">Option 3</option>
+                            <option value="3">Option 4</option>
+                        </select>
                     </div>
                     <div class="admin-form-group">
                         <label>Points</label>
                         <input type="number" id="quiz-points-input" placeholder="e.g., 10">
                     </div>
                     <div class="admin-form-group">
-                        <button id="set-quiz-btn">Set Live Quiz</button>
-                        <button id="clear-quiz-btn">Clear Quiz</button>
+                        <button id="set-quiz-btn">Add & Set Quiz</button>
+                        <button id="clear-quiz-btn" style="margin-top: 10px;">Clear Active Quiz</button>
+                    </div>
+                    
+                    <div id="admin-quiz-list-container" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <h3>Quiz Questions List</h3>
+                        <button id="start-auto-quiz-btn" class="btn" style="background-color: var(--success-color); margin-bottom: 15px;">Start Auto Quiz (30s interval)</button>
+                        <button id="stop-auto-quiz-btn" class="btn hidden" style="background-color: var(--error-color); margin-bottom: 15px;">Stop Auto Quiz</button>
+                        <div id="quiz-questions-list"></div>
                     </div>
                 </div>
 
@@ -1624,17 +1799,32 @@
             let allStreamsData = {};
             let allRadioData = {};
             let allCommentsData = {}; 
+            let allMatchLikes = {}; // NEW for specific match likes
+            let allMatchComments = {}; // NEW for specific match comments
             let joinedCompetitions = {};
             let currentMediaActive = false;
             let currentStreamId = null;
             let currentStreamData = null; // Holds all data for the currently playing stream
             let isQuizActive = false;
+            let currentQuizAnswersListener = null; // Listens to user's answer
             let hls = null;
             let vimeoPlayer = null; // Vimeo player instance
             let videoUrlSources = []; 
             let currentVideoUrlIndex = 0;
             let allCategories = new Set();
             let serverTimeOffset = 0; // For time synchronization
+            
+            // NEW ADMIN SYNC/CONTROL VARIABLES
+            let currentControlStreamId = null;
+            let activeStreamListener = null;
+            let lastProcessedSyncTrigger = null;
+
+            // MATCH COMMENTS TRACKING
+            let currentMatchCommentId = null;
+            
+            // QUIZ TOAST/ANIMATION STATE
+            let lastQuizStatus = null;
+            let autoQuizInterval = null;
 
             // --- HELPER FUNCTIONS ---
             const showLoader = () => loader.classList.remove('hidden');
@@ -1842,19 +2032,18 @@
                     url: shareUrl,
                 };
 
-                try {
-                    if (navigator.share) {
+                // UPDATED: Strictly use native share, no copy fallback.
+                if (navigator.share) {
+                    try {
                         await navigator.share(shareData);
-                    } else {
-                        // Fallback for desktop
-                        await navigator.clipboard.writeText(shareUrl);
-                        showModernAlert('Link copied to clipboard!', 'success');
+                    } catch (err) {
+                        // Don't show an error if the user cancels the share dialog
+                        if (err.name !== 'AbortError') {
+                            showModernAlert(`Could not share: ${err.message}`, 'error');
+                        }
                     }
-                } catch (err) {
-                    // Don't show an error if the user cancels the share dialog
-                    if (err.name !== 'AbortError') {
-                        showModernAlert(`Could not share: ${err.message}`, 'error');
-                    }
+                } else {
+                    showModernAlert('Sharing is not natively supported on this browser/device.', 'warning');
                 }
             }
 
@@ -1921,9 +2110,17 @@
             
                 db.ref('streamComments').on('value', snapshot => {
                     allCommentsData = snapshot.val() || {};
-                    if(document.getElementById('matches-page').offsetParent !== null) {
-                         loadMatches();
-                    }
+                });
+                
+                // NEW: Listeners for match specific likes and comments
+                db.ref('matchLikes').on('value', snapshot => {
+                    allMatchLikes = snapshot.val() || {};
+                    if(document.getElementById('matches-page').offsetParent !== null) loadMatches();
+                });
+                db.ref('matchComments').on('value', snapshot => {
+                    allMatchComments = snapshot.val() || {};
+                    if(document.getElementById('matches-page').offsetParent !== null) loadMatches();
+                    if(currentMatchCommentId) renderMatchCommentsList(); // Update open modal real-time
                 });
 
                 loadCategories('streams', 'livetv-categories', renderStreams, () => allStreamsData);
@@ -1939,6 +2136,7 @@
                 setupModernAudioPlayer();
                 setupSwipeAndTabs(); 
                 setupCommentsLogic();
+                setupMatchCommentsModalLogic(); // NEW
                 setupVideoEventListeners();
                 setupCustomVideoControls();
             }
@@ -2243,6 +2441,11 @@
             
             // --- UPDATED AND ROBUST CLEANUP FUNCTION ---
             async function stopAllMedia() {
+                if (activeStreamListener && currentStreamId) {
+                    db.ref(`streams/${currentStreamId}`).off('value', activeStreamListener);
+                    activeStreamListener = null;
+                }
+
                 const videoPlayer = document.getElementById('live-player');
                 const audioPlayer = document.getElementById('live-audio');
                 const youtubePlayer = document.getElementById('youtube-player');
@@ -2250,6 +2453,7 @@
                 const modernAudioPlayer = document.getElementById('modern-audio-player');
                 const playerContainer = document.getElementById('live-tv-container');
                 const volumeBtn = document.getElementById('volume-btn');
+                const sourceSelector = document.getElementById('video-source-selector');
 
                 currentMediaActive = false;
                 currentStreamId = null;
@@ -2261,7 +2465,6 @@
                 audioPlayer.removeAttribute('src');
                 youtubePlayer.src = 'about:blank';
                 
-                // **FIX**: Properly destroy Vimeo player and clean its container
                 if (vimeoPlayer) {
                     try {
                         await vimeoPlayer.destroy();
@@ -2271,7 +2474,8 @@
                         vimeoPlayer = null;
                     }
                 }
-                vimeoContainer.innerHTML = ''; // Always clear the container
+                vimeoContainer.innerHTML = ''; 
+                vimeoContainer.classList.add('hidden');
 
                 if (hls) {
                     hls.destroy();
@@ -2280,6 +2484,8 @@
                 
                 volumeBtn.classList.add('hidden');
                 volumeBtn.querySelector('i').className = 'fas fa-volume-mute';
+                
+                sourceSelector.innerHTML = ''; // Clear source buttons
 
                 document.getElementById('video-overlay-logo').classList.add('hidden');
                 document.getElementById('player-wrapper').classList.add('hidden');
@@ -2508,7 +2714,6 @@
                 };
             }
             
-            // --- UPDATED ASYNC FUNCTION ---
             async function playStream(id, stream) {
                 if (currentStreamId === id) {
                     switchPage('streaming-page');
@@ -2520,6 +2725,18 @@
 
                 currentStreamId = id;
                 currentStreamData = stream;
+                lastProcessedSyncTrigger = stream.forceSyncTrigger || null;
+                
+                // Set Listener for real-time global admin sync
+                activeStreamListener = db.ref(`streams/${id}`).on('value', snapshot => {
+                    const updatedStream = snapshot.val();
+                    if (!updatedStream) {
+                        stopAllMedia();
+                        return;
+                    }
+                    handleStreamUpdates(updatedStream);
+                });
+
                 loadComments(id);
                 loadLiveQuizAndLeaderboard();
                 
@@ -2538,8 +2755,35 @@
 
                 videoUrlSources = (stream.videoUrls || "").split('\n').map(url => url.trim()).filter(Boolean);
                 
+                // NEW: Logic to show multiple source links
+                const sourceSelector = document.getElementById('video-source-selector');
+                sourceSelector.innerHTML = '';
+                if (videoUrlSources.length > 1) {
+                    videoUrlSources.forEach((url, index) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'source-btn';
+                        btn.textContent = `Source ${index + 1}`;
+                        btn.dataset.index = index;
+                        btn.addEventListener('click', async (e) => {
+                            const selectedIndex = parseInt(e.target.dataset.index, 10);
+                            // Simple stop of current video before playing new one
+                            if (hls) { hls.destroy(); hls = null; }
+                            if (vimeoPlayer) { try { await vimeoPlayer.destroy(); vimeoPlayer = null; } catch (err) {} }
+                            const vidPlayer = document.getElementById('live-player');
+                            vidPlayer.pause();
+                            vidPlayer.removeAttribute('src');
+                            document.getElementById('youtube-player').src = 'about:blank';
+                            playVideoAtIndex(selectedIndex);
+                        });
+                        sourceSelector.appendChild(btn);
+                    });
+                }
+
+                let startIndex = stream.activeLinkIndex !== undefined ? stream.activeLinkIndex : 0;
+                if (startIndex >= videoUrlSources.length) startIndex = 0;
+
                 if (videoUrlSources.length > 0) {
-                    playVideoAtIndex(0);
+                    playVideoAtIndex(startIndex);
                 } else {
                     showModernAlert("No video sources found for this stream.", 'warning');
                 }
@@ -2558,17 +2802,70 @@
                 window.scrollTo(0, 0);
             }
 
+            // Real-time listener handler for Admin controls
+            function handleStreamUpdates(updatedStream) {
+                currentStreamData = updatedStream;
+                if (updatedStream.forceSyncTrigger && updatedStream.forceSyncTrigger !== lastProcessedSyncTrigger) {
+                    lastProcessedSyncTrigger = updatedStream.forceSyncTrigger;
+                    
+                    const targetIndex = updatedStream.activeLinkIndex !== undefined ? updatedStream.activeLinkIndex : 0;
+                    
+                    if (currentVideoUrlIndex !== targetIndex) {
+                        playVideoAtIndex(targetIndex);
+                    } else {
+                        applyGlobalSync();
+                    }
+                }
+            }
+
+            // Global Sync applicator
+            function applyGlobalSync() {
+                if (!currentStreamData) return;
+                const offset = currentStreamData.globalSyncOffset || 0;
+                const syncTime = currentStreamData.globalSyncTimestamp || 0;
+                
+                if (syncTime === 0) return;
+
+                const elapsedTime = (Date.now() + serverTimeOffset - syncTime) / 1000;
+                let targetPlaybackTime = offset + elapsedTime;
+
+                const videoPlayer = document.getElementById('live-player');
+                if (vimeoPlayer && !document.getElementById('vimeo-player-container').classList.contains('hidden')) {
+                    vimeoPlayer.getDuration().then(duration => {
+                        if (duration > 0) {
+                            const seekTime = targetPlaybackTime % duration;
+                            vimeoPlayer.setCurrentTime(seekTime).catch(e => console.error("Vimeo sync seek error:", e));
+                        }
+                    });
+                } else if (!videoPlayer.classList.contains('hidden')) {
+                    if (videoPlayer.duration) {
+                        const seekTime = targetPlaybackTime % videoPlayer.duration;
+                        videoPlayer.currentTime = seekTime;
+                        videoPlayer.play().catch(e => console.warn(e));
+                    } else if (hls) {
+                        videoPlayer.currentTime = targetPlaybackTime;
+                    }
+                }
+            }
+
             function playVideoAtIndex(index) {
                 const videoPlayer = document.getElementById('live-player');
                 const youtubeContainer = document.getElementById('youtube-player-container');
                 const vimeoContainer = document.getElementById('vimeo-player-container');
                 const volumeBtn = document.getElementById('volume-btn');
 
+                // NEW: Update active state for source buttons
+                const sourceSelector = document.getElementById('video-source-selector');
+                if (sourceSelector) {
+                     sourceSelector.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+                     const activeBtn = sourceSelector.querySelector(`[data-index="${index}"]`);
+                     if (activeBtn) activeBtn.classList.add('active');
+                }
+
                 videoPlayer.classList.add('hidden');
                 youtubeContainer.classList.add('hidden');
                 vimeoContainer.classList.add('hidden');
                 volumeBtn.classList.add('hidden');
-
 
                 if (index >= videoUrlSources.length) {
                     console.log("All video URLs attempted. Looping back to first URL.");
@@ -2592,14 +2889,11 @@
                     vimeoContainer.classList.remove('hidden');
                     volumeBtn.classList.remove('hidden');
                     
-                    // **FIX**: Always recreate the iframe to avoid issues with .destroy() removing it.
                     vimeoContainer.innerHTML = `<iframe id="vimeo-player" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
                     const vimeoIframe = document.getElementById('vimeo-player');
                     
                     let finalVimeoUrl = `https://player.vimeo.com/video/${vimeoData.id}?autoplay=1&loop=1&background=1&muted=1`;
-                    if (vimeoData.hash) {
-                        finalVimeoUrl += `&h=${vimeoData.hash}`;
-                    }
+                    if (vimeoData.hash) { finalVimeoUrl += `&h=${vimeoData.hash}`; }
 
                     vimeoIframe.src = finalVimeoUrl;
                     vimeoPlayer = new Vimeo.Player(vimeoIframe);
@@ -2608,7 +2902,10 @@
                         console.log(`Vimeo video ${vimeoData.id} loaded successfully.`);
                         volumeBtn.querySelector('i').className = 'fas fa-volume-mute';
                         
-                        if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
+                        // MODIFIED: Precedence for sync, fallback to start time offset
+                        if (currentStreamData.globalSyncTimestamp) {
+                            applyGlobalSync();
+                        } else if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
                             vimeoPlayer.getDuration().then(duration => {
                                 if (duration > 0) {
                                     const elapsedTime = (Date.now() + serverTimeOffset - currentStreamData.syncStartTime) / 1000;
@@ -2617,7 +2914,11 @@
                                     console.log(`Vimeo Sync: Seeking to ${seekTime.toFixed(2)}s`);
                                 }
                             });
+                        } else if (currentStreamData.startTimeOffset > 0) {
+                             vimeoPlayer.setCurrentTime(currentStreamData.startTimeOffset).catch(seekError => console.error("Vimeo seek error:", seekError));
+                             console.log(`Vimeo Start Offset: Seeking to ${currentStreamData.startTimeOffset}s`);
                         }
+                        
                         vimeoPlayer.play().catch(e => console.warn("Vimeo autoplay was blocked."));
                     });
 
@@ -2633,6 +2934,9 @@
                         hls.loadSource(url);
                         hls.attachMedia(videoPlayer);
                         hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                            if (currentStreamData.globalSyncTimestamp) {
+                                applyGlobalSync();
+                            }
                             videoPlayer.play().catch(e => console.error("HLS play failed:", e));
                         });
                          hls.on(Hls.Events.ERROR, (event, data) => {
@@ -2643,28 +2947,37 @@
                          });
                     } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
                          videoPlayer.src = url;
-                         videoPlayer.play();
+                         videoPlayer.addEventListener('loadedmetadata', () => {
+                             if (currentStreamData.globalSyncTimestamp) {
+                                applyGlobalSync();
+                             }
+                             videoPlayer.play();
+                         });
                     }
                 } else { // Assume MP4 or other direct video file
                     videoPlayer.classList.remove('hidden');
                     videoPlayer.src = url;
                     videoPlayer.loop = true;
                     
-                    if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
-                         const onLoadedMetadata = () => {
+                    const onLoadedMetadata = () => {
+                        // MODIFIED: Precedence for sync, fallback to start time offset
+                        if (currentStreamData.globalSyncTimestamp) {
+                             applyGlobalSync();
+                        } else if (currentStreamData.syncEnabled && currentStreamData.syncStartTime) {
                              if (videoPlayer.duration) {
                                 const elapsedTime = (Date.now() + serverTimeOffset - currentStreamData.syncStartTime) / 1000;
                                 const seekTime = elapsedTime % videoPlayer.duration;
                                 videoPlayer.currentTime = seekTime;
                                 console.log(`MP4 Sync: Seeking to ${seekTime.toFixed(2)}s`);
-                                videoPlayer.play().catch(e => console.warn("Autoplay was blocked", e));
                              }
-                             videoPlayer.removeEventListener('loadedmetadata', onLoadedMetadata);
-                         };
-                         videoPlayer.addEventListener('loadedmetadata', onLoadedMetadata);
-                    } else {
+                        } else if (currentStreamData.startTimeOffset > 0 && videoPlayer.duration > currentStreamData.startTimeOffset) {
+                            videoPlayer.currentTime = currentStreamData.startTimeOffset;
+                            console.log(`MP4 Start Offset: Seeking to ${currentStreamData.startTimeOffset}s`);
+                        }
                         videoPlayer.play().catch(e => console.warn("Autoplay was blocked", e));
-                    }
+                        videoPlayer.removeEventListener('loadedmetadata', onLoadedMetadata);
+                    };
+                    videoPlayer.addEventListener('loadedmetadata', onLoadedMetadata);
                 }
             }
 
@@ -2704,19 +3017,21 @@
 
                 fullscreenBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    const fullscreenIcon = fullscreenBtn.querySelector('i');
-
+                    
                     if (!document.fullscreenElement) {
                         try {
                            await playerContainer.requestFullscreen();
-                           playerContainer.classList.add('fullscreen-mode');
-                           fullscreenIcon.className = 'fas fa-compress';
+                           // NEW: Attempt to lock to landscape
+                           if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                               await screen.orientation.lock('landscape').catch(err => console.warn("Could not lock orientation:", err));
+                           }
                         } catch(err) {
                             console.error(`Error entering full-screen: ${err.message}`);
                         }
                     } else {
                         if (document.exitFullscreen) {
                            await document.exitFullscreen();
+                           // Unlocking is usually handled automatically by the browser upon exiting fullscreen
                         }
                     }
                 });
@@ -2726,6 +3041,10 @@
                     if (!document.fullscreenElement) {
                         playerContainer.classList.remove('fullscreen-mode');
                         fullscreenIcon.className = 'fas fa-expand';
+                        // NEW: Explicitly unlock orientation on exit, just in case
+                        if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+                            screen.orientation.unlock();
+                        }
                     } else {
                         playerContainer.classList.add('fullscreen-mode');
                         fullscreenIcon.className = 'fas fa-compress';
@@ -2733,7 +3052,6 @@
                 });
             }
             
-            // --- UPDATED ASYNC FUNCTION ---
             async function playRadio(id, radio) {
                 if (currentStreamId === id) {
                     switchPage('streaming-page');
@@ -2798,22 +3116,20 @@
                     Object.entries(matches).forEach(([id, match]) => {
                         const imgSrc = match.imageBase64 || match.imageUrl || 'https://i.ibb.co/ryj8vG1/placeholder-video.jpg';
                         
-                        let likeCount = 0;
+                        // NEW: Directly fetch match likes and comments from independent nodes
+                        let likeCount = allMatchLikes[id] ? Object.keys(allMatchLikes[id]).length : 0;
+                        let isLiked = (currentUserData && allMatchLikes[id] && allMatchLikes[id][currentUserId]) ? true : false;
+                        
                         let commentCount = 0;
-                        if(match.streamLink && allCommentsData[match.streamLink]) {
-                            const commentsForStream = Object.values(allCommentsData[match.streamLink]);
-                            commentCount = commentsForStream.length;
-                            commentsForStream.forEach(comment => {
-                                if(comment.likes) {
-                                    likeCount += Object.keys(comment.likes).length;
-                                }
-                                if(comment.replies) {
-                                    commentCount += Object.keys(comment.replies).length;
-                                }
+                        if(allMatchComments[id]) {
+                            const comments = Object.values(allMatchComments[id]);
+                            commentCount = comments.length;
+                            comments.forEach(c => {
+                                if(c.replies) commentCount += Object.keys(c.replies).length;
                             });
                         }
 
-                        // MODIFIED: Create prize display string
+                        // Create prize display string
                         let prizeDisplay = '';
                         if (typeof match.prize === 'object' && match.prize !== null) {
                             const prizes = [];
@@ -2822,7 +3138,7 @@
                             if (match.prize.third) prizes.push(`<strong>3rd:</strong> ${match.prize.third}`);
                             prizeDisplay = prizes.join(', ');
                         } else {
-                            prizeDisplay = match.prize; // Backward compatibility for old string prizes
+                            prizeDisplay = match.prize; // Backward compatibility
                         }
                         
                         const card = document.createElement('div');
@@ -2834,11 +3150,15 @@
                                 <h3>${match.name}</h3>
                                 <div class="match-timer" id="timer-${id}"></div>
                                 <p>${match.description}</p>
-                                <p><strong>Prizes:</strong> ${prizeDisplay}</p>
+                                <p><strong>Prizes:</strong> <span class="match-prize-highlight">${prizeDisplay}</span></p>
                                 <p><strong>Entry Fee:</strong> ${match.entryFee > 0 ? `₹${match.entryFee}` : 'Free'}</p>
                                 <div class="match-stats">
-                                    <span><i class="fas fa-heart"></i> ${likeCount}</span>
-                                    <span><i class="fas fa-comment"></i> ${commentCount}</span>
+                                    <span class="match-like-btn" data-match-id="${id}" style="color: ${isLiked ? 'var(--accent-color)' : '#8e8e93'};">
+                                        <i class="fas fa-heart"></i> ${likeCount}
+                                    </span>
+                                    <span class="match-comment-btn" data-match-id="${id}">
+                                        <i class="fas fa-comment"></i> ${commentCount}
+                                    </span>
                                 </div>
                                 <div class="match-actions">
                                     <button class="watch-match-btn" data-stream-id="${match.streamLink}">Watch Match</button>
@@ -2860,13 +3180,13 @@
                             joinBtn.disabled = true;
                         }
                         
-                        // Add share listener
                         card.querySelector('.share-icon').addEventListener('click', handleShare);
 
                         grid.appendChild(card);
                         startCountdown(`timer-${id}`, match.startTime);
                     });
 
+                    // Add Match Watch Handlers
                     document.querySelectorAll('.watch-match-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const streamId = e.target.dataset.streamId;
@@ -2877,12 +3197,34 @@
                             });
                         });
                     });
+                    
+                    // Add Match Join Handlers
                     document.querySelectorAll('.join-competition-btn').forEach(btn => {
                         btn.addEventListener('click', handleJoinCompetition);
                     });
+
+                    // NEW: Match Like Handlers
+                    document.querySelectorAll('.match-like-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if(!currentUserData) { switchPage('auth-container'); return; }
+                            const mid = e.currentTarget.dataset.matchId;
+                            const ref = db.ref(`matchLikes/${mid}/${currentUserId}`);
+                            ref.once('value').then(snap => {
+                                if(snap.exists()) ref.remove();
+                                else ref.set(true);
+                            });
+                        });
+                    });
+
+                    // NEW: Match Comment Handlers
+                    document.querySelectorAll('.match-comment-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const mid = e.currentTarget.dataset.matchId;
+                            openMatchCommentsModal(mid);
+                        });
+                    });
                 });
             }
-
 
             function startCountdown(elementId, endTime) {
                 const timerEl = document.getElementById(elementId);
@@ -3091,6 +3433,7 @@
             function loadLiveQuizAndLeaderboard() {
                 const questionEl = document.getElementById('quiz-question');
                 const optionsEl = document.getElementById('quiz-options');
+                const resultMsgEl = document.getElementById('quiz-result-message');
                 const tabsContainer = document.getElementById('streaming-tabs');
                 const swipeContainer = document.getElementById('swipe-container');
                 const quizSection = document.getElementById('quiz-section');
@@ -3108,17 +3451,37 @@
                         switchToStreamingTab('quiz');
                         
                         questionEl.textContent = quiz.question;
-                        optionsEl.innerHTML = '';
-                        quiz.options.forEach((option, index) => {
-                            const button = document.createElement('button');
-                            const optionLetter = String.fromCharCode(65 + index);
-                            button.textContent = `${optionLetter}. ${option}`;
-                            button.dataset.option = option;
-                            button.onclick = () => submitQuizAnswer(quiz, option);
-                            optionsEl.appendChild(button);
-                        });
+                        
+                        // Handle user animation for correct/wrong answer
+                        if (quiz.status === 'completed' && lastQuizStatus === 'active') {
+                             if (currentUserId) {
+                                 db.ref(`liveQuizAnswers/${quiz.linkedStreamId}/${currentUserId}`).once('value').then(ansSnap => {
+                                     const myAnswerObj = ansSnap.val();
+                                     if (myAnswerObj) {
+                                         if (myAnswerObj.answer === quiz.answer) {
+                                             showQuizToast(true, quiz.points);
+                                         } else {
+                                             showQuizToast(false, 0);
+                                         }
+                                     } else {
+                                         showQuizToast(false, 0, "Quiz Completed. Time's up!");
+                                     }
+                                 });
+                             }
+                        }
+                        lastQuizStatus = quiz.status;
+                        
+                        if (currentUserId) {
+                            if (currentQuizAnswersListener) db.ref(`liveQuizAnswers/${currentStreamId}/${currentUserId}`).off('value', currentQuizAnswersListener);
+                            currentQuizAnswersListener = db.ref(`liveQuizAnswers/${currentStreamId}/${currentUserId}`).on('value', ansSnap => {
+                                renderQuizUI(quiz, ansSnap.val(), optionsEl, resultMsgEl);
+                            });
+                        } else {
+                            renderQuizUI(quiz, null, optionsEl, resultMsgEl);
+                        }
                     } else {
                         isQuizActive = false;
+                        lastQuizStatus = null;
                         tabsContainer.classList.add('hidden');
                         swipeContainer.style.width = '100%';
                         swipeContainer.style.transform = 'translateX(0)';
@@ -3126,6 +3489,7 @@
                         commentsSection.style.width = '100%';
                         questionEl.textContent = 'No active quiz at the moment.';
                         optionsEl.innerHTML = '';
+                        if(resultMsgEl) resultMsgEl.innerHTML = '';
                     }
                 });
 
@@ -3147,26 +3511,134 @@
                 });
             }
 
+            function showQuizToast(isCorrect, points, customMsg = null) {
+                const toast = document.createElement('div');
+                toast.className = `quiz-toast ${isCorrect ? 'success' : 'error'}`;
+                toast.textContent = customMsg ? customMsg : (isCorrect ? `Correct Answer! +${points} Points` : `Wrong Answer!`);
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 100);
+                
+                if (isCorrect) {
+                    const anim = document.createElement('div');
+                    anim.className = 'point-animation';
+                    anim.textContent = `+${points}`;
+                    document.body.appendChild(anim);
+                    setTimeout(() => anim.remove(), 2500);
+                }
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            function distributePoints(streamId, correctAns, points) {
+                db.ref(`liveQuizAnswers/${streamId}`).once('value').then(ansSnap => {
+                    if (ansSnap.exists()) {
+                        const answers = ansSnap.val();
+                        Object.keys(answers).forEach(uid => {
+                            if (answers[uid].answer === correctAns) {
+                                const userScoreRef = db.ref(`leaderboard/${uid}`);
+                                userScoreRef.transaction(currentData => {
+                                    const newScore = (currentData ? currentData.score : 0) + points;
+                                    return { 
+                                        score: newScore, 
+                                        name: answers[uid].userName || 'User', 
+                                        email: answers[uid].email || '' 
+                                    };
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            function renderQuizUI(quiz, myAnswerObj, optionsEl, resultMsgEl) {
+                optionsEl.innerHTML = '';
+                resultMsgEl.innerHTML = '';
+                
+                quiz.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    const optionLetter = String.fromCharCode(65 + index);
+                    button.textContent = `${optionLetter}. ${option}`;
+                    
+                    if (quiz.status === 'completed') {
+                        button.disabled = true;
+                        if (option === quiz.answer) {
+                            button.style.backgroundColor = 'var(--success-color)';
+                            button.style.color = 'white';
+                        } else if (myAnswerObj && myAnswerObj.answer === option && option !== quiz.answer) {
+                            button.style.backgroundColor = 'var(--error-color)';
+                            button.style.color = 'white';
+                        }
+                    } else if (myAnswerObj) {
+                        button.disabled = true;
+                        if (myAnswerObj.answer === option) {
+                             button.style.border = '2px solid var(--admin-color)';
+                        }
+                    } else {
+                        button.onclick = () => submitQuizAnswer(quiz, option);
+                    }
+                    optionsEl.appendChild(button);
+                });
+
+                if (quiz.status === 'completed') {
+                    if (myAnswerObj) {
+                        if (myAnswerObj.answer === quiz.answer) {
+                            resultMsgEl.innerHTML = `<span style="color:var(--success-color)">Correct! You earned ${quiz.points} points.</span><br>Correct Answer: ${quiz.answer}`;
+                        } else {
+                            resultMsgEl.innerHTML = `<span style="color:var(--error-color)">Wrong Answer.</span><br>Correct Answer: ${quiz.answer}`;
+                        }
+                    } else {
+                        resultMsgEl.innerHTML = `Quiz Completed.<br>Correct Answer: ${quiz.answer}`;
+                    }
+                } else if (myAnswerObj) {
+                    if (quiz.answer) {
+                        if (myAnswerObj.answer === quiz.answer) {
+                            resultMsgEl.innerHTML = `<span style="color:var(--success-color)">Correct! You earned ${quiz.points} points.</span>`;
+                        } else {
+                            resultMsgEl.innerHTML = `<span style="color:var(--error-color)">Wrong Answer.</span>`;
+                        }
+                    } else {
+                        resultMsgEl.innerHTML = `Answer submitted!<br>Correct answer will be announced soon.`;
+                    }
+                }
+            }
+
             function submitQuizAnswer(quiz, selectedAnswer) {
                 if (!currentUserData) {
                     showModernAlert("Please log in to participate.", 'warning'); switchPage('auth-container'); return;
                 }
-                document.querySelectorAll('#quiz-options button').forEach(b => b.disabled = true);
+                
+                const ansData = {
+                    answer: selectedAnswer,
+                    userName: currentUserData.name || 'User',
+                    email: currentUserData.email || '',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
 
-                if (selectedAnswer === quiz.answer) {
-                    showModernAlert(`Correct! You earned ${quiz.points} points.`, 'success');
-                    const userScoreRef = db.ref(`leaderboard/${currentUserId}`);
-                    userScoreRef.transaction(currentData => {
-                        const newScore = (currentData ? currentData.score : 0) + quiz.points;
-                        return { 
-                            score: newScore, 
-                            name: currentUserData.name, 
-                            email: currentUserData.email 
-                        };
-                    });
-                } else {
-                    showModernAlert('Wrong answer. Try again next time!', 'error');
-                }
+                db.ref(`liveQuizAnswers/${quiz.linkedStreamId}/${currentUserId}`).set(ansData).then(() => {
+                    if (quiz.answer) {
+                        if (selectedAnswer === quiz.answer) {
+                            showModernAlert(`Correct! You earned ${quiz.points} points.`, 'success');
+                            const userScoreRef = db.ref(`leaderboard/${currentUserId}`);
+                            userScoreRef.transaction(currentData => {
+                                const newScore = (currentData ? currentData.score : 0) + quiz.points;
+                                return { 
+                                    score: newScore, 
+                                    name: currentUserData.name, 
+                                    email: currentUserData.email 
+                                };
+                            });
+                        } else {
+                            showModernAlert('Wrong answer. Try again next time!', 'error');
+                        }
+                    } else {
+                        showModernAlert('Answer submitted! Result will be announced soon.', 'success');
+                    }
+                }).catch(err => showModernAlert(err.message, 'error'));
             }
             
             function setupCommentsLogic() {
@@ -3281,6 +3753,148 @@
                 return el;
             }
 
+            // --- MATCH COMMENTS MODAL LOGIC ---
+            function setupMatchCommentsModalLogic() {
+                document.getElementById('send-match-comment-btn').addEventListener('click', () => {
+                    if (!currentUserData) {
+                        document.getElementById('match-comments-modal').classList.remove('visible');
+                        switchPage('auth-container');
+                        return;
+                    }
+                    if (!currentMatchCommentId) return;
+
+                    const input = document.getElementById('match-comment-input');
+                    const text = input.value.trim();
+                    if (!text) return;
+
+                    db.ref(`matchComments/${currentMatchCommentId}`).push({
+                        userId: currentUserId,
+                        userName: currentUserData.name || 'User',
+                        text: text,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        input.value = '';
+                    }).catch(e => showModernAlert(e.message, 'error'));
+                });
+
+                document.getElementById('close-match-comments-btn').addEventListener('click', () => {
+                    currentMatchCommentId = null;
+                    document.getElementById('match-comments-modal').classList.remove('visible');
+                });
+            }
+
+            function openMatchCommentsModal(matchId) {
+                currentMatchCommentId = matchId;
+                document.getElementById('match-comments-modal').classList.add('visible');
+                renderMatchCommentsList();
+            }
+
+            function renderMatchCommentsList() {
+                if (!currentMatchCommentId) return;
+                const listEl = document.getElementById('match-comments-list');
+                listEl.innerHTML = '';
+                
+                const commentsData = allMatchComments[currentMatchCommentId];
+                if (!commentsData) {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6; margin-top:20px;">No comments yet. Be the first!</p>';
+                    return;
+                }
+                
+                const commentsArr = Object.keys(commentsData)
+                                    .map(k => ({id: k, ...commentsData[k]}))
+                                    .sort((a,b) => b.timestamp - a.timestamp);
+                
+                commentsArr.forEach(comment => {
+                    const el = createMatchCommentElement(comment, currentMatchCommentId);
+                    listEl.appendChild(el);
+                });
+            }
+
+            function createMatchCommentElement(comment, matchId) {
+                const el = document.createElement('div');
+                el.className = 'comment-item';
+                const likesCount = comment.likes ? Object.keys(comment.likes).length : 0;
+                const isLikedByMe = (currentUserData && comment.likes && comment.likes[currentUserId]) ? true : false;
+                
+                const content = document.createElement('div');
+                content.innerHTML = `<strong>${comment.userName}</strong> <span class="time">${new Date(comment.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span><p style="margin: 5px 0;">${comment.text}</p>`;
+                
+                const actions = document.createElement('div');
+                actions.className = 'comment-actions';
+                
+                const likeBtn = document.createElement('span');
+                likeBtn.innerHTML = `<i class="fas fa-heart"></i> ${likesCount}`;
+                if (isLikedByMe) likeBtn.style.color = 'var(--accent-color)';
+                likeBtn.onclick = () => {
+                    if (!currentUserData) { 
+                        document.getElementById('match-comments-modal').classList.remove('visible');
+                        switchPage('auth-container'); 
+                        return; 
+                    }
+                    const ref = db.ref(`matchComments/${matchId}/${comment.id}/likes/${currentUserId}`);
+                    ref.once('value').then(snap => {
+                        if (snap.exists()) ref.remove();
+                        else ref.set(true);
+                    });
+                };
+                
+                const replyBtn = document.createElement('span');
+                replyBtn.innerHTML = `<i class="fas fa-reply"></i> Reply`;
+                replyBtn.onclick = () => {
+                    if (!currentUserData) { 
+                        document.getElementById('match-comments-modal').classList.remove('visible');
+                        switchPage('auth-container'); 
+                        return; 
+                    }
+                    replyBox.classList.toggle('hidden');
+                };
+                
+                actions.appendChild(likeBtn);
+                actions.appendChild(replyBtn);
+                
+                const replyBox = document.createElement('div');
+                replyBox.className = 'reply-input-area hidden';
+                const replyInput = document.createElement('input');
+                replyInput.type = 'text';
+                replyInput.placeholder = 'Write a reply...';
+                const submitReplyBtn = document.createElement('button');
+                submitReplyBtn.textContent = 'Reply';
+                submitReplyBtn.onclick = () => {
+                     const text = replyInput.value.trim();
+                     if(!text) return;
+                     db.ref(`matchComments/${matchId}/${comment.id}/replies`).push({
+                         userId: currentUserId,
+                         userName: currentUserData.name || 'User',
+                         text: text,
+                         timestamp: firebase.database.ServerValue.TIMESTAMP
+                     });
+                     replyInput.value = '';
+                     replyBox.classList.add('hidden');
+                };
+                replyBox.appendChild(replyInput);
+                replyBox.appendChild(submitReplyBtn);
+                
+                const repliesList = document.createElement('div');
+                repliesList.className = 'replies-list';
+                if (comment.replies) {
+                     const repliesArr = Object.keys(comment.replies)
+                                        .map(k => ({id: k, ...comment.replies[k]}))
+                                        .sort((a,b) => a.timestamp - b.timestamp);
+                     repliesArr.forEach(reply => {
+                         const repEl = document.createElement('div');
+                         repEl.style.marginBottom = '10px';
+                         repEl.innerHTML = `<strong>${reply.userName}</strong> <span class="time">${new Date(reply.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span><p style="margin: 5px 0; font-size: 0.9em;">${reply.text}</p>`;
+                         repliesList.appendChild(repEl);
+                     });
+                }
+                
+                el.appendChild(content);
+                el.appendChild(actions);
+                el.appendChild(replyBox);
+                el.appendChild(repliesList);
+                return el;
+            }
+
             // --- ADMIN PANEL ---
             function initAdminPanel() {
                 loadAdminStreams();
@@ -3292,6 +3906,9 @@
                 setupAdminImageToggles();
                 setupCategorySelectListeners();
                 populateCategoryDropdowns();
+                setupDynamicUrlInputs(); // Initialize dynamic URLs
+                loadAdminQuizState(); // Loads active quiz data into form
+                loadAdminQuizList(); // NEW: Loads the quiz list
                 handleImageUpload('stream-image-upload', 'stream-image-base64');
                 handleImageUpload('radio-image-upload', 'radio-image-base64');
                 handleImageUpload('match-image-upload', 'match-image-base64');
@@ -3325,6 +3942,30 @@
                 });
             }
             
+            // Setup dynamic multiple URL inputs
+            function setupDynamicUrlInputs() {
+                document.getElementById('dynamic-url-inputs').addEventListener('click', function(e) {
+                    const addBtn = e.target.closest('.add-url-btn');
+                    const removeBtn = e.target.closest('.remove-url-btn');
+                    
+                    if (addBtn) {
+                        const container = document.getElementById('dynamic-url-inputs');
+                        const row = document.createElement('div');
+                        row.className = 'url-input-group';
+                        row.style.display = 'flex';
+                        row.style.gap = '8px';
+                        row.style.marginBottom = '8px';
+                        row.innerHTML = `
+                            <input type="text" class="stream-video-url-input" placeholder="https://.../stream.m3u8" style="flex-grow: 1; margin-bottom: 0;">
+                            <button type="button" class="remove-url-btn btn" style="width: auto; margin-top: 0; padding: 0 15px; background-color: var(--error-color);"><i class="fas fa-minus"></i></button>
+                        `;
+                        container.appendChild(row);
+                    } else if (removeBtn) {
+                        removeBtn.closest('.url-input-group').remove();
+                    }
+                });
+            }
+
             function setupAdminImageToggles() {
                 document.querySelectorAll('.image-upload-options .img-opt-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -3417,16 +4058,75 @@
                         item.innerHTML = `
                             <span>${child.val().name} (${child.val().category})</span>
                             <div class="actions">
+                                <button class="stream-control-btn" data-id="${child.key}">Control</button>
                                 <button class="edit-btn" data-id="${child.key}">Edit</button>
                                 <button class="delete-btn" data-id="${child.key}" data-node="streams">Delete</button>
                             </div>`;
                         listEl.appendChild(item);
                     });
+                    listEl.querySelectorAll('.stream-control-btn').forEach(btn => btn.onclick = (e) => openStreamControl(e.target.dataset.id));
                     listEl.querySelectorAll('.edit-btn').forEach(btn => btn.onclick = (e) => editStream(e.target.dataset.id));
                     listEl.querySelectorAll('.delete-btn').forEach(btn => btn.onclick = (e) => deleteData(e.target.dataset.node, e.target.dataset.id));
                 });
             }
             
+            // NEW ADMIN STREAM CONTROL FUNCTIONS
+            function openStreamControl(id) {
+                currentControlStreamId = id;
+                db.ref(`streams/${id}`).once('value', snapshot => {
+                    const stream = snapshot.val();
+                    if (!stream) return;
+                    
+                    document.getElementById('ctrl-stream-name-display').textContent = stream.name;
+                    
+                    const select = document.getElementById('ctrl-active-link');
+                    select.innerHTML = '';
+                    const urls = (stream.videoUrls || "").split('\n').map(u => u.trim()).filter(Boolean);
+                    
+                    if (urls.length === 0) {
+                        select.innerHTML = '<option value="">No URLs available</option>';
+                    } else {
+                        urls.forEach((url, index) => {
+                            select.innerHTML += `<option value="${index}">Link ${index + 1}: ${url}</option>`;
+                        });
+                    }
+                    
+                    if (stream.activeLinkIndex !== undefined && stream.activeLinkIndex < urls.length) {
+                        select.value = stream.activeLinkIndex;
+                    }
+                    
+                    document.getElementById('ctrl-start-time').value = stream.globalSyncOffset || 0;
+                    document.getElementById('stream-control-modal').classList.add('visible');
+                });
+            }
+            
+            document.getElementById('ctrl-close-btn').addEventListener('click', () => {
+                document.getElementById('stream-control-modal').classList.remove('visible');
+            });
+            
+            document.getElementById('ctrl-sync-btn').addEventListener('click', () => {
+                if (!currentControlStreamId) return;
+                const activeLinkIndex = parseInt(document.getElementById('ctrl-active-link').value, 10);
+                const startTime = parseInt(document.getElementById('ctrl-start-time').value, 10) || 0;
+                
+                if (isNaN(activeLinkIndex)) {
+                    showModernAlert("Please select a valid link.", 'warning');
+                    return;
+                }
+                
+                db.ref(`streams/${currentControlStreamId}`).update({
+                    activeLinkIndex: activeLinkIndex,
+                    globalSyncOffset: startTime,
+                    globalSyncTimestamp: firebase.database.ServerValue.TIMESTAMP,
+                    forceSyncTrigger: Date.now() // to force value change detection on client
+                }).then(() => {
+                    showModernAlert('Stream updated and synchronized globally!', 'success');
+                    document.getElementById('stream-control-modal').classList.remove('visible');
+                }).catch(err => {
+                    showModernAlert(err.message, 'error');
+                });
+            });
+
             function getStreamFormData(isNew = false) {
                 let category = document.getElementById('stream-category').value;
                 if (category === '--addNew--') {
@@ -3437,6 +4137,15 @@
                     }
                 }
 
+                // Handle dynamic inputs to compile newline-separated video urls string
+                const urlInputs = document.querySelectorAll('.stream-video-url-input');
+                const urlsArray = [];
+                urlInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if(val) urlsArray.push(val);
+                });
+                const videoUrlsJoined = urlsArray.join('\n');
+
                 const base64 = document.getElementById('stream-image-base64').value;
                 const url = document.getElementById('stream-image-url').value;
                 const syncEnabled = document.getElementById('stream-sync-enabled').checked;
@@ -3444,12 +4153,14 @@
                 const data = {
                     name: document.getElementById('stream-name').value,
                     category: category,
-                    videoUrls: document.getElementById('stream-video-urls').value,
+                    videoUrls: videoUrlsJoined,
                     audioUrl: document.getElementById('stream-audio-url').value,
                     imageBase64: base64,
                     imageUrl: base64 ? '' : url,
                     overlayLogoBase64: document.getElementById('stream-overlay-base64').value,
-                    syncEnabled: syncEnabled
+                    syncEnabled: syncEnabled,
+                    // NEW: Saving start time offset
+                    startTimeOffset: parseInt(document.getElementById('stream-start-offset').value, 10) || 0,
                 };
                 
                 if (isNew && syncEnabled) {
@@ -3464,7 +4175,14 @@
                 document.getElementById('stream-category').value = '';
                 document.getElementById('new-stream-category-container').classList.add('hidden');
                 document.getElementById('new-stream-category-input').value = '';
-                document.getElementById('stream-video-urls').value = '';
+                
+                document.getElementById('dynamic-url-inputs').innerHTML = `
+                    <div class="url-input-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" class="stream-video-url-input" placeholder="https://.../stream1.m3u8" style="flex-grow: 1; margin-bottom: 0;">
+                        <button type="button" class="add-url-btn btn" style="width: auto; margin-top: 0; padding: 0 15px; background-color: var(--success-color);"><i class="fas fa-plus"></i></button>
+                    </div>
+                `;
+
                 document.getElementById('stream-audio-url').value = '';
                 document.getElementById('stream-image-base64').value = '';
                 document.getElementById('stream-image-url').value = '';
@@ -3473,6 +4191,7 @@
                 document.getElementById('stream-overlay-upload').value = '';
                 document.getElementById('stream-edit-id').value = '';
                 document.getElementById('stream-sync-enabled').checked = false;
+                document.getElementById('stream-start-offset').value = ''; // NEW
                 document.getElementById('add-stream-btn').classList.remove('hidden');
                 document.getElementById('update-stream-btn').classList.add('hidden');
                 document.getElementById('remove-stream-overlay-btn').classList.add('hidden');
@@ -3494,12 +4213,43 @@
                         document.getElementById('new-stream-category-input').value = stream.category || '';
                     }
                     
-                    document.getElementById('stream-video-urls').value = stream.videoUrls || '';
+                    // Set up dynamic URL inputs from saved multiline string
+                    const container = document.getElementById('dynamic-url-inputs');
+                    container.innerHTML = '';
+                    const urls = (stream.videoUrls || "").split('\n').map(u => u.trim()).filter(Boolean);
+                    if (urls.length === 0) {
+                        container.innerHTML = `
+                            <div class="url-input-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <input type="text" class="stream-video-url-input" placeholder="https://.../stream1.m3u8" style="flex-grow: 1; margin-bottom: 0;">
+                                <button type="button" class="add-url-btn btn" style="width: auto; margin-top: 0; padding: 0 15px; background-color: var(--success-color);"><i class="fas fa-plus"></i></button>
+                            </div>
+                        `;
+                    } else {
+                        urls.forEach((url, index) => {
+                            const isFirst = index === 0;
+                            const btnClass = isFirst ? 'add-url-btn' : 'remove-url-btn';
+                            const btnColor = isFirst ? 'var(--success-color)' : 'var(--error-color)';
+                            const btnIcon = isFirst ? 'fa-plus' : 'fa-minus';
+                            
+                            const row = document.createElement('div');
+                            row.className = 'url-input-group';
+                            row.style.display = 'flex';
+                            row.style.gap = '8px';
+                            row.style.marginBottom = '8px';
+                            row.innerHTML = `
+                                <input type="text" class="stream-video-url-input" placeholder="https://.../stream.m3u8" value="${url}" style="flex-grow: 1; margin-bottom: 0;">
+                                <button type="button" class="${btnClass} btn" style="width: auto; margin-top: 0; padding: 0 15px; background-color: ${btnColor};"><i class="fas ${btnIcon}"></i></button>
+                            `;
+                            container.appendChild(row);
+                        });
+                    }
+
                     document.getElementById('stream-audio-url').value = stream.audioUrl || '';
                     document.getElementById('stream-image-base64').value = stream.imageBase64 || '';
                     document.getElementById('stream-image-url').value = stream.imageUrl || '';
                     document.getElementById('stream-overlay-base64').value = stream.overlayLogoBase64 || '';
                     document.getElementById('stream-sync-enabled').checked = stream.syncEnabled || false;
+                    document.getElementById('stream-start-offset').value = stream.startTimeOffset || ''; // NEW
                     document.getElementById('stream-edit-id').value = id;
                     document.getElementById('add-stream-btn').classList.add('hidden');
                     document.getElementById('update-stream-btn').classList.remove('hidden');
@@ -3631,7 +4381,6 @@
                     name: document.getElementById('match-name').value,
                     startTime: document.getElementById('match-time').value,
                     description: document.getElementById('match-description').value,
-                    // MODIFIED: Read from 3 separate prize inputs
                     prize: {
                         first: document.getElementById('match-prize-1st').value || '',
                         second: document.getElementById('match-prize-2nd').value || '',
@@ -3649,7 +4398,6 @@
                 document.getElementById('match-name').value = '';
                 document.getElementById('match-time').value = '';
                 document.getElementById('match-description').value = '';
-                // MODIFIED: Clear the 3 prize inputs
                 document.getElementById('match-prize-1st').value = '';
                 document.getElementById('match-prize-2nd').value = '';
                 document.getElementById('match-prize-3rd').value = '';
@@ -3713,13 +4461,11 @@
                     document.getElementById('match-time').value = match.startTime || '';
                     document.getElementById('match-description').value = match.description || '';
                     
-                    // MODIFIED: Populate the 3 prize inputs
                     if (typeof match.prize === 'object' && match.prize !== null) {
                         document.getElementById('match-prize-1st').value = match.prize.first || '';
                         document.getElementById('match-prize-2nd').value = match.prize.second || '';
                         document.getElementById('match-prize-3rd').value = match.prize.third || '';
                     } else {
-                        // For backward compatibility with old string-based prizes
                         document.getElementById('match-prize-1st').value = match.prize || '';
                         document.getElementById('match-prize-2nd').value = '';
                         document.getElementById('match-prize-3rd').value = '';
@@ -3748,31 +4494,214 @@
                 });
             }
             
+            function loadAdminQuizState() {
+                // Remove complete button logic as we use the list container now
+            }
+
+            // NEW: Toggle text handler
+            document.getElementById('quiz-mode-toggle').addEventListener('change', (e) => {
+                document.getElementById('quiz-mode-label').textContent = e.target.checked ? 'Live Mode' : 'Presave Mode';
+            });
+            
+            // NEW: Add Question (Live or Presave)
             document.getElementById('set-quiz-btn').addEventListener('click', () => {
                 const linkedStreamId = document.getElementById('quiz-stream-link').value;
                 if (!linkedStreamId) {
                     showModernAlert('You must link the quiz to a specific live stream.', 'warning');
                     return;
                 }
+                
+                const opt1 = document.getElementById('quiz-option-1').value.trim();
+                const opt2 = document.getElementById('quiz-option-2').value.trim();
+                const opt3 = document.getElementById('quiz-option-3').value.trim();
+                const opt4 = document.getElementById('quiz-option-4').value.trim();
+                
+                const optionsArray = [opt1, opt2, opt3, opt4].filter(o => o !== '');
+                
+                const ansIndex = document.getElementById('quiz-answer-input').value;
+                let answerText = null;
+                if (ansIndex !== '') {
+                    answerText = optionsArray[parseInt(ansIndex)];
+                    if (!answerText) {
+                        showModernAlert('Selected correct option is empty. Please fill the option field first.', 'warning'); 
+                        return;
+                    }
+                }
+
+                const mode = document.getElementById('quiz-mode-toggle').checked ? 'live' : 'presave';
+                const points = parseInt(document.getElementById('quiz-points-input').value, 10);
+
+                if(!document.getElementById('quiz-question-input').value.trim() || optionsArray.length < 2 || !points) {
+                    showModernAlert('Please fill all quiz fields and provide at least 2 options.', 'warning'); return;
+                }
+
                 const quizData = {
                     linkedStreamId: linkedStreamId,
-                    question: document.getElementById('quiz-question-input').value,
-                    options: document.getElementById('quiz-options-input').value.split(',').map(o => o.trim()),
-                    answer: document.getElementById('quiz-answer-input').value,
-                    points: parseInt(document.getElementById('quiz-points-input').value, 10)
+                    question: document.getElementById('quiz-question-input').value.trim(),
+                    options: optionsArray,
+                    answer: answerText,
+                    points: points,
+                    status: 'pending',
+                    timestamp: Date.now()
                 };
-                if(!quizData.question || quizData.options.length < 2 || !quizData.answer || !quizData.points) {
-                    showModernAlert('Please fill all quiz fields.', 'warning'); return;
+                
+                const newRef = db.ref('adminQuizList').push();
+                quizData.id = newRef.key;
+
+                newRef.set(quizData).then(() => {
+                    if (mode === 'live') {
+                        quizData.status = 'active';
+                        db.ref('liveQuiz').set(quizData).then(() => {
+                            db.ref(`liveQuizAnswers/${linkedStreamId}`).remove();
+                            showModernAlert('Question published to Live Quiz & saved to list!', 'success');
+                        });
+                        newRef.update({status: 'active'});
+                    } else {
+                        showModernAlert('Question saved to Presave list!', 'success');
+                    }
+                    
+                    // Clear inputs for next question
+                    document.getElementById('quiz-question-input').value = '';
+                    document.getElementById('quiz-option-1').value = '';
+                    document.getElementById('quiz-option-2').value = '';
+                    document.getElementById('quiz-option-3').value = '';
+                    document.getElementById('quiz-option-4').value = '';
+                    document.getElementById('quiz-answer-input').value = '';
+                });
+            });
+
+            // NEW: Load Admin Quiz List
+            function loadAdminQuizList() {
+                db.ref('adminQuizList').on('value', snap => {
+                    const listEl = document.getElementById('quiz-questions-list');
+                    listEl.innerHTML = '';
+                    if(!snap.exists()) {
+                        listEl.innerHTML = '<p>No questions added yet.</p>';
+                        return;
+                    }
+                    
+                    snap.forEach(child => {
+                        const q = child.val();
+                        const qId = child.key;
+                        const div = document.createElement('div');
+                        div.className = 'data-list-item quiz-list-item';
+                        div.style.flexDirection = 'column';
+                        div.style.alignItems = 'flex-start';
+                        
+                        let answerUI = '';
+                        if (!q.answer) {
+                            answerUI = `
+                                <div style="margin-top: 10px; width: 100%;">
+                                    <select id="select-ans-${qId}" style="padding: 5px; margin-right: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--secondary-color); color: var(--text-color);">
+                                        <option value="">-- Choose Answer --</option>
+                                        ${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                                    </select>
+                                    <button class="btn save-ans-btn" data-qid="${qId}" data-streamid="${q.linkedStreamId}" data-points="${q.points}" style="width: auto; padding: 5px 10px; margin-top: 0;">Save Answer</button>
+                                </div>
+                            `;
+                        } else {
+                            answerUI = `<div style="margin-top: 5px; color: var(--success-color); font-weight: bold;">Answer: ${q.answer}</div>`;
+                        }
+
+                        div.innerHTML = `
+                            <div style="width: 100%; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong style="font-size: 1.1em;">${q.question}</strong>
+                                <button class="delete-btn delete-q-btn" data-qid="${qId}" style="padding: 4px 8px; margin-left: 10px;"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div style="font-size: 0.85em; opacity: 0.8;">Stream ID: ${q.linkedStreamId} | Points: ${q.points} | Status: <span style="color: var(--accent-color);">${q.status.toUpperCase()}</span></div>
+                            ${answerUI}
+                        `;
+                        listEl.appendChild(div);
+                    });
+                });
+            }
+
+            // NEW: Handle List Container Buttons (Save Answer & Delete)
+            document.getElementById('quiz-questions-list').addEventListener('click', (e) => {
+                if (e.target.classList.contains('save-ans-btn') || e.target.closest('.save-ans-btn')) {
+                    const btn = e.target.classList.contains('save-ans-btn') ? e.target : e.target.closest('.save-ans-btn');
+                    const qId = btn.dataset.qid;
+                    const streamId = btn.dataset.streamid;
+                    const points = parseInt(btn.dataset.points);
+                    const sel = document.getElementById(`select-ans-${qId}`);
+                    const ans = sel.value;
+                    
+                    if(!ans) {
+                        showModernAlert('Please select an answer.', 'warning');
+                        return;
+                    }
+                    
+                    db.ref(`adminQuizList/${qId}`).update({ answer: ans, status: 'completed' });
+                    
+                    db.ref('liveQuiz').once('value').then(snap => {
+                        const lq = snap.val();
+                        if(lq && lq.id === qId) {
+                            db.ref('liveQuiz').update({ status: 'completed', answer: ans }).then(() => {
+                                distributePoints(streamId, ans, points);
+                                showModernAlert('Answer published and results updated!', 'success');
+                            });
+                        } else {
+                            showModernAlert('Answer saved for the question!', 'success');
+                        }
+                    });
+                } else if (e.target.classList.contains('delete-q-btn') || e.target.closest('.delete-q-btn')) {
+                    const btn = e.target.classList.contains('delete-q-btn') ? e.target : e.target.closest('.delete-q-btn');
+                    const qId = btn.dataset.qid;
+                    showModernConfirm('Delete this question?', (confirmed) => {
+                        if(confirmed) {
+                            db.ref(`adminQuizList/${qId}`).remove();
+                        }
+                    });
                 }
-                if (!quizData.options.includes(quizData.answer)) {
-                    showModernAlert('The correct answer must be one of the options.', 'warning');
-                    return;
-                }
-                db.ref('liveQuiz').set(quizData).then(()=>showModernAlert('Quiz is now live for the selected stream!', 'success'));
+            });
+
+            // NEW: Auto Quiz Flow
+            function runNextAutoQuiz() {
+                db.ref('adminQuizList').orderByChild('status').equalTo('pending').once('value').then(snap => {
+                    if(snap.exists()) {
+                        let nextQ = null;
+                        let nextQId = null;
+                        
+                        snap.forEach(child => {
+                            if(!nextQ) {
+                                nextQ = child.val();
+                                nextQId = child.key;
+                            }
+                        });
+                        
+                        if(nextQ) {
+                            db.ref(`adminQuizList/${nextQId}`).update({ status: 'active' });
+                            nextQ.id = nextQId;
+                            nextQ.status = 'active';
+                            db.ref('liveQuiz').set(nextQ);
+                            db.ref(`liveQuizAnswers/${nextQ.linkedStreamId}`).remove();
+                        }
+                    } else {
+                        clearInterval(autoQuizInterval);
+                        document.getElementById('start-auto-quiz-btn').classList.remove('hidden');
+                        document.getElementById('stop-auto-quiz-btn').classList.add('hidden');
+                        showModernAlert('All presaved questions have been shown!', 'info');
+                    }
+                });
+            }
+
+            document.getElementById('start-auto-quiz-btn').addEventListener('click', () => {
+                document.getElementById('start-auto-quiz-btn').classList.add('hidden');
+                document.getElementById('stop-auto-quiz-btn').classList.remove('hidden');
+                runNextAutoQuiz(); // First run
+                autoQuizInterval = setInterval(runNextAutoQuiz, 30000); // 30s interval
+            });
+
+            document.getElementById('stop-auto-quiz-btn').addEventListener('click', () => {
+                clearInterval(autoQuizInterval);
+                document.getElementById('start-auto-quiz-btn').classList.remove('hidden');
+                document.getElementById('stop-auto-quiz-btn').classList.add('hidden');
             });
             
             document.getElementById('clear-quiz-btn').addEventListener('click', () => {
-                 db.ref('liveQuiz').set(null).then(()=>showModernAlert('Quiz cleared.', 'info'));
+                 db.ref('liveQuiz').set(null).then(() => {
+                     showModernAlert('Active Quiz cleared from screen.', 'info');
+                 });
             });
 
             function loadWithdrawalRequests() {
