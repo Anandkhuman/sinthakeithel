@@ -1488,10 +1488,20 @@
                         <label>Description</label>
                         <textarea id="match-description"></textarea>
                     </div>
+                    <!-- MODIFIED: Prize inputs -->
                     <div class="admin-form-group">
-                        <label>Prize</label>
-                        <input type="text" id="match-prize" placeholder="e.g., 1000">
+                        <label>1st Prize</label>
+                        <input type="text" id="match-prize-1st" placeholder="e.g., 1000">
                     </div>
+                    <div class="admin-form-group">
+                        <label>2nd Prize</label>
+                        <input type="text" id="match-prize-2nd" placeholder="e.g., 500">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>3rd Prize</label>
+                        <input type="text" id="match-prize-3rd" placeholder="e.g., 250">
+                    </div>
+                    <!-- END MODIFICATION -->
                     <div class="admin-form-group">
                         <label>Location</label>
                         <input type="text" id="match-location" placeholder="e.g., Virtual Stadium">
@@ -2802,6 +2812,18 @@
                                 }
                             });
                         }
+
+                        // MODIFIED: Create prize display string
+                        let prizeDisplay = '';
+                        if (typeof match.prize === 'object' && match.prize !== null) {
+                            const prizes = [];
+                            if (match.prize.first) prizes.push(`<strong>1st:</strong> ${match.prize.first}`);
+                            if (match.prize.second) prizes.push(`<strong>2nd:</strong> ${match.prize.second}`);
+                            if (match.prize.third) prizes.push(`<strong>3rd:</strong> ${match.prize.third}`);
+                            prizeDisplay = prizes.join(', ');
+                        } else {
+                            prizeDisplay = match.prize; // Backward compatibility for old string prizes
+                        }
                         
                         const card = document.createElement('div');
                         card.className = 'match-card';
@@ -2812,7 +2834,7 @@
                                 <h3>${match.name}</h3>
                                 <div class="match-timer" id="timer-${id}"></div>
                                 <p>${match.description}</p>
-                                <p><strong>Prize:</strong> ${match.prize}</p>
+                                <p><strong>Prizes:</strong> ${prizeDisplay}</p>
                                 <p><strong>Entry Fee:</strong> ${match.entryFee > 0 ? `₹${match.entryFee}` : 'Free'}</p>
                                 <div class="match-stats">
                                     <span><i class="fas fa-heart"></i> ${likeCount}</span>
@@ -3609,7 +3631,12 @@
                     name: document.getElementById('match-name').value,
                     startTime: document.getElementById('match-time').value,
                     description: document.getElementById('match-description').value,
-                    prize: document.getElementById('match-prize').value,
+                    // MODIFIED: Read from 3 separate prize inputs
+                    prize: {
+                        first: document.getElementById('match-prize-1st').value || '',
+                        second: document.getElementById('match-prize-2nd').value || '',
+                        third: document.getElementById('match-prize-3rd').value || ''
+                    },
                     location: document.getElementById('match-location').value,
                     entryFee: parseFloat(document.getElementById('match-fee').value) || 0,
                     streamLink: document.getElementById('match-stream-link').value,
@@ -3622,7 +3649,10 @@
                 document.getElementById('match-name').value = '';
                 document.getElementById('match-time').value = '';
                 document.getElementById('match-description').value = '';
-                document.getElementById('match-prize').value = '';
+                // MODIFIED: Clear the 3 prize inputs
+                document.getElementById('match-prize-1st').value = '';
+                document.getElementById('match-prize-2nd').value = '';
+                document.getElementById('match-prize-3rd').value = '';
                 document.getElementById('match-location').value = '';
                 document.getElementById('match-fee').value = '';
                 document.getElementById('match-stream-link').value = '';
@@ -3682,7 +3712,19 @@
                     document.getElementById('match-name').value = match.name || '';
                     document.getElementById('match-time').value = match.startTime || '';
                     document.getElementById('match-description').value = match.description || '';
-                    document.getElementById('match-prize').value = match.prize || '';
+                    
+                    // MODIFIED: Populate the 3 prize inputs
+                    if (typeof match.prize === 'object' && match.prize !== null) {
+                        document.getElementById('match-prize-1st').value = match.prize.first || '';
+                        document.getElementById('match-prize-2nd').value = match.prize.second || '';
+                        document.getElementById('match-prize-3rd').value = match.prize.third || '';
+                    } else {
+                        // For backward compatibility with old string-based prizes
+                        document.getElementById('match-prize-1st').value = match.prize || '';
+                        document.getElementById('match-prize-2nd').value = '';
+                        document.getElementById('match-prize-3rd').value = '';
+                    }
+
                     document.getElementById('match-location').value = match.location || '';
                     document.getElementById('match-fee').value = match.entryFee || 0;
                     document.getElementById('match-stream-link').value = match.streamLink || '';
