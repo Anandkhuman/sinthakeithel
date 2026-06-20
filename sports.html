@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sintha Sports Live</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+/* --- Base App CSS & Mobile Compact Layout --- */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+body{
+    background-image:
+        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+        url("https://i.ibb.co/YBXZLNwZ/footballbg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color:#fff;
+    min-height:100vh;
+    padding-bottom:70px;
+    font-size:14px;
+    overflow-x:hidden;
+}
+header{
+    padding:4px 4px;
+    text-align:center;
+}
+h1{
+    color:#00ff88;
+    text-shadow:0 0 15px #00ff88;
+    font-size:22px;
+}
+header p {
+    font-size: 13px;
+    margin-top: 2px;
+}
+.search{
+    padding:4px 4px;
+}
+.search input{
+    width:100%;
+    padding:10px 14px;
+    border:none;
+    border-radius:20px;
+    font-size:14px;
+    outline:none;
+    color:#333;
+}
+.stats{
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+}
+.badge{
+    background:rgba(255,255,255,.1);
+    backdrop-filter:blur(12px);
+    padding:4px 4px;
+    border-radius:12px;
+    font-size:12px;
+}
+#matches{
+    padding:4px 4px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:12px;
+}
+.card{
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(12px);
+    border-radius:15px;
+    padding:15px;
+    border:1px solid rgba(255,255,255,.1);
+    transition:.3s;
+    cursor: pointer;
+    user-select: none; /* Prevents text selection on long press */
+}
+.card:hover{
+    transform:translateY(-3px);
+    border-color: #00ff88;
+}
+.date{
+    color:#8fffc9;
+    margin-bottom:8px;
+    font-size:12px;
+    text-align:center;
+}
+.teams{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:10px 0;
+    font-weight:bold;
+    font-size:16px;
+}
+.team{
+    width:40%;
+    text-align:center;
+    line-height: 1.4;
+}
+.vs{
+    color:#00ff88;
+    font-size:18px;
+    font-weight:bold;
+}
+.info{
+    margin-top:10px;
+    font-size:12px;
+    color:#ddd;
+    text-align:center;
+}
+.timer-badge {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 12px;
+    padding: 6px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.blink {
+    animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+    50% { opacity: 0.5; }
+}
+
+.bottom-nav{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
+
+    background: rgba(0, 80, 40, 0.25);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-top: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+}
+.bottom-nav a{
+    color:white;
+    text-decoration:none;
+    font-size:11px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transition: 0.3s;
+    width: 25%;
+}
+.bottom-nav a.active-tab {
+    color: #00ff88;
+}
+.bottom-nav i{
+    font-size:16px;
+    margin-bottom:3px;
+}
+.loading{
+    text-align:center;
+    padding:20px;
+    font-size:15px;
+}
+
+/* --- Base Admin Panel & Auth CSS --- */
+.admin-container {
+    padding: 10px 15px;
+    max-width: 600px;
+    margin: 10px auto;
+}
+.admin-panel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 15px;
+    width: 100%;
+}
+.admin-panel h2, .admin-panel h3 {
+    text-align: center;
+    color: #00ff88;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    text-align: left;
+}
+.input-group label {
+    flex: 0 0 35%;
+    font-weight: bold;
+    color: #8fffc9;
+    font-size: 12px;
+    padding-right: 8px;
+}
+.input-group input, .input-group select, .input-group textarea {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #00a651;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    margin-bottom: 0;
+}
+@media (max-width: 480px) {
+    .input-group { flex-direction: column; align-items: flex-start; }
+    .input-group label { margin-bottom: 4px; flex: unset; }
+}
+
+.admin-panel button, .btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #00ff88;
+    color: #001a0d;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+.admin-panel button:hover, .btn:hover {
+    background-color: #8fffc9;
+}
+.btn-google {
+    background-color: #db4437 !important;
+    color: white !important;
+    margin-top: 5px;
+}
+.btn-google:hover { background-color: #e57368 !important; }
+.btn-danger {
+    background-color: #ff4d4d !important;
+    color: white !important;
+}
+.btn-danger:hover {
+    background-color: #ff8080 !important;
+}
+.auth-error {
+    color: #ff8080;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    min-height: 18px;
+    font-size: 13px;
+}
+.auth-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.auth-links a {
+    color: #8fffc9;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+.auth-links a:hover { text-decoration: underline; }
+.divider {
+    text-align: center;
+    margin: 12px 0;
+    position: relative;
+    font-size: 12px;
+    color: #ddd;
+}
+.divider::before, .divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.view-section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+.view-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.profile-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.prize-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.prize-row input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+}
+
+.q-row-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.q-row-container .q-row-top, .q-row-container .q-row-bottom {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    align-items: center;
+}
+.q-row-container input[type="text"], .q-row-container select { 
+    flex: 3; min-width: 0; padding: 8px; border-radius: 6px; border: none; outline: none; background: rgba(255, 255, 255, 0.9); color: #333; font-size: 12px;
+}
+
+/* --- NEW PLAYER SPLIT LAYOUT UI --- */
+.inner-admin-block {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    overflow: hidden; 
+}
+.teams-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    width: 100%;
+}
+.team-btn {
+    background: rgba(0, 255, 136, 0.15);
+    border: 1px solid #00ff88;
+    color: #fff;
+    padding: 6px 4px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.vs-divider-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+.vs-divider-vertical .line {
+    flex: 1;
+    width: 2px;
+    background: rgba(0, 255, 136, 0.5);
+}
+.vs-divider-vertical .vs-text {
+    background: #001a0d;
+    color: #ffae00;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 5px;
+    border: 1px solid #00ff88;
+    border-radius: 50%;
+    margin: 5px 0;
+    z-index: 1;
+}
+
+.player-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(0,0,0,0.5);
+    padding: 6px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #00ff88;
+    font-size: 13px;
+}
+
+#two-fa-modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;
+}
+
+.swipe-fade {
+    animation: fadeInSwipe 0.4s ease;
+}
+@keyframes fadeInSwipe {
+    0% { opacity: 0; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Admin Custom Navbar */
+.admin-navbar {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+    scrollbar-width: none; 
+}
+.admin-navbar::-webkit-scrollbar { display: none; }
+.admin-nav-btn {
+    background: #004d26;
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    transition: 0.3s;
+}
+.admin-nav-btn.active {
+    background: #00ff88;
+    color: #001a0d;
+    font-weight: bold;
+}
+.admin-section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+.admin-section.active {
+    display: block;
+}
+
+/* Wallet Transaction Styles */
+.transaction-item {
+    background:rgba(0,0,0,0.4);
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:8px;
+    font-size:12px;
+    border-left: 3px solid #00ff88;
+}
+.transaction-item.debit {
+    border-left-color: #ff4d4d;
+}
+
+/* --- MODERN NOTIFICATION / TOAST CSS --- */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    left: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+.modern-toast {
+    padding: 14px 20px;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    border-left: 5px solid #00ff88;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    animation: slideInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+}
+.modern-toast.error { border-left-color: #ff4d4d; }
+.modern-toast.warning { border-left-color: #ffae00; }
+.modern-toast.success { border-left-color: #00ff88; }
+.modern-toast.info { border-left-color: #00a651; }
+.modern-toast i { font-size: 18px; }
+
+@keyframes slideInDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOutToast {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-20px); opacity: 0; }
+}
+
+/* --- CUSTOM MODAL DIALOG CSS --- */
+#custom-dialog-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 100000; justify-content: center; align-items: center;
+    backdrop-filter: blur(4px);
+}
+#custom-dialog-box {
+    width: 320px; text-align: center; background: #012d17;
+    border: 1px solid #00ff88; padding: 20px; border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    animation: fadeInSwipe 0.3s ease;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Sintha Sports</h1>
+<p>Predict and earn money</p>
+</header>
+
+<!-- Toast Notifications Container -->
+<div id="toast-container"></div>
+
+<!-- Custom Dialog Overlay -->
+<div id="custom-dialog-overlay">
+    <div id="custom-dialog-box" class="profile-card">
+        <h3 id="custom-dialog-title" style="color:#00ff88; margin-bottom:10px;">Confirm</h3>
+        <p id="custom-dialog-msg" style="font-size:13px; margin-bottom:15px; color:#ddd; line-height:1.5;"></p>
+        <input type="text" id="custom-dialog-input" style="display:none; width:100%; padding:10px; border-radius:8px; border:1px solid #00a651; outline:none; background:rgba(255,255,255,0.9); color:#333; margin-bottom:15px; font-size:13px;">
+        <div style="display:flex; gap:10px;">
+            <button class="btn" id="custom-dialog-btn-ok" style="flex:1; margin:0;">OK</button>
+            <button class="btn btn-danger" id="custom-dialog-btn-cancel" style="flex:1; margin:0;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- LINEUP UPLOAD POPUP (Admin) -->
+<div id="lineup-upload-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center;">
+    <div class="profile-card" style="width: 320px; background:#012d17; border: 1px solid #00ff88;">
+        <h3 style="color:#00ff88; margin-bottom:15px; text-align:center;">Upload Lineup Image</h3>
+        <div class="input-group">
+            <label>Image URL</label>
+            <input type="text" id="popup-lineup-url" placeholder="Paste image link here">
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn" onclick="saveLineupImage()" style="flex:1; margin:0;">Save</button>
+            <button class="btn btn-danger" onclick="document.getElementById('lineup-upload-popup').style.display='none'" style="flex:1; margin:0;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- LIVE LINKS UPLOAD POPUP (Admin) -->
+<div id="live-links-upload-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center;">
+    <div class="profile-card" style="width: 350px; background:#012d17; border: 1px solid #00ff88; max-height: 80vh; display: flex; flex-direction: column;">
+        <h3 style="color:#00ff88; margin-bottom:15px; text-align:center;">Manage Live Links</h3>
+        <div id="live-links-container" style="overflow-y:auto; flex:1; margin-bottom: 15px; padding-right:5px;">
+            <!-- Link rows injected here -->
+        </div>
+        <button class="btn" onclick="addLiveLinkRow()" style="background:#006633; margin-bottom:15px; font-size:12px;">+ Add New Link</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="saveLiveLinks()" style="flex:1; margin:0;">Save</button>
+            <button class="btn btn-danger" onclick="document.getElementById('live-links-upload-popup').style.display='none'" style="flex:1; margin:0;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- HOME VIEW (Matches) -->
+<div id="view-home" class="view-section active">
+    <div class="search">
+        <input id="search" placeholder="Search Team...">
+    </div>
+    <div class="stats">
+        <div class="badge">⚽ Matches: <span id="count">0</span></div>
+    </div>
+    <div id="loading" class="loading">Loading Matches from Database...</div>
+    <div id="matches"></div>
+</div>
+
+<!-- RESULT UPDATER POPUP (FLOATING - ADMIN ONLY) -->
+<div id="result-updater-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center;">
+    <div class="profile-card" style="width: 320px; background:#012d17; border: 1px solid #00ff88;">
+        <h3 style="color:#00ff88; margin-bottom:15px; text-align:center;">Update Live Match</h3>
+        <input type="hidden" id="popup-match-id">
+        <div class="input-group"><label>Match Status</label>
+            <select id="popup-status">
+                <option value="Upcoming">Upcoming</option>
+                <option value="Live">Live</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <div style="flex:1;">
+                <label style="font-size:11px; color:#8fffc9;">T1 Goals</label>
+                <input type="number" id="popup-t1-goals" style="width:100%; padding:8px; border-radius:5px; border:1px solid #00a651;">
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:11px; color:#8fffc9;">T2 Goals</label>
+                <input type="number" id="popup-t2-goals" style="width:100%; padding:8px; border-radius:5px; border:1px solid #00a651;">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label style="font-size:11px; color:#8fffc9;">T1 Result</label>
+                <select id="popup-t1-result" style="width:100%; padding:8px; border-radius:5px; border:1px solid #00a651;">
+                    <option value="">None</option>
+                    <option value="Win">Win</option>
+                    <option value="Loss">Loss</option>
+                    <option value="Draw">Draw</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:11px; color:#8fffc9;">T2 Result</label>
+                <select id="popup-t2-result" style="width:100%; padding:8px; border-radius:5px; border:1px solid #00a651;">
+                    <option value="">None</option>
+                    <option value="Win">Win</option>
+                    <option value="Loss">Loss</option>
+                    <option value="Draw">Draw</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="savePopupMatchResults()" style="flex:1; font-size:13px; margin:0;">Save</button>
+            <button class="btn btn-danger" onclick="document.getElementById('result-updater-popup').style.display='none'" style="flex:1; font-size:13px; margin:0;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- PREDICTION VIEW (User Panel) -->
+<div id="view-prediction" class="view-section">
+    <div class="admin-container" id="pred-swipe-area">
+        
+        <!-- Swipe Indicators -->
+        <div id="pred-swipe-indicator" style="text-align:center; margin-bottom:8px; color:#8fffc9; font-size:12px; display:none;">
+            <i class="fa-solid fa-angles-left"></i> Swipe left/right for more <i class="fa-solid fa-angles-right"></i>
+        </div>
+        <div id="pred-dots" style="text-align:center; margin-bottom:12px; font-size: 16px; color:#fff;"></div>
+
+        <div id="pred-content-wrapper">
+            <div id="pred-info-card" class="profile-card" style="display:none;">
+                <img id="u-pred-img" src="" style="width:100%; border-radius:8px; margin-bottom:12px; display:none;">
+                <h3 id="u-pred-desc" style="color:#00ff88; margin-bottom: 12px; font-size:16px; text-align:center;"></h3>
+                
+                <!-- NEW SUB NAV -->
+                <div class="admin-navbar" style="justify-content:space-between; margin-bottom:15px; border: 1px solid rgba(0,255,136,0.3); padding: 5px; border-radius: 8px;">
+                    <button class="admin-nav-btn active" id="btn-tab-pred" onclick="handlePredNavClick(event, 'pred')" style="flex:1; text-align:center; margin:0 2px;">Prediction</button>
+                    
+                    <button class="admin-nav-btn" id="btn-tab-lineup" 
+                        onpointerdown="startPredNavPress(event, 'lineup')" 
+                        onpointerup="endPredNavPress(event, 'lineup')" 
+                        onpointerleave="cancelPredNavPress(event)"
+                        onpointercancel="cancelPredNavPress(event)"
+                        onclick="handlePredNavClick(event, 'lineup')" style="flex:1; text-align:center; margin:0 2px; user-select:none;">Lineup</button>
+                        
+                    <button class="admin-nav-btn" id="btn-tab-live" 
+                        onpointerdown="startPredNavPress(event, 'live')" 
+                        onpointerup="endPredNavPress(event, 'live')" 
+                        onpointerleave="cancelPredNavPress(event)"
+                        onpointercancel="cancelPredNavPress(event)"
+                        onclick="handlePredNavClick(event, 'live')" style="flex:1; text-align:center; margin:0 2px; user-select:none;">Live</button>
+                </div>
+
+                <!-- PREDICTION CONTENT -->
+                <div id="tab-content-pred">
+                    <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 12px; width: 100%; overflow: hidden;">
+                        <h4 style="color:#ffae00; margin-bottom: 5px; font-size:14px; text-align:center;">Starting Lineups & Players</h4>
+                        <div id="u-pred-players"></div>
+                    </div>
+
+                    <p style="font-size:13px;"><strong><i class="fa-regular fa-clock"></i> Window:</strong> <span id="u-pred-time"></span></p>
+                    <h4 style="margin-top: 12px; color:#8fffc9; font-size:14px;">Winner Prizes:</h4>
+                    <ul id="u-pred-prizes" style="margin-left: 20px; margin-top:5px; line-height: 1.6; font-size:13px;"></ul>
+                </div>
+
+                <!-- LINEUP CONTENT -->
+                <div id="tab-content-lineup" style="display:none; text-align:center;">
+                    <img id="u-lineup-img" src="" style="width:100%; border-radius:8px; display:none;">
+                    <p id="u-lineup-msg" style="font-size:13px; color:#aaa; margin-top:10px;">No lineup image available.</p>
+                    <p id="u-lineup-admin-hint" style="font-size:11px; color:#ffae00; margin-top:10px; display:none;">(Admin: Long press 'Lineup' button to upload image)</p>
+                </div>
+
+                <!-- LIVE CONTENT -->
+                <div id="tab-content-live" style="display:none;">
+                    <ul id="u-live-links" style="list-style:none; padding:0; margin:0;"></ul>
+                    <p id="u-live-msg" style="font-size:13px; color:#aaa; text-align:center; margin-top:10px;">No live links available.</p>
+                    <p id="u-live-admin-hint" style="font-size:11px; color:#ffae00; margin-top:10px; text-align:center; display:none;">(Admin: Long press 'Live' button to add links)</p>
+                </div>
+            </div>
+
+            <!-- EXTRA PREDICTION STUFF (Form, Leaderboard) hidden when not on 'pred' tab -->
+            <div id="extra-pred-content">
+                <div id="pred-status-msg" style="text-align:center; margin: 15px 0; font-size: 15px; font-weight:bold; color: #fff; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px;">
+                    Loading Prediction...
+                </div>
+
+                <div id="pred-form-container" class="profile-card" style="display:none;">
+                    <!-- Content injected by JS -->
+                </div>
+
+                <div id="pred-leaderboard-container" class="profile-card" style="display:none;">
+                    <h3 style="color:#00ff88; text-align:center; font-size:16px;">Prediction Leaderboard</h3>
+                    <div id="leaderboard-list" style="margin-top: 12px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WALLET VIEW -->
+<div id="view-wallet" class="view-section">
+    <div class="admin-container">
+        <div id="wallet-auth-msg" style="display:none; text-align:center; padding: 20px;">
+            <h3>Login to view your wallet</h3>
+            <button class="btn" onclick="switchTab('view-profile')" style="margin-top:10px;">Go to Login</button>
+        </div>
+        
+        <div id="wallet-content" style="display:none;">
+            <div class="profile-card" style="text-align:center;">
+                <h2 style="color:#00ff88;">My Wallet</h2>
+                <h1 style="font-size:36px; margin: 10px 0;">₹ <span id="wallet-balance">0</span></h1>
+            </div>
+            
+            <div class="profile-card">
+                <h3 style="margin-bottom:10px; font-size: 16px;">Topup Wallet</h3>
+                <div class="input-group">
+                    <input type="number" id="topup-amount" placeholder="Enter Amount (₹)">
+                </div>
+                <button class="btn" id="btn-topup" style="font-size:13px; margin-bottom:0;">Add Money via Razorpay</button>
+            </div>
+
+            <div class="profile-card">
+                <h3 style="margin-bottom:10px; font-size: 16px;">Withdraw Amount</h3>
+                <div class="input-group">
+                    <input type="text" id="withdraw-upi" placeholder="Enter UPI ID">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="withdraw-amount" placeholder="Enter Amount (₹)">
+                </div>
+                <button class="btn btn-danger" id="btn-withdraw" style="font-size:13px; margin-bottom:0;">Request Withdrawal</button>
+            </div>
+
+            <div class="profile-card">
+                <h3 style="margin-bottom:10px; font-size: 16px;">Transaction History</h3>
+                <div id="transaction-history" style="max-height: 250px; overflow-y:auto; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <!-- dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE VIEW (Auth & Settings) -->
+<div id="view-profile" class="view-section">
+    <div class="admin-container">
+        
+        <!-- Login / Register System -->
+        <div id="auth-container" class="admin-panel">
+            
+            <div id="login-view">
+                <h2>Account Login</h2>
+                <div class="input-group">
+                    <label>Email / Mobile</label>
+                    <input type="text" id="login-identifier" placeholder="Email OR Mobile Number" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Enter Password" required>
+                </div>
+                <button id="login-btn">Login</button>
+                <p id="login-error" class="auth-error"></p>
+                
+                <div class="divider">OR</div>
+                <button id="google-login-btn" class="btn btn-google"><i class="fa-brands fa-google"></i> Sign in with Google</button>
+                
+                <div class="auth-links">
+                    <a id="show-forgot-password">Forgot Password?</a>
+                    <a id="show-register">Create New Account</a>
+                </div>
+            </div>
+
+            <div id="register-view" style="display: none;">
+                <h2>Create Account</h2>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="register-name" placeholder="E.g. John Doe" required>
+                </div>
+                <div class="input-group">
+                    <label>Mobile No.</label>
+                    <input type="tel" id="register-mobile" placeholder="E.g. 9876543210" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="register-email" placeholder="E.g. john@mail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="register-password" placeholder="Min. 6 chars" required>
+                </div>
+                
+                <button id="register-btn">Sign Up</button>
+                <p id="register-error" class="auth-error"></p>
+                
+                <div class="divider">OR</div>
+                <button id="google-register-btn" class="btn btn-google"><i class="fa-brands fa-google"></i> Sign up with Google</button>
+
+                <div class="auth-links" style="justify-content: center;">
+                    <a id="show-login-from-register">Already have an account? Login</a>
+                </div>
+            </div>
+
+            <div id="forgot-password-view" style="display: none;">
+                <h2>Reset Password</h2>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="forgot-email" placeholder="Enter registered email" required>
+                </div>
+                <button id="forgot-password-btn">Send Reset Email</button>
+                <p id="forgot-error" class="auth-error"></p>
+                <div class="auth-links" style="justify-content: center;">
+                     <a id="show-login-from-forgot">Back to Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Dashboard -->
+        <div id="profile-container" style="display:none;">
+            <div class="profile-card" style="text-align:center;">
+                <h2 style="color:#00ff88; margin-bottom:8px; font-size:18px;">My Profile</h2>
+                <p style="font-size:16px; margin-bottom: 4px;"><strong><span id="user-name-display"></span></strong></p>
+                <p style="font-size:13px;"><i class="fa-solid fa-envelope"></i> <span id="user-email-display"></span></p>
+                <p style="font-size:13px; margin-bottom: 8px;"><i class="fa-solid fa-phone"></i> <span id="user-mobile-display"></span></p>
+                
+                <p style="margin: 8px 0; font-size:12px;">Email Status: <span id="email-verified-status" style="font-weight:bold;"></span></p>
+                <button class="btn" id="btn-verify-email" style="display:none; width:auto; margin:auto; font-size:12px; padding:6px 12px;">Send Verification Email</button>
+            </div>
+            
+            <div class="profile-card">
+                <h3 style="margin-bottom:12px; font-size:15px; text-align:left;"><i class="fa-solid fa-user-pen"></i> Update Profile Details</h3>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="update-name-input" placeholder="New Full Name">
+                </div>
+                <div class="input-group">
+                    <label>Mobile No.</label>
+                    <input type="tel" id="update-mobile-input" placeholder="New Mobile Number">
+                </div>
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" id="update-password-input" placeholder="Leave blank to keep current">
+                </div>
+                <button class="btn" id="btn-update-profile" style="font-size:13px; padding:8px;">Save Changes</button>
+            </div>
+
+            <div class="profile-card">
+                <h3 style="margin-bottom:12px; font-size:15px; text-align:left;"><i class="fa-solid fa-shield-halved"></i> Two-Factor Auth (2FA)</h3>
+                <div class="input-group">
+                    <label>4-Digit PIN</label>
+                    <input type="password" id="pin-setup-input" placeholder="Set 4-digit PIN" maxlength="4">
+                </div>
+                <button class="btn" id="btn-setup-pin" style="font-size:13px; padding:8px;">Set / Update 2FA PIN</button>
+            </div>
+
+            <div id="admin-entry-container" class="profile-card" style="display:none; text-align:center; background: rgba(255, 174, 0, 0.2); border-color:#ffae00;">
+                <h3 style="color:#ffae00; margin-bottom:8px; font-size:15px;">Admin Privileges Active</h3>
+                <button class="btn" style="background-color:#ffae00; color:#000; font-size:13px; padding:8px;" onclick="switchTab('view-admin')">Go to Admin Control Panel</button>
+            </div>
+
+            <button class="btn btn-danger" id="btn-logout">Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN CONTROL PANEL VIEW -->
+<div id="view-admin" class="view-section">
+    <div class="admin-container" style="max-width: 800px;">
+        <button class="btn" onclick="switchTab('view-profile')" style="margin-bottom: 15px; font-size:13px; padding:8px;"><i class="fa-solid fa-arrow-left"></i> Back to Profile Menu</button>
+        
+        <!-- Admin Navbar -->
+        <div class="admin-navbar">
+            <button class="admin-nav-btn active" onclick="showAdminSection('admin-dashboard', this)">Dashboard</button>
+            <button class="admin-nav-btn" onclick="showAdminSection('admin-matches', this)">Matches & Predictions</button>
+            <button class="admin-nav-btn" onclick="showAdminSection('admin-winners', this)">Winner History</button>
+            <button class="admin-nav-btn" onclick="showAdminSection('admin-requests', this)">Requests</button>
+            <button class="admin-nav-btn" onclick="showAdminSection('admin-users', this)">Users</button>
+        </div>
+
+        <!-- 1. DASHBOARD -->
+        <div id="admin-dashboard" class="admin-section active">
+            <div class="admin-panel" style="text-align:center;">
+                <h2>Admin Dashboard Overview</h2>
+                <div style="display:flex; justify-content:space-around; margin-top:20px;">
+                    <div style="background:rgba(0,255,136,0.1); padding:15px; border-radius:10px; border:1px solid #00ff88; width:30%;">
+                        <h3 style="margin-bottom:5px; font-size:14px; color:#fff;">Users</h3>
+                        <p id="dash-users" style="font-size:24px; color:#00ff88; font-weight:bold;">0</p>
+                    </div>
+                    <div style="background:rgba(0,255,136,0.1); padding:15px; border-radius:10px; border:1px solid #00ff88; width:30%;">
+                        <h3 style="margin-bottom:5px; font-size:14px; color:#fff;">Matches</h3>
+                        <p id="dash-matches" style="font-size:24px; color:#00ff88; font-weight:bold;">0</p>
+                    </div>
+                    <div style="background:rgba(0,255,136,0.1); padding:15px; border-radius:10px; border:1px solid #00ff88; width:30%;">
+                        <h3 style="margin-bottom:5px; font-size:14px; color:#fff;">Predictions</h3>
+                        <p id="dash-preds" style="font-size:24px; color:#00ff88; font-weight:bold;">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. MATCH & PREDICTION LIST -->
+        <div id="admin-matches" class="admin-section">
+            
+            <!-- Match & Prediction COMBINED Form -->
+            <div class="admin-panel" id="match-pred-setup-panel" style="margin-bottom: 15px;">
+                 <h2>⚽ Add Match & Publish Prediction</h2>
+                 <p style="font-size:11px; color:#aaa; text-align:center; margin-bottom:10px;">Fill out all information below to simultaneously schedule the match and publish its prediction event.</p>
+                 
+                 <input type="hidden" id="edit-match-id">
+                 
+                 <!-- Match Details -->
+                 <div class="input-group"><label>Team 1</label> <input type="text" id="team1" placeholder="Team 1 Name" required oninput="updateTeamHeaders()"></div>
+                 <div class="input-group"><label>Team 2</label> <input type="text" id="team2" placeholder="Team 2 Name" required oninput="updateTeamHeaders()"></div>
+                 <div class="input-group"><label>Match Date</label> <input type="date" id="match-date" required></div>
+                 <div class="input-group"><label>Match Time</label> <input type="time" id="match-time" required></div>
+                 <div class="input-group"><label>Group/Round</label> <input type="text" id="group" placeholder="E.g. Group A" required></div>
+                 <div class="input-group"><label>Stadium</label> <input type="text" id="ground" placeholder="Stadium / Ground" required></div>
+                 
+                 <hr style="margin:15px 0; border-color:rgba(255,255,255,0.2)">
+                 
+                 <!-- Prediction Extra Details -->
+                 <h3 style="color:#00ff88; font-size:14px; margin-bottom:10px; text-align:left;">Prediction Specific Setup</h3>
+                 <div class="input-group"><label>Image URL</label> <input type="text" id="pred-img" placeholder="https://..." required></div>
+                 <div class="input-group"><label>Title</label> <textarea id="pred-desc" placeholder="Title" rows="2" required></textarea></div>
+                 <div class="input-group"><label>Joining Fee (₹)</label> <input type="number" id="pred-fee" placeholder="0 for Free Event" required></div>
+                 
+                 <hr style="margin:15px 0; border-color:rgba(255,255,255,0.2)">
+                 
+                 <!-- Players Setup -->
+                 <h3 style="color:#00ff88; font-size:14px; margin-bottom:10px; text-align:left;">Add Players Lineup</h3>
+                 <div class="inner-admin-block">
+                     <div class="teams-container">
+                          <!-- Team 1 Side -->
+                          <div style="flex: 1 1 0; min-width: 0; display:flex; flex-direction:column; gap:6px;">
+                              <button class="team-btn" id="t1-header-btn" style="pointer-events:none;">🏳️ Team 1</button>
+                              <div id="team1-players-list" style="display:flex; flex-direction:column; gap:4px;"></div>
+                              <button class="btn" id="add-t1-player-btn" style="font-size:10px; padding:6px; background:#006633; color:#fff; margin-bottom:0;">+ Add T1 Player</button>
+                          </div>
+
+                          <!-- Middle VS Line -->
+                          <div class="vs-divider-vertical">
+                               <div class="line"></div>
+                               <div class="vs-text">Vs</div>
+                               <div class="line"></div>
+                          </div>
+
+                          <!-- Team 2 Side -->
+                          <div style="flex: 1 1 0; min-width: 0; display:flex; flex-direction:column; gap:6px;">
+                              <button class="team-btn" id="t2-header-btn" style="pointer-events:none;">🏳️ Team 2</button>
+                              <div id="team2-players-list" style="display:flex; flex-direction:column; gap:4px;"></div>
+                              <button class="btn" id="add-t2-player-btn" style="font-size:10px; padding:6px; background:#006633; color:#fff; margin-bottom:0;">+ Add T2 Player</button>
+                          </div>
+                     </div>
+                 </div>
+
+                 <!-- Prizes -->
+                 <h3 style="margin-top:15px; color:#00ff88; font-size:14px; text-align:left;">Winner Prizes Set</h3>
+                 <div id="prize-container"></div>
+                 <button class="btn" id="add-prize-btn" style="background:#006633; color:#fff; margin-bottom: 20px; font-size:12px; padding:8px;">+ Add Position Amount</button>
+
+                 <!-- Generate Questions -->
+                 <h3 style="color:#ffae00; font-size:14px; text-align:left;">Match Prediction Questions</h3>
+                 <button class="btn" id="generate-qs-btn" style="background:#ffae00; color:#000; margin-bottom:12px; font-size:13px; padding:8px;">Generate Questions using Teams/Players</button>
+                 <div id="questions-container"></div>
+
+                 <!-- Actions -->
+                 <div style="display:flex; gap:8px; margin-top:15px;">
+                     <button class="btn" id="save-match-pred-btn" style="margin-bottom:0;">Save Match & Publish Prediction</button>
+                     <button class="btn" id="update-match-pred-btn" style="display:none; background:#ffae00; color:#000; margin-bottom:0;">Update Match & Prediction Data</button>
+                     <button class="btn btn-danger" id="cancel-edit-match-btn" style="display:none; margin-bottom:0;">Cancel Editing</button>
+                 </div>
+            </div>
+
+            <!-- Match List for Admin -->
+            <div id="admin-match-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 8px;">
+                 <!-- Populated dynamically -->
+            </div>
+
+            <!-- Announce Results Block -->
+            <div class="admin-panel" style="border-color:#ffae00;">
+                <h2 style="color:#ffae00;">🎯 Announce Prediction Results</h2>
+                <p style="font-size:11px; color:#ccc; text-align:center; margin-bottom:10px;">Select a completed event, answer the questions, and distribute prizes.</p>
+                
+                <div class="input-group">
+                    <label>Select Event</label>
+                    <select id="admin-pred-select"></select>
+                </div>
+                
+                <div id="questions-announce-container"></div>
+                <button class="btn" id="announce-btn" style="background:#ffae00; color:#000; margin-top:15px; display:none;">Announce Results & Pay Winners</button>
+            </div>
+
+        </div>
+
+        <!-- 3. WINNER HISTORY -->
+        <div id="admin-winners" class="admin-section">
+            <div class="admin-panel">
+                <h2>🏆 Winner History</h2>
+                <div id="admin-winner-list" style="max-height: 400px; overflow-y:auto; margin-top:10px;"></div>
+            </div>
+        </div>
+
+        <!-- 4. REQUESTS -->
+        <div id="admin-requests" class="admin-section">
+            <div class="admin-panel">
+                <h2>💸 Withdrawal Requests</h2>
+                <div id="admin-req-list" style="max-height: 500px; overflow-y:auto; margin-top:10px;"></div>
+            </div>
+        </div>
+
+        <!-- 5. USERS -->
+        <div id="admin-users" class="admin-section">
+            <div class="admin-panel">
+                <h2>👥 Manage Registered Users</h2>
+                <div id="admin-user-list" style="max-height: 600px; overflow-y:auto; margin-top:10px;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 2FA Modal -->
+<div id="two-fa-modal">
+    <div class="profile-card" style="width: 280px; text-align:center; background:#001a0d; border:2px solid #00ff88; padding:20px;">
+        <h3 style="color:#00ff88; font-size:18px;">Security Check</h3>
+        <p style="font-size:13px; margin-top:8px;">Enter your 4-digit 2FA PIN</p>
+        <input type="password" id="verify-pin-input" placeholder="PIN" style="width:100%; padding:12px; margin:15px 0; text-align:center; font-size:18px; letter-spacing: 5px; border-radius:8px;" maxlength="4">
+        <button class="btn" id="btn-verify-pin" style="font-size:14px; padding:10px;">Unlock Account</button>
+        <p id="pin-error" style="color:#ff4d4d; margin-top:8px; font-size:12px;"></p>
+        <button class="btn btn-danger" onclick="firebase.auth().signOut(); document.getElementById('two-fa-modal').style.display='none';" style="margin-top:8px; font-size:12px; padding:8px;">Cancel & Logout</button>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+<a href="javascript:void(0)" onclick="switchTab('view-home')" class="active-tab" id="nav-home"><i class="fa-solid fa-house"></i>Home</a>
+<a href="javascript:void(0)" onclick="switchTab('view-prediction')" id="nav-prediction"><i class="fa-solid fa-ranking-star"></i>Prediction</a>
+<a href="javascript:void(0)" onclick="switchTab('view-wallet')" id="nav-wallet"><i class="fa-solid fa-wallet"></i>Wallet</a>
+<a href="javascript:void(0)" onclick="switchTab('view-profile')" id="nav-profile"><i class="fa-solid fa-user"></i>Profile</a>
+</nav>
+
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+<script>
+// --- FIREBASE CONFIGURATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDn_l1TL9tpLKG3_e1g2U8H_V1pamfvgiU",
+  authDomain: "sinthav4.firebaseapp.com",
+  databaseURL: "https://sinthav4-default-rtdb.firebaseio.com",
+  projectId: "sinthav4",
+  storageBucket: "sinthav4.firebasestorage.app",
+  messagingSenderId: "222906020524",
+  appId: "1:222906020524:web:a39f7e15ea59d958142509",
+  measurementId: "G-0C7N4VP7M0"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+window.isAdmin = false;
+window.currentUserOldMobile = ''; 
+
+// --- MODERN UI SYSTEM (TOAST & CUSTOM MODAL) ---
+function showToast(msg, type='success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `modern-toast ${type}`;
+    let icon = 'fa-circle-check';
+    if(type === 'error') icon = 'fa-circle-xmark';
+    if(type === 'warning') icon = 'fa-triangle-exclamation';
+    if(type === 'info') icon = 'fa-circle-info';
+    
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'fadeOutToast 0.4s ease forwards';
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+function showCustomConfirm(msg, title="Confirm Action") {
+    return new Promise(resolve => {
+        document.getElementById('custom-dialog-title').innerText = title;
+        document.getElementById('custom-dialog-msg').innerText = msg;
+        document.getElementById('custom-dialog-input').style.display = 'none';
+        document.getElementById('custom-dialog-overlay').style.display = 'flex';
+        
+        const btnOk = document.getElementById('custom-dialog-btn-ok');
+        const btnCancel = document.getElementById('custom-dialog-btn-cancel');
+        
+        btnOk.onclick = () => { closeDialog(); resolve(true); };
+        btnCancel.onclick = () => { closeDialog(); resolve(false); };
+    });
+}
+
+function showCustomPrompt(msg, title="Input Required", type="text") {
+    return new Promise(resolve => {
+        document.getElementById('custom-dialog-title').innerText = title;
+        document.getElementById('custom-dialog-msg').innerText = msg;
+        const inp = document.getElementById('custom-dialog-input');
+        inp.style.display = 'block';
+        inp.type = type;
+        inp.value = '';
+        document.getElementById('custom-dialog-overlay').style.display = 'flex';
+        
+        const btnOk = document.getElementById('custom-dialog-btn-ok');
+        const btnCancel = document.getElementById('custom-dialog-btn-cancel');
+        
+        btnOk.onclick = () => { closeDialog(); resolve(inp.value); };
+        btnCancel.onclick = () => { closeDialog(); resolve(null); };
+    });
+}
+
+function closeDialog() {
+    document.getElementById('custom-dialog-overlay').style.display = 'none';
+}
+
+
+// --- NAVIGATION LOGIC ---
+function switchTab(tabId) {
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+
+    document.querySelectorAll('.bottom-nav a').forEach(a => a.classList.remove('active-tab'));
+    const linkId = tabId.replace('view-', 'nav-');
+    if(document.getElementById(linkId)) document.getElementById(linkId).classList.add('active-tab');
+}
+
+window.openPrediction = function(matchId) {
+    if(!window.allPredictions || window.allPredictions.length === 0) return showToast('Predictions are not loaded yet.', 'error');
+    const pIdx = window.allPredictions.findIndex(p => p.matchId === matchId);
+    if(pIdx !== -1) {
+        window.currentPredIndex = pIdx;
+        switchTab('view-prediction');
+        switchPredTab('pred');
+        refreshPredictionUI();
+    } else {
+        showToast('Prediction for this match is not setup or available yet.', 'warning');
+    }
+};
+
+function showAdminSection(secId, btnElement) {
+    document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+    document.getElementById(secId).style.display = 'block';
+    document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+    if(btnElement) btnElement.classList.add('active');
+    if(secId === 'admin-dashboard') updateAdminDashboard();
+}
+
+function updateAdminDashboard() {
+    const dbUsers = document.getElementById('dash-users');
+    const dbMatches = document.getElementById('dash-matches');
+    const dbPreds = document.getElementById('dash-preds');
+    if(dbUsers) db.ref('users').once('value', s => dbUsers.innerText = s.numChildren());
+    if(dbMatches) dbMatches.innerText = allMatches.length;
+    if(dbPreds) dbPreds.innerText = window.allPredictions ? window.allPredictions.length : 0;
+}
+
+// --- HOMEPAGE MATCHES LOGIC ---
+let allMatches=[];
+
+const flags = {
+  "Afghanistan": "🇦🇫", "Albania": "🇦🇱", "Algeria": "🇩🇿", "Andorra": "🇦🇩", "Angola": "🇦🇴", "Antigua and Barbuda": "🇦🇬", "Argentina": "🇦🇷", "Armenia": "🇦🇲", "Australia": "🇦🇺", "Austria": "🇦🇹", "Azerbaijan": "🇦🇿", "Bahamas": "🇧🇸", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩", "Barbados": "🇧🇧", "Belarus": "🇧🇾", "Belgium": "🇧🇪", "Belize": "🇧🇿", "Benin": "🇧🇯", "Bhutan": "🇧🇹", "Bolivia": "🇧🇴", "Bosnia and Herzegovina": "🇧🇦", "Botswana": "🇧🇼", "Brazil": "🇧🇷", "Brunei": "🇧🇳", "Bulgaria": "🇧🇬", "Burkina Faso": "🇧🇫", "Burundi": "🇧🇮", "Côte d'Ivoire": "🇨🇮", "Cabo Verde": "🇨🇻", "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦", "Central African Republic": "🇨🇫", "Chad": "🇹🇩", "Chile": "🇨🇱", "China": "🇨🇳", "Colombia": "🇨🇴", "Comoros": "🇰🇲", "Congo": "🇨🇬", "Costa Rica": "🇨🇷", "Croatia": "🇭🇷", "Cuba": "🇨🇺", "Cyprus": "🇨🇾", "Czechia": "🇨🇿", "Democratic Republic of the Congo": "🇨🇩", "Denmark": "🇩🇰", "Djibouti": "🇩🇯", "Dominica": "🇩🇲", "Dominican Republic": "🇩🇴", "Ecuador": "🇪🇨", "Egypt": "🇪🇬", "El Salvador": "🇸🇻", "Equatorial Guinea": "🇬🇶", "Eritrea": "🇪🇷", "Estonia": "🇪🇪", "Eswatini": "🇸🇿", "Ethiopia": "🇪🇹", "Fiji": "🇫🇯", "Finland": "🇫🇮", "France": "🇫🇷", "Gabon": "🇬🇦", "Gambia": "🇬🇲", "Georgia": "🇬🇪", "Germany": "🇩🇪", "Ghana": "🇬🇭", "Greece": "🇬🇷", "Grenada": "🇬GD", "Guatemala": "🇬🇹", "Guinea": "🇬🇳", "Guinea-Bissau": "🇬🇼", "Guyana": "🇬🇾", "Haiti": "🇭🇹", "Holy See": "🇻🇦", "Honduras": "🇭🇳", "Hungary": "🇭🇺", "Iceland": "🇮🇸", "India": "🇮🇳", "Indonesia": "🇮🇩", "Iran": "🇮🇷", "Iraq": "🇮🇶", "Ireland": "🇮🇪", "Israel": "🇮🇱", "Italy": "🇮🇹", "Jamaica": "🇯🇲", "Japan": "🇯🇵", "Jordan": "🇯🇴", "Kazakhstan": "🇰🇿", "Kenya": "🇰🇪", "Kiribati": "🇰🇮", "Kuwait": "🇰🇼", "Kyrgyzstan": "🇰🇬", "Laos": "🇱🇦", "Latvia": "🇱🇻", "Lebanon": "🇱🇧", "Lesotho": "🇱🇸", "Liberia": "🇱🇷", "Libya": "🇱🇾", "Liechtenstein": "🇱🇮", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺", "Madagascar": "🇲🇬", "Malawi": "🇲🇼", "Malaysia": "🇲🇾", "Maldives": "🇲🇻", "Mali": "🇲🇱", "Malta": "🇲🇹", "Marshall Islands": "🇲🇭", "Mauritania": "🇲🇷", "Mauritius": "🇲🇺", "Mexico": "🇲🇽", "Micronesia": "🇫🇲", "Moldova": "🇲🇩", "Monaco": "🇲🇨", "Mongolia": "🇲🇳", "Montenegro": "🇲🇪", "Morocco": "🇲🇦", "Mozambique": "🇲🇿", "Myanmar": "🇲🇲", "Namibia": "🇳🇦", "Nauru": "🇳🇷", "Nepal": "🇳🇵", "Netherlands": "🇳🇱", "New Zealand": "🇳🇿", "Nicaragua": "🇳🇮", "Niger": "🇳🇪", "Nigeria": "🇳🇬", "North Korea": "🇰🇵", "North Macedonia": "🇲🇰", "Norway": "🇳🇴", "Oman": "🇴🇲", "Pakistan": "🇵🇰", "Palau": "🇵🇼", "Palestine State": "🇵🇸", "Panama": "🇵🇦", "Papua New Guinea": "🇵🇬", "Paraguay": "🇵🇾", "Peru": "🇵🇪", "Philippines": "🇵🇭", "Poland": "🇵🇱", "Portugal": "🇵🇹", "Qatar": "🇶🇦", "Romania": "🇷🇴", "Russia": "🇷🇺", "Rwanda": "🇷🇼", "Saint Kitts and Nevis": "🇰🇳", "Saint Lucia": "🇱🇨", "Saint Vincent and the Grenadines": "🇻🇨", "Samoa": "🇼🇸", "San Marino": "🇸🇲", "Sao Tome and Principe": "🇸🇹", "Saudi Arabia": "🇸🇦", "Senegal": "🇸🇳", "Serbia": "🇷🇸", "Seychelles": "🇸🇨", "Sierra Leone": "🇸🇱", "Singapore": "🇸🇬", "Slovakia": "🇸🇰", "Slovenia": "🇸🇮", "Solomon Islands": "🇸🇧", "Somalia": "🇸🇴", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "South Sudan": "🇸🇸", "Spain": "🇪🇸", "Sri Lanka": "🇱🇰", "Sudan": "🇸🇩", "Suriname": "🇸🇷", "Sweden": "🇸🇪", "Switzerland": "🇨🇭", "Syria": "🇸🇾", "Tajikistan": "🇹🇯", "Tanzania": "🇹🇿", "Thailand": "🇹🇭", "Timor-Leste": "🇹🇱", "Togo": "🇹🇬", "Tonga": "🇹🇴", "Trinidad and Tobago": "🇹🇹", "Tunisia": "🇹🇳", "Turkey": "🇹🇷", "Turkmenistan": "🇹🇲", "Tuvalu": "🇹🇻", "Uganda": "🇺🇬", "Ukraine": "🇺🇦", "United Arab Emirates": "🇦🇪", "United Kingdom": "🇬🇧", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "United States": "🇺🇸", "USA": "🇺🇸", "Uruguay": "🇺🇾", "Uzbekistan": "🇺🇿", "Vanuatu": "🇻🇺", "Venezuela": "🇻🇪", "Vietnam": "🇻🇳", "Yemen": "🇾🇪", "Zambia": "🇿🇲", "Zimbabwe": "🇿🇼"
+};
+
+function flag(team){ return flags[team] || "🏳️"; }
+function getTeamStr(team) { return team ? `${flag(team)} ${team}` : ""; }
+
+function formatTimeDiff(ms, isLive) {
+    let totalSeconds = Math.floor(Math.abs(ms) / 1000);
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    let seconds = totalSeconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+setInterval(() => {
+    allMatches.forEach(match => {
+        const timerEl = document.getElementById(`timer-${match.id}`);
+        if(timerEl && match.date && match.time) {
+            let matchDateStr = `${match.date}T${match.time}`;
+            let matchTime = new Date(matchDateStr).getTime();
+            let now = new Date().getTime();
+            if (isNaN(matchTime)) { timerEl.innerText = "TBA"; return; }
+            let diff = matchTime - now;
+            
+            if (match.status === "Completed") {
+                timerEl.innerText = "Match Ended";
+                timerEl.style.color = "#ff4d4d";
+                timerEl.classList.remove("blink");
+            } else if (diff > 0) {
+                timerEl.innerText = "Starts in: " + formatTimeDiff(diff, false);
+                timerEl.style.color = "#ffae00";
+                timerEl.classList.remove("blink");
+            } else {
+                timerEl.innerText = "Live: " + formatTimeDiff(diff, true);
+                timerEl.style.color = "#00ff88";
+                timerEl.classList.add("blink");
+            }
+        }
+    });
+}, 1000);
+
+// --- Match Long Press Result Updater (Admin Only) ---
+let pressTimer;
+let isLongPress = false;
+window.startPress = function(e, matchId) {
+    if(!window.isAdmin) return;
+    isLongPress = false;
+    pressTimer = setTimeout(() => {
+        isLongPress = true;
+        showResultUpdaterPopup(matchId);
+    }, 800);
+};
+window.endPress = function(e) { clearTimeout(pressTimer); };
+window.cancelPress = function(e) { clearTimeout(pressTimer); };
+window.handleCardClick = function(e, matchId) {
+    if (isLongPress) {
+        e.preventDefault(); e.stopPropagation(); isLongPress = false; return;
+    }
+    openPrediction(matchId);
+};
+
+window.showResultUpdaterPopup = function(matchId) {
+    const match = allMatches.find(m => m.id === matchId);
+    if(!match) return;
+    document.getElementById('popup-match-id').value = match.id;
+    document.getElementById('popup-status').value = match.status || 'Upcoming';
+    document.getElementById('popup-t1-goals').value = match.team1Goals || '';
+    document.getElementById('popup-t2-goals').value = match.team2Goals || '';
+    document.getElementById('popup-t1-result').value = match.team1Result || '';
+    document.getElementById('popup-t2-result').value = match.team2Result || '';
+    document.getElementById('result-updater-popup').style.display = 'flex';
+};
+
+window.savePopupMatchResults = function() {
+    const id = document.getElementById('popup-match-id').value;
+    if(!id) return;
+    const updates = {
+        status: document.getElementById('popup-status').value,
+        team1Goals: document.getElementById('popup-t1-goals').value,
+        team2Goals: document.getElementById('popup-t2-goals').value,
+        team1Result: document.getElementById('popup-t1-result').value,
+        team2Result: document.getElementById('popup-t2-result').value
+    };
+    db.ref('matches/' + id).update(updates).then(() => {
+        showToast("Live Match results updated!", "success");
+        document.getElementById('result-updater-popup').style.display = 'none';
+    });
+};
+
+function loadData(){
+    const loadingDiv = document.getElementById('loading');
+    db.ref('matches').on('value', (snapshot) => {
+        const data = snapshot.val();
+        allMatches = [];
+        if(data) {
+            for(let key in data) allMatches.push({ id: key, ...data[key] });
+            allMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+        document.getElementById('count').innerText = allMatches.length;
+        if (allMatches.length === 0) {
+            loadingDiv.innerText = 'No matches currently available.';
+            loadingDiv.style.display = 'block';
+        } else {
+            loadingDiv.style.display = 'none';
+        }
+        render(allMatches);
+        renderAdminMatches();
+        updateAdminDashboard();
+    }, (error) => {
+        loadingDiv.innerText = 'Error loading data from server.';
+    });
+}
+
+function render(matches){
+    const box = document.getElementById('matches');
+    box.innerHTML = '';
+    matches.forEach(match=>{
+        const showResults = match.status === 'Live' || match.status === 'Completed';
+        const t1G = match.team1Goals !== undefined && match.team1Goals !== '' ? match.team1Goals : '0';
+        const t2G = match.team2Goals !== undefined && match.team2Goals !== '' ? match.team2Goals : '0';
+        
+        let t1ResColor = match.team1Result === 'Win' ? '#00ff88' : match.team1Result === 'Loss' ? '#ff4d4d' : '#ffae00';
+        let t2ResColor = match.team2Result === 'Win' ? '#00ff88' : match.team2Result === 'Loss' ? '#ff4d4d' : '#ffae00';
+
+        box.innerHTML+=`
+        <div class="card" 
+            onpointerdown="startPress(event, '${match.id}')" 
+            onpointerup="endPress(event)" 
+            onpointerleave="cancelPress(event)" 
+            onpointercancel="cancelPress(event)"
+            onclick="handleCardClick(event, '${match.id}')">
+            
+            <div class="date">📅 ${match.date || ''} ${match.time || ''}</div>
+            <div class="teams">
+                <div class="team">${flag(match.team1)} <br> ${match.team1 || ''}
+                    ${showResults ? `<br><span style="font-size:14px; font-weight:bold; color:#fff; display:inline-block; margin-top:4px;">Goals: ${t1G}</span>` : ''}
+                    ${match.status === 'Completed' && match.team1Result ? `<br><span style="font-size:12px; font-weight:bold; color:${t1ResColor};">${match.team1Result}</span>` : ''}
+                </div>
+                <div class="vs"> VS </div>
+                <div class="team">${flag(match.team2)} <br> ${match.team2 || ''}
+                    ${showResults ? `<br><span style="font-size:14px; font-weight:bold; color:#fff; display:inline-block; margin-top:4px;">Goals: ${t2G}</span>` : ''}
+                    ${match.status === 'Completed' && match.team2Result ? `<br><span style="font-size:12px; font-weight:bold; color:${t2ResColor};">${match.team2Result}</span>` : ''}
+                </div>
+            </div>
+            <div class="info">🏆 ${match.group || 'World Cup'} &nbsp;|&nbsp; 🏟 ${match.ground || 'TBA'}</div>
+            <div class="timer-badge" id="timer-${match.id}">Calculating...</div>
+        </div>`;
+    });
+}
+
+document.getElementById('search').addEventListener('input', function(){
+    const q = this.value.toLowerCase();
+    const filtered = allMatches.filter(m => (m.team1||'').toLowerCase().includes(q) || (m.team2||'').toLowerCase().includes(q));
+    render(filtered);
+});
+loadData();
+
+
+// --- AUTHENTICATION & PROFILE LOGIC ---
+const loginView = document.getElementById('login-view');
+const registerView = document.getElementById('register-view');
+const forgotPasswordView = document.getElementById('forgot-password-view');
+const authViews = [loginView, registerView, forgotPasswordView];
+
+function showAuthView(viewId) {
+    authViews.forEach(view => view.style.display = view.id === viewId ? 'block' : 'none');
+}
+
+document.getElementById('show-register').addEventListener('click', () => showAuthView('register-view'));
+document.getElementById('show-forgot-password').addEventListener('click', () => showAuthView('forgot-password-view'));
+document.getElementById('show-login-from-register').addEventListener('click', () => showAuthView('login-view'));
+document.getElementById('show-login-from-forgot').addEventListener('click', () => showAuthView('login-view'));
+
+document.getElementById('login-btn').addEventListener('click', () => {
+    const identifier = document.getElementById('login-identifier').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errObj = document.getElementById('login-error');
+    errObj.textContent = 'Authenticating...';
+
+    if(identifier.includes('@')) {
+        auth.signInWithEmailAndPassword(identifier, password).catch(err => { showToast(err.message, 'error'); errObj.textContent = err.message; });
+    } else {
+        const mobile = identifier.replace(/\D/g, ''); 
+        if(mobile.length < 5) { showToast("Please enter a valid email or mobile number.", 'error'); errObj.textContent = "Invalid ID"; return; }
+        db.ref('mappings/phone_to_email/' + mobile).once('value').then(snap => {
+            if(snap.exists()) auth.signInWithEmailAndPassword(snap.val(), password).catch(err => { showToast(err.message, 'error'); errObj.textContent = err.message; });
+            else { showToast("Mobile number not found. Please register.", 'error'); errObj.textContent = "Mobile not found"; }
+        }).catch(err => { showToast(err.message, 'error'); errObj.textContent = err.message; });
+    }
+});
+
+document.getElementById('register-btn').addEventListener('click', () => {
+    const name = document.getElementById('register-name').value.trim();
+    const mobileRaw = document.getElementById('register-mobile').value.trim();
+    const mobile = mobileRaw.replace(/\D/g, '');
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+    const errObj = document.getElementById('register-error');
+
+    if(!name || !mobile || !email || !password) { showToast("Please fill all fields.", 'warning'); return errObj.textContent = "Missing fields"; }
+    if(mobile.length < 8) { showToast("Please enter a valid mobile number.", 'warning'); return errObj.textContent = "Invalid mobile"; }
+
+    errObj.textContent = 'Creating account...';
+    db.ref('mappings/phone_to_email/' + mobile).once('value').then(snap => {
+        if(snap.exists()) { showToast("Mobile number is already registered.", 'error'); errObj.textContent = "Mobile already registered"; }
+        else {
+            auth.createUserWithEmailAndPassword(email, password).then(cred => {
+                db.ref('users/' + cred.user.uid).set({ name: name, mobile: mobile, email: email, wallet: 0 });
+                db.ref('mappings/phone_to_email/' + mobile).set(email);
+                showToast('Account successfully created! You are now logged in.', 'success');
+            }).catch(err => { showToast(err.message, 'error'); errObj.textContent = err.message; });
+        }
+    });
+});
+
+function handleGoogleLogin() {
+    auth.signInWithPopup(googleProvider).then((result) => {
+        const user = result.user;
+        db.ref('users/' + user.uid).once('value').then(snap => {
+            if(!snap.exists()) {
+                db.ref('users/' + user.uid).set({ name: user.displayName || 'Google User', email: user.email, mobile: 'Not Provided', wallet: 0 });
+            }
+        });
+    }).catch(error => showToast(error.message, 'error'));
+}
+
+document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
+document.getElementById('google-register-btn').addEventListener('click', handleGoogleLogin);
+
+document.getElementById('forgot-password-btn').addEventListener('click', () => {
+    const email = document.getElementById('forgot-email').value;
+    document.getElementById('forgot-error').textContent = '';
+    auth.sendPasswordResetEmail(email).then(() => {
+        showToast('Password reset email sent! Check your inbox.', 'success');
+        document.getElementById('forgot-error').textContent = 'Password reset email sent!';
+    }).catch(err => { showToast(err.message, 'error'); document.getElementById('forgot-error').textContent = err.message; });
+});
+
+window.hasPassed2FA = false;
+let userJustLoggedIn = false; 
+let emailVerificationInterval = null; 
+let userWallet = 0;
+let banListenerRef = null;
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        banListenerRef = db.ref(`users/${user.uid}/banned`);
+        banListenerRef.on('value', snap => {
+            if(snap.val() === true) {
+                showToast("Your account has been banned. You are being logged out.", "error");
+                auth.signOut();
+            }
+        });
+
+        userJustLoggedIn = true;
+        db.ref('users/' + user.uid).update({ email: user.email });
+
+        db.ref('users/' + user.uid + '/pin').once('value').then(snap => {
+            const pin = snap.val();
+            if (pin && !window.hasPassed2FA) {
+                document.getElementById('two-fa-modal').style.display = 'flex';
+                window.expectedPin = pin;
+            } else {
+                completeLoginFlow(user);
+            }
+        });
+
+        document.getElementById('wallet-auth-msg').style.display = 'none';
+        document.getElementById('wallet-content').style.display = 'block';
+
+        db.ref(`users/${user.uid}/wallet`).on('value', snap => {
+            userWallet = parseFloat(snap.val()) || 0;
+            const wBal = document.getElementById('wallet-balance');
+            if(wBal) wBal.innerText = userWallet;
+        });
+
+        db.ref(`users/${user.uid}/transactions`).on('value', snap => {
+            const hist = document.getElementById('transaction-history');
+            if(!hist) return;
+            hist.innerHTML = '';
+            const data = snap.val();
+            if(data) {
+                const txns = Object.values(data).sort((a,b) => b.date - a.date);
+                txns.forEach(tx => {
+                    const isDebit = tx.type === 'withdraw' || tx.type === 'join_fee';
+                    const color = isDebit ? '#ff4d4d' : '#00ff88';
+                    const sign = isDebit ? '-' : '+';
+                    hist.innerHTML += `
+                        <div class="transaction-item ${isDebit?'debit':''}">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${tx.type.toUpperCase().replace('_',' ')}</strong>
+                                <span style="color:${color}; font-weight:bold;">${sign}₹${tx.amount}</span>
+                            </div>
+                            <div style="font-size:10px; color:#aaa; margin-top:4px;">${new Date(tx.date).toLocaleString()} | Status: ${tx.status} ${tx.remarks ? `| Rem: ${tx.remarks}` : ''}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                hist.innerHTML = '<p style="text-align:center; font-size:12px; color:#aaa;">No transactions yet.</p>';
+            }
+        });
+
+    } else {
+        if(banListenerRef) { banListenerRef.off(); banListenerRef = null; }
+        if(emailVerificationInterval) clearInterval(emailVerificationInterval);
+        
+        window.isAdmin = false;
+        window.currentUserOldMobile = '';
+        document.getElementById('auth-container').style.display = 'block';
+        document.getElementById('profile-container').style.display = 'none';
+        document.getElementById('admin-entry-container').style.display = 'none';
+        document.getElementById('wallet-auth-msg').style.display = 'block';
+        document.getElementById('wallet-content').style.display = 'none';
+
+        window.hasPassed2FA = false;
+        if(document.getElementById('view-profile').classList.contains('active') || document.getElementById('view-admin').classList.contains('active')){
+            switchTab('view-home');
+        }
+        refreshPredictionUI();
+    }
+});
+
+function completeLoginFlow(user) {
+    document.getElementById('auth-container').style.display = 'none';
+    document.getElementById('profile-container').style.display = 'block';
+    
+    db.ref('users/' + user.uid).once('value').then(snap => {
+        const uData = snap.val() || {};
+        document.getElementById('user-name-display').innerText = uData.name || user.displayName || 'Sports Fan';
+        document.getElementById('user-email-display').innerText = user.email;
+        document.getElementById('user-mobile-display').innerText = uData.mobile || 'No Mobile Linked';
+        
+        document.getElementById('update-name-input').value = uData.name || '';
+        document.getElementById('update-mobile-input').value = uData.mobile || '';
+        window.currentUserOldMobile = uData.mobile || ''; 
+
+        // Role & Admin Access Check
+        const hasAdminRole = uData.role === 'admin';
+        const hasAdminEmail = user.email.toLowerCase().includes('admin');
+
+        if(hasAdminRole || hasAdminEmail) {
+            window.isAdmin = true;
+            document.getElementById('admin-entry-container').style.display = 'block';
+            updateAdminDashboard();
+        } else {
+            window.isAdmin = false;
+            document.getElementById('admin-entry-container').style.display = 'none';
+        }
+    });
+
+    document.getElementById('email-verified-status').innerText = user.emailVerified ? "Verified ✅" : "Not Verified ❌";
+    document.getElementById('email-verified-status').style.color = user.emailVerified ? "#00ff88" : "#ff4d4d";
+    document.getElementById('btn-verify-email').style.display = user.emailVerified ? 'none' : 'block';
+
+    if(emailVerificationInterval) clearInterval(emailVerificationInterval);
+    if (!user.emailVerified) {
+        emailVerificationInterval = setInterval(() => {
+            auth.currentUser.reload().then(() => {
+                if (auth.currentUser.emailVerified) {
+                    clearInterval(emailVerificationInterval);
+                    document.getElementById('email-verified-status').innerText = "Verified ✅";
+                    document.getElementById('email-verified-status').style.color = "#00ff88";
+                    document.getElementById('btn-verify-email').style.display = 'none';
+                }
+            }).catch(e => console.error(e));
+        }, 3000);
+    }
+
+    if(userJustLoggedIn && document.getElementById('view-profile').classList.contains('active')) {
+        switchTab('view-home');
+        userJustLoggedIn = false;
+    }
+    refreshPredictionUI();
+}
+
+document.getElementById('btn-update-profile').addEventListener('click', async () => {
+    const newName = document.getElementById('update-name-input').value.trim();
+    let newMobile = document.getElementById('update-mobile-input').value.trim();
+    newMobile = newMobile.replace(/\D/g, ''); 
+    const newPassword = document.getElementById('update-password-input').value;
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    try {
+        const updates = {};
+        if(newName) updates.name = newName;
+        if(newMobile) updates.mobile = newMobile;
+
+        if(Object.keys(updates).length > 0) {
+            await db.ref('users/' + user.uid).update(updates);
+            
+            if(newMobile && window.currentUserOldMobile !== newMobile) {
+                await db.ref('mappings/phone_to_email/' + newMobile).set(user.email);
+                if(window.currentUserOldMobile) {
+                    await db.ref('mappings/phone_to_email/' + window.currentUserOldMobile).remove();
+                }
+                window.currentUserOldMobile = newMobile;
+            }
+
+            if(newName) document.getElementById('user-name-display').innerText = newName;
+            if(newMobile) document.getElementById('user-mobile-display').innerText = newMobile;
+        }
+
+        if(newPassword) {
+            if(newPassword.length < 6) return showToast("Password must be at least 6 characters long.", "error");
+            await user.updatePassword(newPassword);
+            document.getElementById('update-password-input').value = '';
+        }
+
+        showToast("Profile successfully updated!", "success");
+    } catch (error) {
+        if(error.code === 'auth/requires-recent-login') {
+            showToast('For security reasons, please logout and login again before changing your password.', 'warning');
+        } else {
+            showToast(error.message, 'error');
+        }
+    }
+});
+
+document.getElementById('btn-verify-pin').addEventListener('click', () => {
+    if(document.getElementById('verify-pin-input').value === window.expectedPin) {
+        document.getElementById('two-fa-modal').style.display = 'none';
+        window.hasPassed2FA = true;
+        completeLoginFlow(firebase.auth().currentUser);
+    } else {
+        document.getElementById('pin-error').innerText = "Incorrect PIN!";
+    }
+});
+
+document.getElementById('btn-setup-pin').addEventListener('click', () => {
+    const pin = document.getElementById('pin-setup-input').value;
+    if(auth.currentUser && pin.length === 4) {
+        db.ref('users/' + auth.currentUser.uid + '/pin').set(pin).then(() => {
+            showToast('2FA Security PIN successfully activated!', 'success');
+            document.getElementById('pin-setup-input').value = '';
+        });
+    } else {
+        showToast('Please enter a valid 4-digit PIN.', 'error');
+    }
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => auth.signOut());
+
+// --- WALLET: TOPUP & WITHDRAW ---
+document.getElementById('btn-topup').addEventListener('click', () => {
+    const amt = parseFloat(document.getElementById('topup-amount').value);
+    if(!amt || amt <= 0) return showToast('Enter a valid amount', 'error');
+
+    var options = {
+        "key": "rzp_live_SUarhYm5IfBTar", 
+        "amount": amt * 100, 
+        "currency": "INR",
+        "name": "Sintha Sports Live",
+        "description": "Wallet Topup",
+        "handler": function (response){
+            const txId = db.ref(`users/${auth.currentUser.uid}/transactions`).push().key;
+            db.ref(`users/${auth.currentUser.uid}/transactions/${txId}`).set({
+                type: 'topup', amount: amt, date: firebase.database.ServerValue.TIMESTAMP, status: 'success', paymentId: response.razorpay_payment_id
+            });
+            db.ref(`users/${auth.currentUser.uid}/wallet`).set(userWallet + amt);
+            showToast('Topup Successful!', 'success');
+            document.getElementById('topup-amount').value = '';
+        },
+        "theme": { "color": "#00ff88" }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+});
+
+document.getElementById('btn-withdraw').addEventListener('click', () => {
+    const upi = document.getElementById('withdraw-upi').value.trim();
+    const amt = parseFloat(document.getElementById('withdraw-amount').value);
+    if(!upi || !amt || amt <= 0) return showToast('Enter valid UPI and amount', 'error');
+    if(amt > userWallet) return showToast('Insufficient wallet balance', 'error');
+
+    db.ref(`users/${auth.currentUser.uid}/wallet`).set(userWallet - amt);
+    const txId = db.ref(`users/${auth.currentUser.uid}/transactions`).push().key;
+    const reqRef = db.ref('withdrawals').push();
+
+    db.ref(`users/${auth.currentUser.uid}/transactions/${txId}`).set({
+        type: 'withdraw', amount: amt, date: firebase.database.ServerValue.TIMESTAMP, status: 'pending', upi: upi, reqId: reqRef.key
+    });
+    
+    reqRef.set({
+        uid: auth.currentUser.uid, userName: document.getElementById('user-name-display').innerText, upi: upi, amount: amt, date: firebase.database.ServerValue.TIMESTAMP, status: 'pending', txId: txId
+    }).then(() => {
+        showToast('Withdrawal request submitted to Admin!', 'success');
+        document.getElementById('withdraw-upi').value = '';
+        document.getElementById('withdraw-amount').value = '';
+    });
+});
+
+
+// --- ADMIN: MANAGE MATCHES & PREDICTION SETUP COMBINED ---
+function renderAdminMatches() {
+    const list = document.getElementById('admin-match-list');
+    list.innerHTML = '';
+    if(allMatches.length === 0) {
+        list.innerHTML = '<p style="text-align:center; font-size:12px;">No matches found.</p>';
+        return;
+    }
+    allMatches.forEach(m => {
+        list.innerHTML += `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; margin-bottom:6px; font-size:13px;">
+            <div style="line-height:1.4;"><strong>${flag(m.team1)} ${m.team1} vs ${flag(m.team2)} ${m.team2}</strong><br><span style="font-size:11px; color:#8fffc9;">${m.date} - ${m.time}</span>
+            <br><span style="font-size:11px; color:#ffae00;">Status: ${m.status || 'Upcoming'}</span>
+            </div>
+            <div style="display:flex; gap: 5px;">
+                <button class="btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="editMatch('${m.id}')">Edit Data</button>
+                <button class="btn btn-danger" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="deleteMatch('${m.id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+}
+
+window.deleteMatch = async function(matchId) {
+    const proceed = await showCustomConfirm("Are you sure you want to permanently delete this match and its associated prediction?");
+    if(proceed) {
+        db.ref('matches/' + matchId).remove().then(() => {
+            const pred = window.allPredictions.find(p => p.matchId === matchId);
+            if(pred) {
+                db.ref('predictions/list/' + pred.id).remove();
+            }
+            showToast("Match and Prediction deleted successfully.", "success");
+            cancelMatchEdit(); 
+        }).catch(err => showToast("Error deleting match: " + err.message, "error"));
+    }
+};
+
+function updateTeamHeaders() {
+    const t1 = document.getElementById('team1').value.trim() || 'Team 1';
+    const t2 = document.getElementById('team2').value.trim() || 'Team 2';
+    document.getElementById('t1-header-btn').innerHTML = `${flag(t1)} ${t1}`;
+    document.getElementById('t2-header-btn').innerHTML = `${flag(t2)} ${t2}`;
+}
+
+function addPlayerInput(team = 1, name = '', pos = 'Forward') {
+    const div = document.createElement('div');
+    div.className = 'player-row';
+    div.innerHTML = `
+        <div style="display:flex; width:100%; gap:4px;">
+            <input type="text" class="p-name" placeholder="Name" value="${name}" style="flex:1; min-width:0; width:100%; padding:4px 6px; font-size:11px; border-radius:4px; border:none; outline:none; color:#333;">
+            <button type="button" class="btn btn-danger" style="width:auto; padding:4px 8px; font-size:10px; margin:0; flex-shrink:0;" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <select class="p-pos" style="width:100%; min-width:0; padding:4px 6px; font-size:11px; border-radius:4px; border:none; outline:none; color:#333;">
+            <option value="Goalkeeper" ${pos==='Goalkeeper'?'selected':''}>GK</option>
+            <option value="Defender" ${pos==='Defender'?'selected':''}>DEF</option>
+            <option value="Midfielder" ${pos==='Midfielder'?'selected':''}>MID</option>
+            <option value="Forward" ${pos==='Forward'?'selected':''}>FWD</option>
+        </select>
+        <input type="hidden" class="p-team" value="${team}">
+    `;
+    document.getElementById(`team${team}-players-list`).appendChild(div);
+}
+
+function addPrizeInput(val = '') {
+    const div = document.createElement('div');
+    div.className = 'prize-row';
+    div.innerHTML = `
+        <span class="prize-label" style="font-weight:bold; width:30px; font-size:12px;"></span>
+        <input type="text" class="prize-val" value="${val}" placeholder="Prize Amount (₹)">
+        <button type="button" class="btn btn-danger" style="width:auto; margin-bottom:0; padding:8px 12px;" onclick="this.parentElement.remove(); updatePrizeLabels();"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    document.getElementById('prize-container').appendChild(div);
+    updatePrizeLabels();
+}
+
+function updatePrizeLabels() {
+    const rows = document.querySelectorAll('.prize-row');
+    rows.forEach((row, idx) => {
+        let suf = "th";
+        let num = idx + 1;
+        if(num === 1) suf = "st"; else if(num === 2) suf = "nd"; else if(num === 3) suf = "rd";
+        const label = row.querySelector('.prize-label');
+        if(label) label.innerText = `${num}${suf}`;
+    });
+}
+
+addPlayerInput(1); addPlayerInput(2);
+document.getElementById('add-t1-player-btn').addEventListener('click', () => addPlayerInput(1));
+document.getElementById('add-t2-player-btn').addEventListener('click', () => addPlayerInput(2));
+addPrizeInput(); addPrizeInput(); addPrizeInput();
+document.getElementById('add-prize-btn').addEventListener('click', () => addPrizeInput());
+
+const defaultQuestionsTemplate = [
+    { text: "Who will win the match?", options: ["{team1}", "{team2}", "Draw"] },
+    { text: "Who will score the first goal?", options: ["{team1}", "{team2}", "No Goal"] },
+    { text: "Total goals in the match?", options: ["0-1", "2-3", "4-5", "6+"] },
+    { text: "Both teams to score?", options: ["Yes", "No"] },
+    { text: "Who will win the 1st Half?", options: ["{team1}", "{team2}", "Draw"] },
+    { text: "Number of yellow cards?", options: ["0-2", "3-4", "5-6", "7+"] },
+    { text: "Will there be a red card?", options: ["Yes", "No"] },
+    { text: "Who will get the first corner?", options: ["{team1}", "{team2}"] },
+    { text: "Total corners in the match?", options: ["0-5", "6-8", "9-11", "12+"] },
+    { text: "Will there be a penalty awarded?", options: ["Yes", "No"] },
+    { text: "Who will keep a clean sheet?", options: ["{team1}", "{team2}", "Both", "None"] },
+    { text: "Which half will have more goals?", options: ["1st Half", "2nd Half", "Equal"] },
+    { text: "Will {team1} score in both halves?", options: ["Yes", "No"] },
+    { text: "Will {team2} score in both halves?", options: ["Yes", "No"] },
+    { text: "Exact goal margin?", options: ["1 Goal", "2 Goals", "3+ Goals", "Draw"] },
+    { text: "Will a goal be scored from outside the box?", options: ["Yes", "No"] },
+    { text: "Who will make the first substitution?", options: ["{team1}", "{team2}", "Same Time"] },
+    { text: "Method of first goal?", options: ["Header", "Shot", "Penalty", "Free Kick", "Own Goal", "No Goal"] },
+    { text: "Will the match go to extra time/penalties?", options: ["Yes", "No", "Not Applicable"] },
+    { text: "Who will commit more fouls?", options: ["{team1}", "{team2}", "Equal"] },
+    { text: "Who will be the Man of the Match?", options: "{all_players}" },
+    { text: "Who will provide the first assist?", options: "{all_players_none}" },
+    { text: "Who will receive the first Yellow Card?", options: "{all_players_none}" },
+    { text: "Which Goalkeeper will make more saves?", options: "{goalkeepers}" },
+    { text: "Who will score the last goal of the match?", options: "{all_players_none}" },
+    { text: "Who will be the first player substituted out?", options: "{all_players_none}" },
+    { text: "Who will be the first player substituted in?", options: "{all_players_none}" },
+    { text: "Who will receive a Red Card?", options: "{all_players_none}" },
+    { text: "Who will commit the most fouls?", options: "{all_players}" },
+    { text: "Who will have the most shots on target?", options: "{all_players}" }
+];
+
+document.getElementById('generate-qs-btn').addEventListener('click', () => {
+    const t1 = document.getElementById('team1').value.trim();
+    const t2 = document.getElementById('team2').value.trim();
+    if(!t1 || !t2) return showToast("Please enter Team 1 and Team 2 names first.", "warning");
+    
+    const currentPlayers = [];
+    document.querySelectorAll('.player-row').forEach(row => {
+        const name = row.querySelector('.p-name').value.trim();
+        const pos = row.querySelector('.p-pos').value;
+        if(name) currentPlayers.push({ name, pos });
+    });
+
+    const allPlayerNames = currentPlayers.map(p => p.name);
+    const gks = currentPlayers.filter(p => p.pos === 'Goalkeeper').map(p => p.name);
+
+    const t1Str = getTeamStr(t1);
+    const t2Str = getTeamStr(t2);
+    const qCount = currentPlayers.length > 0 ? 30 : 20;
+    const templates = defaultQuestionsTemplate.slice(0, qCount);
+
+    let html = '';
+    templates.forEach((q, i) => {
+        let qText = q.text.replace(/{team1}/g, t1Str).replace(/{team2}/g, t2Str);
+        let qOptsArray = [];
+
+        if (Array.isArray(q.options)) {
+            qOptsArray = q.options.map(o => o.replace(/{team1}/g, t1Str).replace(/{team2}/g, t2Str));
+        } else if (q.options === "{all_players}") {
+            qOptsArray = [...allPlayerNames];
+        } else if (q.options === "{all_players_none}") {
+            qOptsArray = [...allPlayerNames, "None"];
+        } else if (q.options === "{goalkeepers}") {
+            qOptsArray = gks.length > 0 ? [...gks] : ["No Goalkeepers Available"];
+        }
+        let qOpts = qOptsArray.join(',');
+        
+        html += `
+        <div class="q-row-container setup-q-row">
+            <div class="q-row-top">
+                <span style="font-weight:bold; width:25px; font-size:12px;">Q${i+1}</span>
+                <input type="text" class="q-text" value="${qText}" readonly style="flex:3; padding:8px; border-radius:6px; border:none; color:#333; font-size:12px;">
+                <input type="hidden" class="q-opts" value="${qOpts}">
+                <span style="color:#ffae00; font-size:11px; font-weight:bold; width:40px; text-align:center;">10 pt</span>
+            </div>
+        </div>`;
+    });
+    document.getElementById('questions-container').innerHTML = html;
+});
+
+function cancelMatchEdit() {
+    document.getElementById('edit-match-id').value = '';
+    document.querySelectorAll('#team1, #team2, #match-date, #match-time, #group, #ground, #pred-img, #pred-desc, #pred-fee').forEach(inp => inp.value = '');
+    
+    document.getElementById('save-match-pred-btn').style.display = 'block';
+    document.getElementById('update-match-pred-btn').style.display = 'none';
+    document.getElementById('cancel-edit-match-btn').style.display = 'none';
+
+    document.getElementById('team1-players-list').innerHTML = '';
+    document.getElementById('team2-players-list').innerHTML = '';
+    addPlayerInput(1); addPlayerInput(2);
+    
+    document.getElementById('prize-container').innerHTML = '';
+    addPrizeInput(); addPrizeInput(); addPrizeInput();
+    
+    document.getElementById('questions-container').innerHTML = '';
+    updateTeamHeaders();
+}
+document.getElementById('cancel-edit-match-btn').addEventListener('click', cancelMatchEdit);
+
+document.getElementById('save-match-pred-btn').addEventListener('click', () => {
+    const newMatch = {
+        team1: document.getElementById('team1').value,
+        team2: document.getElementById('team2').value,
+        date: document.getElementById('match-date').value,
+        time: document.getElementById('match-time').value,
+        group: document.getElementById('group').value,
+        ground: document.getElementById('ground').value,
+        status: 'Upcoming'
+    };
+    
+    const predImg = document.getElementById('pred-img').value;
+    const predDesc = document.getElementById('pred-desc').value;
+    const predFee = document.getElementById('pred-fee').value;
+
+    if (!newMatch.team1 || !newMatch.team2 || !newMatch.date || !newMatch.time || !predImg || !predDesc || !predFee) {
+        return showToast('Please fill all Match details, Prediction Image, Desc, and Entry Fee!', 'warning');
+    }
+
+    const prizes = Array.from(document.querySelectorAll('.prize-val')).map(inp => inp.value).filter(v => v);
+    
+    const finalPlayers = [];
+    document.querySelectorAll('.player-row').forEach(row => {
+        const name = row.querySelector('.p-name').value.trim();
+        const pos = row.querySelector('.p-pos').value;
+        const team = row.querySelector('.p-team').value;
+        if(name) finalPlayers.push({ name, position: pos, team: parseInt(team) });
+    });
+
+    const questions = [];
+    document.querySelectorAll('.setup-q-row').forEach((row) => {
+        const text = row.querySelector('.q-text').value;
+        const opts = row.querySelector('.q-opts').value.split(',');
+        if(text) questions.push({ text: text, points: 10, options: opts });
+    });
+
+    if(questions.length === 0) return showToast("Please generate the questions first!", "warning");
+
+    db.ref('matches').push(newMatch).then(matchRef => {
+        const dMatch = new Date(`${newMatch.date}T${newMatch.time}`);
+        let offset = dMatch.getTimezoneOffset() * 60000;
+        let endIso = new Date(dMatch.getTime() - offset).toISOString().slice(0,16);
+        let dNow = new Date();
+        let startIso = new Date(dNow.getTime() - (dNow.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
+
+        const newPred = {
+            matchId: matchRef.key,
+            team1: newMatch.team1,
+            team2: newMatch.team2,
+            image: predImg,
+            description: predDesc,
+            joining_fee: parseFloat(predFee) || 0,
+            startTime: startIso,
+            endTime: endIso,
+            prizes: prizes,
+            questions: questions,
+            players_list: finalPlayers,
+            announced: false
+        };
+
+        db.ref('predictions/list').push(newPred).then(() => {
+            showToast("Match and Prediction created successfully!", "success");
+            cancelMatchEdit();
+        });
+    });
+});
+
+window.editMatch = function(id) {
+    const match = allMatches.find(m => m.id === id);
+    if(!match) return;
+
+    document.getElementById('edit-match-id').value = match.id;
+    document.getElementById('team1').value = match.team1 || '';
+    document.getElementById('team2').value = match.team2 || '';
+    document.getElementById('match-date').value = match.date || '';
+    document.getElementById('match-time').value = match.time || '';
+    document.getElementById('group').value = match.group || '';
+    document.getElementById('ground').value = match.ground || '';
+    
+    updateTeamHeaders();
+
+    const pred = window.allPredictions.find(p => p.matchId === id);
+    if(pred) {
+        document.getElementById('pred-img').value = pred.image || '';
+        document.getElementById('pred-desc').value = pred.description || '';
+        document.getElementById('pred-fee').value = pred.joining_fee !== undefined ? pred.joining_fee : '';
+
+        document.getElementById('team1-players-list').innerHTML = '';
+        document.getElementById('team2-players-list').innerHTML = '';
+        if(pred.players_list) {
+            pred.players_list.forEach(p => addPlayerInput(p.team || 1, p.name, p.position));
+        } else {
+            addPlayerInput(1); addPlayerInput(2);
+        }
+
+        const pc = document.getElementById('prize-container');
+        pc.innerHTML = '';
+        if(pred.prizes && pred.prizes.length > 0) {
+            pred.prizes.forEach(p => addPrizeInput(p));
+        } else {
+            addPrizeInput(); addPrizeInput(); addPrizeInput();
+        }
+
+        const qContainer = document.getElementById('questions-container');
+        qContainer.innerHTML = '';
+        if(pred.questions) {
+            pred.questions.forEach((q, i) => {
+                let qOpts = (q.options || []).join(',');
+                qContainer.innerHTML += `
+                <div class="q-row-container setup-q-row">
+                    <div class="q-row-top">
+                        <span style="font-weight:bold; width:25px; font-size:12px;">Q${i+1}</span>
+                        <input type="text" class="q-text" value="${q.text}" readonly style="flex:3; padding:8px; border-radius:6px; border:none; color:#333; font-size:12px;">
+                        <input type="hidden" class="q-opts" value="${qOpts}">
+                        <span style="color:#ffae00; font-size:11px; font-weight:bold; width:40px; text-align:center;">10 pt</span>
+                    </div>
+                </div>`;
+            });
+        }
+    }
+
+    document.getElementById('save-match-pred-btn').style.display = 'none';
+    document.getElementById('update-match-pred-btn').style.display = 'block';
+    document.getElementById('cancel-edit-match-btn').style.display = 'block';
+    document.getElementById('match-pred-setup-panel').scrollIntoView({behavior: 'smooth'});
+};
+
+document.getElementById('update-match-pred-btn').addEventListener('click', () => {
+    const id = document.getElementById('edit-match-id').value;
+    const updatedMatch = {
+        team1: document.getElementById('team1').value,
+        team2: document.getElementById('team2').value,
+        date: document.getElementById('match-date').value,
+        time: document.getElementById('match-time').value,
+        group: document.getElementById('group').value,
+        ground: document.getElementById('ground').value
+    };
+    
+    const predImg = document.getElementById('pred-img').value;
+    const predDesc = document.getElementById('pred-desc').value;
+    const predFee = document.getElementById('pred-fee').value;
+
+    if (!updatedMatch.team1 || !updatedMatch.team2 || !updatedMatch.date || !updatedMatch.time || !predImg || !predDesc || !predFee) {
+        return showToast('Please fill all Match and Prediction fields!', 'warning');
+    }
+
+    const prizes = Array.from(document.querySelectorAll('.prize-val')).map(inp => inp.value).filter(v => v);
+    const finalPlayers = [];
+    document.querySelectorAll('.player-row').forEach(row => {
+        const name = row.querySelector('.p-name').value.trim();
+        const pos = row.querySelector('.p-pos').value;
+        const team = row.querySelector('.p-team').value;
+        if(name) finalPlayers.push({ name, position: pos, team: parseInt(team) });
+    });
+
+    const questions = [];
+    document.querySelectorAll('.setup-q-row').forEach((row) => {
+        const text = row.querySelector('.q-text').value;
+        const opts = row.querySelector('.q-opts').value.split(',');
+        if(text) questions.push({ text: text, points: 10, options: opts });
+    });
+
+    if(questions.length === 0) return showToast("Please generate the questions!", "warning");
+
+    db.ref('matches/' + id).update(updatedMatch).then(() => {
+        const pred = window.allPredictions.find(p => p.matchId === id);
+        if(pred) {
+            const dMatch = new Date(`${updatedMatch.date}T${updatedMatch.time}`);
+            let offset = dMatch.getTimezoneOffset() * 60000;
+            let endIso = new Date(dMatch.getTime() - offset).toISOString().slice(0,16);
+
+            db.ref(`predictions/list/${pred.id}`).update({
+                team1: updatedMatch.team1,
+                team2: updatedMatch.team2,
+                image: predImg,
+                description: predDesc,
+                joining_fee: parseFloat(predFee) || 0,
+                endTime: endIso,
+                prizes: prizes,
+                questions: questions,
+                players_list: finalPlayers
+            });
+        }
+        showToast("Match and Prediction updated successfully!", "success");
+        cancelMatchEdit();
+    });
+});
+
+
+// --- ADMIN: ANNOUNCE RESULTS SETUP ---
+document.getElementById('admin-pred-select').addEventListener('change', function() {
+    const pId = this.value;
+    const pred = window.allPredictions.find(p => p.id === pId);
+    if(pred && pred.questions) {
+        let html = '';
+        pred.questions.forEach((q, i) => {
+            let optsHtml = '<option value="">-- Select Answer --</option>';
+            (q.options || []).forEach(opt => optsHtml += `<option value="${opt}">${opt}</option>`);
+            html += `
+            <div class="q-row-container" style="margin-bottom:8px;">
+                <p style="font-size:12px; font-weight:bold; color:#8fffc9; margin-bottom:4px;">Q${i+1}: ${q.text}</p>
+                <select id="a-text-${i}" style="width:100%; padding:8px; border-radius:5px; color:#333; font-size:12px;">${optsHtml}</select>
+            </div>`;
+        });
+        document.getElementById('questions-announce-container').innerHTML = html;
+        document.getElementById('announce-btn').style.display = 'block';
+        
+        if(pred.answers) {
+            setTimeout(() => {
+                pred.answers.forEach((ans, i) => {
+                    const el = document.getElementById(`a-text-${i}`);
+                    if(el && ans) el.value = ans;
+                });
+            }, 50);
+        }
+    } else {
+        document.getElementById('questions-announce-container').innerHTML = '';
+        document.getElementById('announce-btn').style.display = 'none';
+    }
+});
+
+document.getElementById('announce-btn').addEventListener('click', async () => {
+    const selectedId = document.getElementById('admin-pred-select').value;
+    if(!selectedId) return showToast("Select an active event to announce results.", "warning");
+
+    const data = window.allPredictions.find(p => p.id === selectedId);
+    if(!data || !data.questions) return showToast("No active questions available.", "error");
+    
+    const questions = data.questions;
+    const answers = [];
+    for(let i=0; i<questions.length; i++) {
+        const val = document.getElementById(`a-text-${i}`).value;
+        if(!val) return showToast(`Please provide the correct answer for Q${i+1} before announcing.`, "warning");
+        answers.push(val);
+    }
+    await db.ref(`predictions/list/${selectedId}/answers`).set(answers);
+    
+    const userAnswers = data.user_answers || {};
+    const leaderboard = {};
+    for(const uid in userAnswers) {
+        let score = 0;
+        userAnswers[uid].forEach((uAns, i) => {
+            if(uAns && answers[i] && uAns === answers[i]) score += parseInt(questions[i].points);
+        });
+        const uSnap = await db.ref('users/' + uid).once('value');
+        const dName = (uSnap.val() && uSnap.val().name) ? uSnap.val().name : "User";
+        leaderboard[uid] = { name: dName, score: score, uid: uid };
+    }
+    
+    await db.ref(`predictions/list/${selectedId}/leaderboard`).set(leaderboard);
+    await db.ref(`predictions/list/${selectedId}/announced`).set(true);
+
+    const sortedUsers = Object.values(leaderboard).sort((a, b) => b.score - a.score);
+    const prizes = data.prizes || [];
+    
+    for(let i=0; i<Math.min(sortedUsers.length, prizes.length); i++) {
+        const winUid = sortedUsers[i].uid;
+        const prizeAmt = parseFloat(prizes[i]);
+        if(!isNaN(prizeAmt) && prizeAmt > 0) {
+            const uWalletSnap = await db.ref(`users/${winUid}/wallet`).once('value');
+            const cBal = parseFloat(uWalletSnap.val()) || 0;
+            await db.ref(`users/${winUid}/wallet`).set(cBal + prizeAmt);
+            
+            const txId = db.ref(`users/${winUid}/transactions`).push().key;
+            await db.ref(`users/${winUid}/transactions/${txId}`).set({
+                type: 'prize', amount: prizeAmt, date: firebase.database.ServerValue.TIMESTAMP, status: 'success', remarks: `Won ${i+1} Position in ${data.team1} vs ${data.team2}`
+            });
+        }
+    }
+    showToast("Results announced and winners credited to their wallets successfully!", "success");
+});
+
+// --- ADMIN: REQUESTS ---
+let allWithdrawals = [];
+db.ref('withdrawals').on('value', snap => {
+    allWithdrawals = [];
+    const data = snap.val();
+    if(data) for(let key in data) allWithdrawals.push({ id: key, ...data[key] });
+    renderWithdrawalsAdmin();
+});
+
+function renderWithdrawalsAdmin() {
+    const list = document.getElementById('admin-req-list');
+    if(!list) return;
+    list.innerHTML = '';
+    const pending = allWithdrawals.filter(w => w.status === 'pending');
+    const past = allWithdrawals.filter(w => w.status !== 'pending');
+    
+    let html = '<h3 style="margin-bottom:10px;">Pending Requests</h3>';
+    if(pending.length === 0) html += '<p style="font-size:12px; color:#aaa;">No pending requests.</p>';
+    
+    pending.forEach(w => {
+        html += `
+            <div class="profile-card" style="padding:10px; margin-bottom:8px;">
+                <p><strong>User:</strong> ${w.userName}</p>
+                <p><strong>UPI:</strong> <span style="color:#ffae00;">${w.upi}</span></p>
+                <p><strong>Amount:</strong> ₹${w.amount}</p>
+                <input type="text" id="rem-${w.id}" placeholder="Remarks (optional)" style="width:100%; padding:8px; margin:8px 0; font-size:11px; border-radius:4px; border:none;">
+                <div style="display:flex; gap:5px; margin-top:5px;">
+                    <button class="btn" onclick="handleReq('${w.id}', 'approved')" style="padding:8px; font-size:11px; margin-bottom:0;">Approve</button>
+                    <button class="btn btn-danger" onclick="handleReq('${w.id}', 'rejected')" style="padding:8px; font-size:11px; margin-bottom:0;">Reject</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '<h3 style="margin-top:20px; margin-bottom:10px;">Past Requests</h3>';
+    past.forEach(w => {
+        const color = w.status === 'approved' ? '#00ff88' : '#ff4d4d';
+        html += `
+            <div class="profile-card" style="padding:10px; margin-bottom:8px;">
+                <p><strong>User:</strong> ${w.userName} | <strong>₹${w.amount}</strong></p>
+                <p><strong>Status:</strong> <span style="color:${color}; font-weight:bold;">${w.status.toUpperCase()}</span></p>
+                <p style="font-size:11px;">Remarks: ${w.remarks || 'None'}</p>
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+window.handleReq = function(reqId, action) {
+    const w = allWithdrawals.find(x => x.id === reqId);
+    const remarks = document.getElementById(`rem-${reqId}`).value || '';
+    if(action === 'rejected') {
+        db.ref(`users/${w.uid}/wallet`).once('value').then(snap => {
+            const currentBal = parseFloat(snap.val()) || 0;
+            db.ref(`users/${w.uid}/wallet`).set(currentBal + w.amount);
+            const txId = db.ref(`users/${w.uid}/transactions`).push().key;
+            db.ref(`users/${w.uid}/transactions/${txId}`).set({
+                type: 'refund', amount: w.amount, date: firebase.database.ServerValue.TIMESTAMP, status: 'success', remarks: `Refund: ${remarks}`
+            });
+        });
+    }
+    db.ref(`withdrawals/${reqId}`).update({ status: action, remarks: remarks });
+    if(w.txId) db.ref(`users/${w.uid}/transactions/${w.txId}`).update({ status: action, remarks: remarks });
+    showToast(`Request marked as ${action}!`, "success");
+};
+
+// --- ADMIN: MANAGE USERS ---
+db.ref('users').on('value', snap => {
+    const list = document.getElementById('admin-user-list');
+    if(!list) return;
+    list.innerHTML = '';
+    const users = snap.val();
+    if(users) {
+        for(let uid in users) {
+            const u = users[uid];
+            const isBanned = u.banned === true;
+            const role = u.role || 'user';
+            const isAdminRole = role === 'admin';
+            const roleBadge = isAdminRole ? '<span style="background:#ffae00; color:#000; padding:2px 4px; border-radius:3px; font-size:9px; font-weight:bold; margin-left:5px;">ADMIN</span>' : '';
+            
+            list.innerHTML += `
+                <div class="profile-card" style="padding:10px; margin-bottom:8px; font-size:12px;">
+                    <strong>${u.name}</strong> ${roleBadge} <span style="float:right; color:#00ff88; font-weight:bold;">Wallet: ₹${u.wallet || 0}</span><br>
+                    <span style="${isBanned ? 'color:#ff4d4d;' : 'color:#ddd;'}">${u.email} | ${u.mobile} ${isBanned ? '(BANNED)' : ''}</span>
+                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;">
+                        <button class="btn" style="flex:1; padding:5px; font-size:11px; margin-bottom:0;" onclick="adminTopupUser('${uid}', '${u.name}')">Topup</button>
+                        <button class="btn" style="flex:1; padding:5px; font-size:11px; margin-bottom:0; background:${isAdminRole ? '#ff4d4d' : '#00a651'}; color:#fff;" onclick="adminToggleRole('${uid}', '${role}', '${u.name}')">${isAdminRole ? 'Revoke Admin' : 'Make Admin'}</button>
+                        <button class="btn" style="flex:1; padding:5px; font-size:11px; margin-bottom:0; background:${isBanned ? '#00ff88' : '#ffae00'}; color:#000;" onclick="adminToggleBan('${uid}', ${isBanned})">${isBanned ? 'Unban' : 'Ban'}</button>
+                        <button class="btn btn-danger" style="flex:1; padding:5px; font-size:11px; margin-bottom:0;" onclick="adminDeleteUser('${uid}', '${u.name}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+});
+
+window.adminToggleRole = async function(uid, currentRole, name) {
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+    const actionText = newRole === 'admin' ? 'grant Admin privileges to' : 'revoke Admin privileges from';
+    
+    const proceed = await showCustomConfirm(`Are you sure you want to ${actionText} ${name}?`);
+    if(!proceed) return;
+    
+    db.ref(`users/${uid}`).update({ role: newRole }).then(() => {
+        showToast(`Successfully updated ${name}'s role to ${newRole.toUpperCase()}.`, "success");
+    }).catch(err => showToast("Error updating role: " + err.message, "error"));
+};
+
+window.adminTopupUser = async function(uid, name) {
+    const amtStr = await showCustomPrompt(`Enter amount to Topup for ${name}:`, "Topup User", "number");
+    if(!amtStr) return;
+    const amt = parseFloat(amtStr);
+    if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!", "error");
+    db.ref(`users/${uid}/wallet`).once('value').then(snap => {
+        const currentBal = parseFloat(snap.val()) || 0;
+        db.ref(`users/${uid}/wallet`).set(currentBal + amt);
+        const txId = db.ref(`users/${uid}/transactions`).push().key;
+        db.ref(`users/${uid}/transactions/${txId}`).set({
+            type: 'topup', amount: amt, date: firebase.database.ServerValue.TIMESTAMP, status: 'success', remarks: 'Admin Topup'
+        });
+        showToast(`Successfully added ₹${amt} to ${name}'s wallet.`, "success");
+    });
+};
+
+window.adminToggleBan = async function(uid, isBanned) {
+    const action = isBanned ? "unban" : "ban";
+    const proceed = await showCustomConfirm(`Are you sure you want to ${action} this user?`);
+    if(!proceed) return;
+    db.ref(`users/${uid}`).update({ banned: !isBanned });
+};
+
+window.adminDeleteUser = async function(uid, name) {
+    const proceed = await showCustomConfirm(`WARNING: Are you sure you want to PERMANENTLY DELETE user ${name}? This cannot be undone.`, "Critical Warning");
+    if(!proceed) return;
+    db.ref(`users/${uid}`).remove().then(() => showToast("User permanently deleted from Database.", "success"));
+};
+
+
+// --- USER: PREDICTION SWIPE, TABS & RENDER LOGIC ---
+window.allPredictions = [];
+window.currentPredIndex = 0;
+window.currentPredTab = 'pred';
+
+let touchstartX = 0;
+let touchendX = 0;
+const predContainer = document.getElementById('pred-swipe-area');
+
+predContainer.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+predContainer.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); });
+
+function handleSwipe() {
+    if(!window.allPredictions || window.allPredictions.length <= 1) return;
+    const threshold = 50; 
+    const wrapper = document.getElementById('pred-content-wrapper');
+
+    let swiped = false;
+    if (touchendX < touchstartX - threshold && window.currentPredIndex < window.allPredictions.length - 1) {
+        window.currentPredIndex++; swiped = true;
+    }
+    if (touchendX > touchstartX + threshold && window.currentPredIndex > 0) {
+        window.currentPredIndex--; swiped = true;
+    }
+
+    if(swiped) {
+        wrapper.classList.remove('swipe-fade'); void wrapper.offsetWidth; wrapper.classList.add('swipe-fade');
+        switchPredTab('pred');
+        refreshPredictionUI();
+    }
+}
+
+// Prediction Inner Tab Switching Logic
+window.switchPredTab = function(tab) {
+    window.currentPredTab = tab;
+    document.getElementById('btn-tab-pred').classList.remove('active');
+    document.getElementById('btn-tab-lineup').classList.remove('active');
+    document.getElementById('btn-tab-live').classList.remove('active');
+    document.getElementById(`btn-tab-${tab}`).classList.add('active');
+
+    document.getElementById('tab-content-pred').style.display = 'none';
+    document.getElementById('tab-content-lineup').style.display = 'none';
+    document.getElementById('tab-content-live').style.display = 'none';
+    
+    document.getElementById(`tab-content-${tab}`).style.display = 'block';
+
+    if(tab === 'pred') {
+        document.getElementById('extra-pred-content').style.display = 'block';
+    } else {
+        document.getElementById('extra-pred-content').style.display = 'none';
+    }
+};
+
+// Sub-Nav Long Press Logic
+let predNavTimer;
+let isPredNavLongPress = false;
+
+window.startPredNavPress = function(e, type) {
+    if(!window.isAdmin) return;
+    isPredNavLongPress = false;
+    predNavTimer = setTimeout(() => {
+        isPredNavLongPress = true;
+        if(type === 'lineup') window.openLineupPopup();
+        if(type === 'live') window.openLiveLinksPopup();
+    }, 800);
+};
+
+window.endPredNavPress = function(e, type) {
+    clearTimeout(predNavTimer);
+};
+
+window.cancelPredNavPress = function(e) {
+    clearTimeout(predNavTimer);
+};
+
+window.handlePredNavClick = function(e, type) {
+    if(isPredNavLongPress) {
+        e.preventDefault();
+        e.stopPropagation();
+        isPredNavLongPress = false;
+        return;
+    }
+    switchPredTab(type);
+};
+
+window.openLineupPopup = function() {
+    const data = window.allPredictions[window.currentPredIndex];
+    if(!data) return;
+    document.getElementById('popup-lineup-url').value = data.lineupImage || '';
+    document.getElementById('lineup-upload-popup').style.display = 'flex';
+};
+
+window.saveLineupImage = function() {
+    const data = window.allPredictions[window.currentPredIndex];
+    if(!data) return;
+    const url = document.getElementById('popup-lineup-url').value.trim();
+    db.ref(`predictions/list/${data.id}`).update({ lineupImage: url }).then(() => {
+        showToast("Lineup image updated!", "success");
+        document.getElementById('lineup-upload-popup').style.display = 'none';
+    });
+};
+
+window.openLiveLinksPopup = function() {
+    const data = window.allPredictions[window.currentPredIndex];
+    if(!data) return;
+    const container = document.getElementById('live-links-container');
+    container.innerHTML = '';
+    const links = data.liveLinks || [];
+    if(links.length === 0) window.addLiveLinkRow();
+    else links.forEach(l => window.addLiveLinkRow(l.title, l.url));
+    document.getElementById('live-links-upload-popup').style.display = 'flex';
+};
+
+window.addLiveLinkRow = function(title = '', url = '') {
+    const div = document.createElement('div');
+    div.className = 'live-link-row';
+    div.style.cssText = 'background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:10px;';
+    div.innerHTML = `
+        <input type="text" class="ll-title" placeholder="Link Title (e.g. Server 1)" value="${title}" style="width:100%; padding:8px; margin-bottom:5px; border-radius:5px; border:1px solid #00a651; outline:none; font-size:12px; background:rgba(255,255,255,0.9); color:#333;">
+        <div style="display:flex; gap:5px;">
+            <input type="text" class="ll-url" placeholder="URL" value="${url}" style="flex:1; padding:8px; border-radius:5px; border:1px solid #00a651; outline:none; font-size:12px; background:rgba(255,255,255,0.9); color:#333;">
+            <button class="btn btn-danger" style="width:auto; padding:8px 12px; margin:0;" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    `;
+    document.getElementById('live-links-container').appendChild(div);
+};
+
+window.saveLiveLinks = function() {
+    const data = window.allPredictions[window.currentPredIndex];
+    if(!data) return;
+    const links = [];
+    document.querySelectorAll('.live-link-row').forEach(row => {
+        const title = row.querySelector('.ll-title').value.trim();
+        const url = row.querySelector('.ll-url').value.trim();
+        if(title && url) links.push({ title, url });
+    });
+    db.ref(`predictions/list/${data.id}`).update({ liveLinks: links }).then(() => {
+        showToast("Live links updated!", "success");
+        document.getElementById('live-links-upload-popup').style.display = 'none';
+    });
+};
+
+function renderUserQuestions(data) {
+    const questions = data.questions || [];
+    const formContainer = document.getElementById('pred-form-container');
+    
+    if(!auth.currentUser) {
+        formContainer.innerHTML = `
+            <div style="text-align:center; padding: 15px 0;">
+                <h3 style="margin-bottom:12px; color:#8fffc9; font-size:16px;">Login to Join Prediction</h3>
+                <p style="font-size:12px; margin-bottom:15px;">You must sign in to participate and submit answers.</p>
+                <button class="btn" onclick="switchTab('view-profile')" style="font-size:13px; padding:10px;">Go to Login / Register</button>
+            </div>
+        `;
+        return;
+    }
+
+    const uid = auth.currentUser.uid;
+    const joinedUsers = data.joined_users || {};
+    const hasJoined = joinedUsers[uid] === true;
+    const joiningFee = parseFloat(data.joining_fee) || 0;
+
+    if (!hasJoined) {
+        formContainer.innerHTML = `
+            <div style="text-align:center; padding: 20px 10px; background: rgba(0,0,0,0.4); border-radius: 8px;">
+                <h3 style="color:#00ff88; margin-bottom:10px;">Join this Prediction</h3>
+                <p style="font-size:13px; margin-bottom:15px;">Participate and win exciting prizes!</p>
+                <p style="font-size:15px; margin-bottom:15px;">Entry Fee: <strong style="color:#ffae00;">₹${joiningFee}</strong></p>
+                <button class="btn" id="btn-join-pred" style="font-size:14px; padding:12px; background:#00ff88; color:#001a0d;">Pay ₹${joiningFee} & Join Now</button>
+            </div>
+        `;
+        document.getElementById('btn-join-pred').addEventListener('click', async () => {
+            if(userWallet < joiningFee) {
+                showToast("Insufficient Wallet Balance! Please Topup in Wallet Section.", "error");
+                switchTab('view-wallet');
+                return;
+            }
+            const proceed = await showCustomConfirm(`Are you sure you want to pay ₹${joiningFee} from your wallet to join this event?`, "Join Event");
+            if(proceed) {
+                db.ref(`users/${uid}/wallet`).set(userWallet - joiningFee).then(() => {
+                    db.ref(`predictions/list/${data.id}/joined_users/${uid}`).set(true).then(() => {
+                        if(joiningFee > 0) {
+                            const txId = db.ref(`users/${uid}/transactions`).push().key;
+                            db.ref(`users/${uid}/transactions/${txId}`).set({
+                                type: 'join_fee', amount: joiningFee, date: firebase.database.ServerValue.TIMESTAMP, status: 'success', remarks: `Joined Event: ${data.team1} vs ${data.team2}`
+                            });
+                        }
+                        showToast("Successfully Joined! You can now submit your answers.", "success");
+                        refreshPredictionUI();
+                    });
+                });
+            }
+        });
+        return;
+    }
+
+    let html = `
+        <h3 style="color:#8fffc9; text-align:center; font-size:16px;">Answer Questions</h3>
+        <p style="text-align:center; font-size:11px; margin-bottom:12px;">You can change your answers anytime before the window closes.</p>
+        <div id="u-questions-container">
+    `;
+    
+    questions.forEach((q, i) => {
+        let optsHtml = `<option value="">-- Select Answer --</option>`;
+        (q.options || []).forEach(opt => { optsHtml += `<option value="${opt}">${opt}</option>`; });
+        html += `
+            <div style="margin-bottom: 12px; text-align: left;">
+                <label style="display:block; font-weight:bold; color:#8fffc9; margin-bottom:4px; font-size:12px;">Q${i+1}: ${q.text} <span style="color:#ffae00; float:right;">(${q.points} pts)</span></label>
+                <select id="u-ans-${i}" style="width:100%; padding:10px; border-radius:8px; border:1px solid #00a651; outline:none; background:rgba(255,255,255,0.9); color:#333; font-size:13px;">${optsHtml}</select>
+            </div>
+        `;
+    });
+    
+    html += `</div><button class="btn" id="u-submit-pred" style="margin-top: 10px; font-size:14px; padding:12px;">Submit Answers</button>`;
+    formContainer.innerHTML = html;
+
+    db.ref(`predictions/list/${data.id}/user_answers/${auth.currentUser.uid}`).once('value', snap => {
+        const saved = snap.val();
+        if(saved) saved.forEach((ans, i) => { if(document.getElementById(`u-ans-${i}`)) document.getElementById(`u-ans-${i}`).value = ans; });
+    });
+
+    document.getElementById('u-submit-pred').addEventListener('click', async () => {
+        const answers = [];
+        let allAnswered = true;
+        for(let i=0; i<questions.length; i++) {
+            const inp = document.getElementById(`u-ans-${i}`);
+            if(!inp.value) allAnswered = false;
+            answers.push(inp ? inp.value : "");
+        }
+        if(!allAnswered) {
+            const proceed = await showCustomConfirm("You haven't answered all questions. Do you still want to save?", "Incomplete Answers");
+            if(!proceed) return;
+        }
+        db.ref(`predictions/list/${data.id}/user_answers/${auth.currentUser.uid}`).set(answers).then(() => showToast("Your answers have been securely saved!", "success"));
+    });
+}
+
+function loadLeaderboardData(data) {
+    const lb = data.leaderboard;
+    const listDiv = document.getElementById('leaderboard-list');
+    listDiv.innerHTML = '';
+    if(!lb) {
+        listDiv.innerHTML = '<p style="text-align:center; font-size:13px;">Calculating ranks...</p>';
+        return;
+    }
+    const arr = Object.values(lb).sort((a, b) => b.score - a.score);
+    arr.forEach((user, idx) => {
+        let medal = `#${idx + 1}`;
+        if(idx === 0) medal = '🥇 1st'; else if(idx === 1) medal = '🥈 2nd'; else if(idx === 2) medal = '🥉 3rd';
+        listDiv.innerHTML += `
+            <div class="leaderboard-row">
+                <span style="font-weight:bold;">${medal} &nbsp;&nbsp; ${user.name}</span>
+                <span style="color:#00ff88; font-weight:bold;">${user.score} pts</span>
+            </div>
+        `;
+    });
+}
+
+function renderWinnerHistory() {
+    const list = document.getElementById('admin-winner-list');
+    if(!list) return;
+    list.innerHTML = '';
+    const announced = window.allPredictions.filter(p => p.announced);
+    if(announced.length === 0) {
+        list.innerHTML = '<p style="text-align:center; font-size:12px;">No announced predictions yet.</p>';
+        return;
+    }
+    announced.forEach(p => {
+        let lbHtml = '';
+        if(p.leaderboard) {
+            const arr = Object.values(p.leaderboard).sort((a,b) => b.score - a.score).slice(0, 3);
+            arr.forEach((u, i) => { lbHtml += `${i+1}. ${u.name} - ${u.score}pts<br>`; });
+        }
+        list.innerHTML += `
+            <div class="profile-card" style="padding:10px; margin-bottom:8px; font-size:12px;">
+                <strong style="color:#ffae00;">${p.team1} vs ${p.team2}</strong><br>
+                <div style="margin-top:5px; color:#8fffc9;">${lbHtml || 'No winners'}</div>
+            </div>
+        `;
+    });
+}
+
+function buildTeamRoster(players) {
+    if(!players || players.length === 0) return '<div style="color:#aaa; text-align:center; margin-top:5px;">No players</div>';
+    const gk = players.filter(p=>p.position==='Goalkeeper').map(p=>p.name).join(', ');
+    const def = players.filter(p=>p.position==='Defender').map(p=>p.name).join(', ');
+    const mid = players.filter(p=>p.position==='Midfielder').map(p=>p.name).join(', ');
+    const fwd = players.filter(p=>p.position==='Forward').map(p=>p.name).join(', ');
+    let s = '';
+    if(gk) s += `<strong style="color:#00ff88;">GK:</strong> ${gk}<br>`;
+    if(def) s += `<strong style="color:#00ff88;">DEF:</strong> ${def}<br>`;
+    if(mid) s += `<strong style="color:#00ff88;">MID:</strong> ${mid}<br>`;
+    if(fwd) s += `<strong style="color:#00ff88;">FWD:</strong> ${fwd}`;
+    return s;
+}
+
+db.ref('predictions/list').on('value', snap => {
+    const dataObj = snap.val();
+    window.allPredictions = [];
+    
+    const selectEl = document.getElementById('admin-pred-select');
+    const currentSelected = selectEl ? selectEl.value : null;
+    if(selectEl) selectEl.innerHTML = '<option value="" disabled selected>-- Select Auto-Created Match Event --</option>';
+
+    if(dataObj) {
+        for(let key in dataObj) window.allPredictions.push({ id: key, ...dataObj[key] });
+        window.allPredictions.sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
+
+        if(selectEl) {
+            window.allPredictions.forEach(p => {
+                selectEl.innerHTML += `<option value="${p.id}">${p.team1} vs ${p.team2} (${new Date(p.endTime).toLocaleDateString()}) ${p.announced ? '✅' : ''}</option>`;
+            });
+        }
+    }
+    
+    if(selectEl && currentSelected && window.allPredictions.find(p => p.id === currentSelected)) {
+        selectEl.value = currentSelected;
+    } else if (selectEl) {
+        selectEl.value = '';
+        document.getElementById('questions-announce-container').innerHTML = '';
+        document.getElementById('announce-btn').style.display = 'none';
+    }
+    
+    if(window.currentPredIndex >= window.allPredictions.length) window.currentPredIndex = Math.max(0, window.allPredictions.length - 1);
+    
+    refreshPredictionUI();
+    renderWinnerHistory();
+});
+
+function refreshPredictionUI() {
+    const infoCard = document.getElementById('pred-info-card');
+    const msgBox = document.getElementById('pred-status-msg');
+    const formContainer = document.getElementById('pred-form-container');
+    const leaderboardContainer = document.getElementById('pred-leaderboard-container');
+    const swipeIndicator = document.getElementById('pred-swipe-indicator');
+    const dotsContainer = document.getElementById('pred-dots');
+
+    if(!window.allPredictions || window.allPredictions.length === 0) {
+        msgBox.innerText = "No Prediction Events Running Currently.";
+        infoCard.style.display = 'none'; formContainer.style.display = 'none';
+        leaderboardContainer.style.display = 'none'; swipeIndicator.style.display = 'none';
+        dotsContainer.innerHTML = '';
+        return;
+    }
+
+    if(window.allPredictions.length > 1) {
+        swipeIndicator.style.display = 'block';
+        let dotsHtml = '';
+        for(let i=0; i<window.allPredictions.length; i++) {
+            dotsHtml += (i === window.currentPredIndex) ? '<i class="fa-solid fa-circle"></i> ' : '<i class="fa-regular fa-circle" style="color:#aaa;"></i> ';
+        }
+        dotsContainer.innerHTML = dotsHtml;
+    } else {
+        swipeIndicator.style.display = 'none'; dotsContainer.innerHTML = '';
+    }
+
+    const data = window.allPredictions[window.currentPredIndex];
+    
+    infoCard.style.display = 'block';
+    if(data.image) { 
+        document.getElementById('u-pred-img').src = data.image; document.getElementById('u-pred-img').style.display = 'block'; 
+    } else {
+        document.getElementById('u-pred-img').style.display = 'none';
+    }
+    document.getElementById('u-pred-desc').innerText = data.description || '';
+    
+    // Lineup Render
+    if(data.lineupImage) {
+        document.getElementById('u-lineup-img').src = data.lineupImage;
+        document.getElementById('u-lineup-img').style.display = 'block';
+        document.getElementById('u-lineup-msg').style.display = 'none';
+    } else {
+        document.getElementById('u-lineup-img').style.display = 'none';
+        document.getElementById('u-lineup-msg').style.display = 'block';
+    }
+
+    // Live Links Render
+    const llUl = document.getElementById('u-live-links');
+    llUl.innerHTML = '';
+    if(data.liveLinks && data.liveLinks.length > 0) {
+        data.liveLinks.forEach(l => {
+            llUl.innerHTML += `<li style="background:rgba(0,255,136,0.1); border:1px solid #00ff88; margin-bottom:8px; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:bold; color:#fff;">${l.title}</span>
+                <a href="${l.url}" target="_blank" style="background:#00ff88; color:#001a0d; padding:6px 12px; border-radius:20px; font-weight:bold; font-size:12px; text-decoration:none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit
+                </a>
+            </li>`;
+        });
+        document.getElementById('u-live-msg').style.display = 'none';
+    } else {
+        document.getElementById('u-live-msg').style.display = 'block';
+    }
+
+    // Admin Hints Display
+    document.getElementById('u-lineup-admin-hint').style.display = window.isAdmin ? 'block' : 'none';
+    document.getElementById('u-live-admin-hint').style.display = window.isAdmin ? 'block' : 'none';
+
+    // Roster Render
+    if(data.players_list && Array.isArray(data.players_list)) {
+        const t1Players = data.players_list.filter(p=>p.team === 1 || !p.team);
+        const t2Players = data.players_list.filter(p=>p.team === 2);
+        const t1N = data.team1 || 'Team 1';
+        const t2N = data.team2 || 'Team 2';
+
+        let pStr = `
+        <div class="teams-container" style="display:flex; justify-content:space-between; margin-top: 5px; width: 100%;">
+             <div style="flex: 1 1 0; min-width: 0; display:flex; flex-direction:column; gap:6px;">
+                 <div class="team-btn" style="pointer-events:none;">${flag(t1N)} ${t1N}</div>
+                 <div style="font-size:11px; line-height:1.6; padding:0 4px;">${buildTeamRoster(t1Players)}</div>
+             </div>
+             <div class="vs-divider-vertical"><div class="line"></div><div class="vs-text">Vs</div><div class="line"></div></div>
+             <div style="flex: 1 1 0; min-width: 0; display:flex; flex-direction:column; gap:6px;">
+                 <div class="team-btn" style="pointer-events:none;">${flag(t2N)} ${t2N}</div>
+                 <div style="font-size:11px; line-height:1.6; padding:0 4px;">${buildTeamRoster(t2Players)}</div>
+             </div>
+        </div>`;
+        document.getElementById('u-pred-players').innerHTML = pStr;
+    } else {
+        document.getElementById('u-pred-players').innerHTML = '<div style="text-align:center; font-size:12px; color:#aaa; margin-top:5px;">No players specified.</div>';
+    }
+
+    document.getElementById('u-pred-time').innerText = `Closing on: ${new Date(data.endTime).toLocaleString()}`;
+    const pUl = document.getElementById('u-pred-prizes'); pUl.innerHTML = '';
+    (data.prizes || []).forEach((p, i) => pUl.innerHTML += `<li>Position ${i+1}: <strong>₹${p}</strong></li>`);
+
+    const now = new Date().getTime();
+    const st = new Date(data.startTime).getTime();
+    const et = new Date(data.endTime).getTime();
+
+    if(now < st) {
+        msgBox.innerHTML = `Event Starts At:<br><span style="color:#00ff88;">${new Date(data.startTime).toLocaleString()}</span>`;
+        formContainer.style.display = 'none'; leaderboardContainer.style.display = 'none';
+    } else if(now >= st && now <= et) {
+        msgBox.innerHTML = `Prediction is Live! 🟢`;
+        formContainer.style.display = 'block'; leaderboardContainer.style.display = 'none';
+        renderUserQuestions(data); 
+    } else {
+        formContainer.style.display = 'none';
+        if(data.announced) {
+            msgBox.innerText = "Event Concluded. Results Announced!";
+            leaderboardContainer.style.display = 'block';
+            loadLeaderboardData(data);
+        } else {
+            msgBox.innerText = "Event Finished. ⏳ Waiting for Admin to announce results.";
+            leaderboardContainer.style.display = 'none';
+        }
+    }
+}
+setInterval(refreshPredictionUI, 60000); 
+
+</script>
+</body>
+</html>
