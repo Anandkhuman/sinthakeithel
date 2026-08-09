@@ -27,10 +27,10 @@
             --white: #ffffff;
             --success: #2ecc71;
             --danger: #e74c3c;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
-            --shadow-md: 0 10px 20px rgba(0,0,0,0.08);
-            --shadow-lg: 0 15px 30px rgba(0,0,0,0.12);
-            --border-radius: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 6px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.12);
+            --border-radius: 8px; 
             --transition: all 0.3s ease;
         }
 
@@ -44,7 +44,8 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 15px; 
             overflow-x: hidden;
         }
 
@@ -53,8 +54,8 @@
             background: linear-gradient(rgba(44, 62, 80, 0.3), rgba(44, 62, 80, 0.4)), url('https://plain-eeur-prod-public.komododecks.com/202608/09/lEUdUjZ0Tqsi5aDRv45y/image.jpg') center/cover;
             color: var(--white);
             text-align: center;
-            padding: 120px 20px 100px 20px;
-            min-height: 60vh;
+            padding: 90px 15px 70px 15px; 
+            min-height: 50vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -62,38 +63,38 @@
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 2.4rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .hero p {
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin-bottom: 40px;
+            font-size: 1rem;
+            max-width: 650px;
+            margin-bottom: 30px;
             opacity: 0.9;
         }
 
         .btn {
-            padding: 14px 32px;
+            padding: 10px 24px;
             border: none;
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-donate-3d {
             background: linear-gradient(145deg, #1E8449, #11502B);
             color: var(--white);
-            padding: 12px 32px;
-            font-size: 1.1rem;
+            padding: 10px 26px; 
+            font-size: 1rem;
             font-weight: 700;
             border: none;
             border-radius: 40px;
@@ -101,13 +102,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             position: relative;
             text-transform: uppercase;
             letter-spacing: 1px;
             box-shadow: 
-                0 6px 0 #0B361B,
-                0 12px 15px rgba(17, 80, 43, 0.4),
+                0 4px 0 #0B361B,
+                0 8px 12px rgba(17, 80, 43, 0.4),
                 inset 0 2px 3px rgba(255, 255, 255, 0.2);
             transform: translateY(0);
             transition: all 0.15s ease;
@@ -143,7 +144,7 @@
         }
 
         .btn-donate-3d i.fa-heart {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             color: #ff6b6b;
             animation: heartBeat3D 1.5s infinite;
         }
@@ -151,8 +152,8 @@
         .btn-donate-3d:hover {
             background: linear-gradient(145deg, #239B56, #146134);
             box-shadow: 
-                0 8px 0 #0B361B, 
-                0 16px 20px rgba(17, 80, 43, 0.5), 
+                0 6px 0 #0B361B, 
+                0 12px 15px rgba(17, 80, 43, 0.5), 
                 inset 0 2px 4px rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
@@ -162,19 +163,19 @@
                 0 0 0 #0B361B, 
                 0 3px 5px rgba(17, 80, 43, 0.4), 
                 inset 0 3px 5px rgba(0, 0, 0, 0.3);
-            transform: translateY(6px);
+            transform: translateY(4px);
         }
 
         .btn-donate-3d.btn-block {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         @keyframes heartBeat3D {
             0% { transform: scale(1); }
-            15% { transform: scale(1.25); }
+            15% { transform: scale(1.2); }
             30% { transform: scale(1); }
-            45% { transform: scale(1.25); }
+            45% { transform: scale(1.2); }
             60% { transform: scale(1); }
             100% { transform: scale(1); }
         }
@@ -193,33 +194,33 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 60px 20px;
+            padding: 40px 15px; 
         }
 
         .section-title {
             text-align: center;
-            font-size: 2.2rem;
+            font-size: 1.8rem; 
             color: var(--secondary);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-weight: 700;
         }
 
         .small-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-size: 1.3rem; 
+            margin-bottom: 15px;
             text-align: center;
             color: var(--secondary);
         }
 
         .community-board {
             background: var(--white);
-            padding: 30px;
+            padding: 20px; 
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-md);
-            margin-top: -60px;
+            margin-top: -40px; 
             position: relative;
             z-index: 10;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .compact-stats-row {
@@ -227,38 +228,38 @@
             justify-content: space-evenly;
             align-items: center;
             background: var(--bg-color);
-            padding: 15px 20px;
-            border-radius: 8px;
+            padding: 12px 15px; 
+            border-radius: 6px;
             border: 1px solid #eee;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .compact-stat {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px; 
         }
 
         .icon-wrapper {
             background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(243, 156, 18, 0.05));
-            width: 65px;
-            height: 65px;
+            width: 50px; 
+            height: 50px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2);
             border: 2px solid rgba(243, 156, 18, 0.3);
             transition: var(--transition);
         }
 
         .icon-wrapper:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.3);
+            box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
         .icon-wrapper i {
-            font-size: 1.8rem;
+            font-size: 1.4rem; 
             color: var(--primary);
         }
 
@@ -269,14 +270,14 @@
         }
 
         .compact-stat .stat-value {
-            font-size: 1.6rem;
+            font-size: 1.4rem; 
             font-weight: 700;
             color: var(--secondary);
             line-height: 1.2;
         }
 
         .compact-stat .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.75rem; 
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 600;
@@ -285,12 +286,14 @@
 
         .stat-divider {
             width: 2px;
-            height: 55px;
+            height: 45px;
             background-color: #ddd;
         }
 
         .table-responsive {
             overflow-x: auto;
+            border-radius: 6px;
+            scrollbar-width: thin;
         }
 
         table {
@@ -299,9 +302,11 @@
         }
 
         th, td {
-            padding: 15px;
+            padding: 10px 8px; 
             text-align: left;
             border-bottom: 1px solid #eee;
+            white-space: nowrap; 
+            font-size: 0.9rem; 
         }
 
         th {
@@ -317,15 +322,15 @@
 
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
             max-width: 900px;
-            margin: 0 auto 50px auto;
+            margin: 0 auto 40px auto;
         }
 
         .feature-card {
             background: var(--white);
-            padding: 25px 20px;
+            padding: 20px 15px; 
             border-radius: var(--border-radius);
             text-align: center;
             box-shadow: var(--shadow-sm);
@@ -333,41 +338,42 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-md);
         }
 
         .feature-card i {
-            font-size: 2.2rem;
+            font-size: 1.8rem; 
             color: var(--primary);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .feature-card h4 {
-            font-size: 1.15rem;
-            margin-bottom: 10px;
+            font-size: 1rem; 
+            margin-bottom: 8px;
             color: var(--secondary);
         }
 
         .feature-card p {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem; 
         }
 
         .transparency-box {
             background: #e8f4fd;
-            border-left: 5px solid #3498db;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 60px;
+            border-left: 4px solid #3498db;
+            padding: 15px; 
+            border-radius: 6px;
+            margin-bottom: 40px; 
         }
         
         .transparency-box h4 {
             color: #2980b9;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 1.05rem; 
         }
         
         .transparency-box ul {
@@ -375,41 +381,43 @@
         }
         
         .transparency-box ul li {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #555;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.95rem;
+            gap: 8px;
+            font-size: 0.85rem; 
         }
         
         .transparency-box ul li i {
             color: #3498db;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         footer {
             background-color: var(--secondary);
             color: var(--white);
             text-align: center;
-            padding: 40px 20px;
-            margin-top: 40px;
+            padding: 30px 15px; 
+            margin-top: 30px;
         }
 
         footer h3 {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
             color: var(--primary);
         }
 
         footer p {
             opacity: 0.8;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
         }
         
         .copyright {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            padding-top: 15px;
             color: #aaa;
         }
 
@@ -420,7 +428,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -438,9 +446,9 @@
         .modal-content {
             background: var(--white);
             width: 90%;
-            max-width: 500px;
+            max-width: 450px; 
             border-radius: var(--border-radius);
-            padding: 40px;
+            padding: 30px; 
             box-shadow: var(--shadow-lg);
             position: relative;
             transform: scale(0.8);
@@ -453,9 +461,9 @@
 
         .close-modal {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.5rem;
+            top: 15px;
+            right: 15px;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--text-muted);
             transition: var(--transition);
@@ -467,31 +475,32 @@
 
         .modal-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .modal-header h2 {
             color: var(--secondary);
-            font-size: 1.8rem;
+            font-size: 1.5rem; 
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
+            font-size: 0.9rem;
             color: var(--secondary);
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
             transition: var(--transition);
         }
         
@@ -507,96 +516,117 @@
 
         .input-icon-wrapper i {
             position: absolute;
-            left: 15px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         .input-icon-wrapper input {
-            padding-left: 40px;
+            padding-left: 35px;
         }
         
         .currency-prefix {
             position: absolute;
-            left: 15px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             font-weight: 600;
+            font-size: 0.9rem;
             color: var(--text-main);
         }
 
         .error-message {
             color: var(--danger);
-            font-size: 0.85rem;
-            margin-top: 5px;
+            font-size: 0.8rem;
+            margin-top: 4px;
             display: none;
         }
 
-        .btn-block {
-            width: 100%;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
         .status-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
         }
         .status-icon.success { color: var(--success); }
         .status-icon.fail { color: var(--danger); }
-        .status-text { margin-bottom: 30px; color: var(--text-muted); }
+        .status-text { margin-bottom: 25px; color: var(--text-muted); font-size: 0.9rem; }
         
         .status-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
         }
 
+        /* 
+         =============================================
+         ULTRA COMPACT MOBILE RESPONSIVE MEDIA QUERIES 
+         =============================================
+        */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.2rem; }
+            body { font-size: 13px; } 
             
-            .compact-stats-row {
-                padding: 10px;
-                gap: 5px;
+            .hero {
+                padding: 60px 10px 40px 10px;
+                min-height: 40vh;
             }
-            .compact-stat {
-                gap: 8px;
+            .hero h1 { font-size: 1.6rem; margin-bottom: 10px; }
+            .hero p { font-size: 0.85rem; margin-bottom: 20px; }
+            
+            .btn-donate-3d {
+                padding: 8px 18px;
+                font-size: 0.85rem;
             }
-            .icon-wrapper {
-                width: 45px;
-                height: 45px;
-            }
-            .icon-wrapper i {
-                font-size: 1.2rem;
-            }
-            .compact-stat .stat-value {
-                font-size: 1.2rem;
-            }
-            .compact-stat .stat-label {
-                font-size: 0.75rem;
-            }
-            .stat-divider {
-                height: 40px;
+            
+            .container { padding: 20px 10px; }
+            .section-title { font-size: 1.4rem; margin-bottom: 15px; }
+            .small-title { font-size: 1.1rem; margin-bottom: 12px; }
+            
+            .community-board { 
+                padding: 12px; 
+                margin-top: -30px;
+                margin-bottom: 25px;
             }
 
-            table, thead, tbody, th, td, tr { display: block; }
-            thead tr { position: absolute; top: -9999px; left: -9999px; }
-            tr { border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; padding: 10px; background: #fff;}
-            td { border: none; position: relative; padding-left: 50%; text-align: right; border-bottom: 1px solid #eee;}
-            td:last-child { border-bottom: 0; }
-            td::before { 
-                content: attr(data-label); 
-                position: absolute; 
-                left: 15px; 
-                width: 45%; 
-                padding-right: 10px; 
-                white-space: nowrap; 
-                font-weight: 600; 
-                text-align: left;
-                color: var(--secondary);
+            .compact-stats-row {
+                padding: 8px;
+                gap: 5px;
+                margin-bottom: 15px;
             }
-            .community-board { padding: 20px; }
+            .compact-stat { gap: 6px; }
+            .icon-wrapper { width: 35px; height: 35px; }
+            .icon-wrapper i { font-size: 1rem; }
+            .compact-stat .stat-value { font-size: 1.1rem; }
+            .compact-stat .stat-label { font-size: 0.65rem; }
+            .stat-divider { height: 30px; }
+
+            th, td { 
+                padding: 6px 5px; 
+                font-size: 0.75rem; 
+            }
+            
+            .features { gap: 10px; margin-bottom: 25px; }
+            .feature-card { padding: 12px; }
+            .feature-card i { font-size: 1.5rem; margin-bottom: 8px; }
+            .feature-card h4 { font-size: 0.9rem; margin-bottom: 5px; }
+            .feature-card p { font-size: 0.75rem; }
+            
+            .transparency-box { padding: 12px; margin-bottom: 30px; }
+            .transparency-box h4 { font-size: 0.95rem; }
+            .transparency-box ul li { font-size: 0.75rem; margin-bottom: 5px; }
+            
+            footer { padding: 20px 10px; margin-top: 15px; }
+            footer h3 { font-size: 1rem; }
+            footer p { font-size: 0.8rem; margin-bottom: 10px; }
+            .copyright { font-size: 0.75rem; }
+            
+            .modal-content { padding: 20px 15px; width: 95%; }
+            .modal-header h2 { font-size: 1.3rem; }
+            .form-group label { font-size: 0.85rem; margin-bottom: 4px; }
+            .form-group input { padding: 8px 10px; font-size: 0.85rem; }
+            .input-icon-wrapper input { padding-left: 30px; }
+            .input-icon-wrapper i, .currency-prefix { left: 10px; font-size: 0.85rem; }
+            .status-icon { font-size: 2.5rem; margin-bottom: 10px; }
         }
     </style>
 </head>
@@ -638,7 +668,6 @@
                 </div>
             </div>
 
-            <!-- Changed title here as requested -->
             <h2 class="small-title">All Contributor List</h2>
             <div class="table-responsive">
                 <table id="contributorsTable">
@@ -647,6 +676,7 @@
                             <th>Sl No</th>
                             <th>Name</th>
                             <th>Mobile Number</th>
+                            <th>Date & Time</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
@@ -700,7 +730,7 @@
             <i class="fas fa-times close-modal" onclick="closeModal('donateModal')"></i>
             <div class="modal-header">
                 <h2>Make a Donation</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Join the campaign to light our village.</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Join the campaign to light our village.</p>
             </div>
             <form id="donationForm" onsubmit="handleProceedToDonate(event)">
                 <div class="form-group">
@@ -725,7 +755,7 @@
                     <label for="donationAmount">Donation Amount (₹)</label>
                     <div class="input-icon-wrapper">
                         <span class="currency-prefix">₹</span>
-                        <input type="number" id="donationAmount" placeholder="Enter amount" min="1" style="padding-left: 35px;">
+                        <input type="number" id="donationAmount" placeholder="Enter amount" min="1" style="padding-left: 30px;">
                     </div>
                     <div class="error-message" id="amountError">Amount must be greater than ₹0.</div>
                 </div>
@@ -740,29 +770,29 @@
     <div class="modal-overlay" id="successModal">
         <div class="modal-content" style="text-align: center;">
             <i class="fas fa-check-circle status-icon success"></i>
-            <div class="modal-header" style="margin-bottom: 10px;">
+            <div class="modal-header" style="margin-bottom: 5px;">
                 <h2 style="color: var(--success);">✅ Donation Successful</h2>
             </div>
             <div class="status-text">
-                <p><strong style="font-size: 1.2rem;" id="successDonorName">Thank you!</strong></p>
+                <p><strong style="font-size: 1.1rem;" id="successDonorName">Thank you!</strong></p>
                 <p>Your contribution of <strong id="successAmount">₹0</strong> has been successfully received.</p>
-                <p style="margin-top: 15px; font-style: italic;">"Together, We Can Make Our Village Brighter."</p>
+                <p style="margin-top: 10px; font-style: italic; font-size: 0.85rem;">"Together, We Can Make Our Village Brighter."</p>
             </div>
-            <button class="btn btn-success btn-block" onclick="closeModal('successModal')">Done</button>
+            <button class="btn btn-success btn-block" onclick="closeModal('successModal')" style="padding: 10px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer;">Done</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="failModal">
         <div class="modal-content" style="text-align: center;">
             <i class="fas fa-times-circle status-icon fail"></i>
-            <div class="modal-header" style="margin-bottom: 10px;">
+            <div class="modal-header" style="margin-bottom: 5px;">
                 <h2 style="color: var(--danger);">❌ Payment Not Completed</h2>
             </div>
             <div class="status-text">
                 <p>Your donation was not recorded because the payment was not completed or failed.</p>
             </div>
             <div class="status-buttons">
-                <button class="btn btn-outline" onclick="closeModal('failModal')">Close</button>
+                <button class="btn btn-outline" style="padding: 8px 16px; border-radius: 40px;" onclick="closeModal('failModal')">Close</button>
                 <button class="btn-donate-3d" onclick="retryDonation()"><span>Try Again</span></button>
             </div>
         </div>
@@ -793,9 +823,8 @@
             useFirebase = true;
         }
 
-        const RAZORPAY_KEY = "rzp_test_YOUR_KEY_HERE"; 
-        
-        const isDummyKey = RAZORPAY_KEY.includes("YOUR_KEY_HERE");
+        // Changed to live Razorpay key as requested
+        const RAZORPAY_KEY = "rzp_live_SUarhYm5IfBTar"; 
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
@@ -856,22 +885,15 @@
         }
 
         function initiateRazorpay(name, phone, amount) {
-            if (isDummyKey) {
-                setTimeout(() => {
-                    const dummyPaymentId = "pay_" + Math.random().toString(36).substring(2, 10);
-                    handlePaymentSuccess(name, phone, amount, dummyPaymentId);
-                }, 1500);
-                return;
-            }
-
             var options = {
-                "key": "rzp_live_SUarhYm5IfBTar", 
-                "amount": amount * 100,
+                "key": RAZORPAY_KEY, 
+                "amount": amount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                 "currency": "INR",
                 "name": "Light Our Village",
                 "description": "Bulb Donation Campaign",
                 "image": "https://cdn-icons-png.flaticon.com/512/427/427735.png",
                 "handler": function (response) {
+                    // On success, this handler gets executed
                     handlePaymentSuccess(name, phone, amount, response.razorpay_payment_id);
                 },
                 "prefill": {
@@ -892,6 +914,7 @@
 
             rzp.open();
 
+            // Resetting button state visually behind the modal just in case user cancels modal
             document.getElementById('proceedBtn').disabled = false;
             document.getElementById('proceedBtn').innerHTML = '<span>Proceed to Donate</span> <i class="fas fa-arrow-right"></i>';
         }
@@ -918,25 +941,34 @@
             if (useFirebase) {
                 firebase.database().ref('donations').push(record);
             } else {
-                let donations = JSON.parse(localStorage.getItem('villageDonations')) || [];
+                let donations = JSON.parse(localStorage.getItem('villageDonationsCached')) || [];
                 donations.push(record);
-                localStorage.setItem('villageDonations', JSON.stringify(donations));
+                localStorage.setItem('villageDonationsCached', JSON.stringify(donations));
                 renderData(donations);
             }
         }
 
         function listenToData() {
+            // Speed Optimization: Instantly Load website data from Local Storage 
+            const cachedData = localStorage.getItem('villageDonationsCached');
+            if(cachedData) {
+                renderData(JSON.parse(cachedData));
+            }
+
             if (useFirebase) {
+                // Listen to Firebase and update Local Storage so next visit is lightning fast
                 firebase.database().ref('donations').on('value', (snapshot) => {
                     const data = snapshot.val();
                     const donationsArray = [];
                     for (let key in data) {
                         donationsArray.push(data[key]);
                     }
+                    localStorage.setItem('villageDonationsCached', JSON.stringify(donationsArray));
                     renderData(donationsArray);
                 });
             } else {
-                let donations = JSON.parse(localStorage.getItem('villageDonations')) || [];
+                // Fallback if Firebase config wasn't provided or available
+                let donations = JSON.parse(localStorage.getItem('villageDonationsCached')) || [];
                 renderData(donations);
             }
         }
@@ -954,11 +986,26 @@
                 if (donor.status === "Success") {
                     totalCol += donor.amount;
                     
+                    // Format Timestamp into Date and Time string
+                    const dateObj = new Date(donor.timestamp);
+                    const formattedDate = dateObj.toLocaleDateString('en-IN', {
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric'
+                    });
+                    const formattedTime = dateObj.toLocaleTimeString('en-IN', {
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: true
+                    });
+                    const dateTimeStr = `${formattedDate}, ${formattedTime}`;
+                    
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td data-label="Sl No"><strong>${slNo}</strong></td>
                         <td data-label="Name"><strong>${donor.name}</strong></td>
                         <td data-label="Mobile Number">${donor.phone}</td>
+                        <td data-label="Date & Time" style="color:var(--text-muted);">${dateTimeStr}</td>
                         <td data-label="Amount" style="color:var(--primary); font-weight:600;">₹${donor.amount.toLocaleString('en-IN')}</td>
                     `;
                     tableBody.appendChild(tr);
