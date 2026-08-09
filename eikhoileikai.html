@@ -85,35 +85,98 @@
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #022F1C, #2ECC71);
-            background-size: 200% 200%;
+        .btn-donate-3d {
+            background: linear-gradient(145deg, #1E8449, #11502B);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
-            animation: btnPulse 2.5s ease infinite;
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 
+                0 6px 0 #0B361B,
+                0 12px 15px rgba(17, 80, 43, 0.4),
+                inset 0 2px 3px rgba(255, 255, 255, 0.2);
+            transform: translateY(0);
+            transition: all 0.15s ease;
+            z-index: 10;
+            overflow: hidden;
+        }
+        
+        .btn-donate-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0) 30%,
+                rgba(255, 255, 255, 0.35) 50%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            animation: shineSweep 4s linear infinite;
+            z-index: 1;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6);
+        .btn-donate-3d > * {
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes btnPulse {
-            0% {
-                background-position: 0% 50%;
-                box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
-            }
-            50% {
-                background-position: 100% 50%;
-                box-shadow: 0 0 25px rgba(46, 204, 113, 0.8);
-            }
-            100% {
-                background-position: 0% 50%;
-                box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
-            }
+        @keyframes shineSweep {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
+
+        .btn-donate-3d i.fa-heart {
+            font-size: 1.25rem;
+            color: #ff6b6b;
+            animation: heartBeat3D 1.5s infinite;
+        }
+
+        .btn-donate-3d:hover {
+            background: linear-gradient(145deg, #239B56, #146134);
+            box-shadow: 
+                0 8px 0 #0B361B, 
+                0 16px 20px rgba(17, 80, 43, 0.5), 
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-donate-3d:active {
+            box-shadow: 
+                0 0 0 #0B361B, 
+                0 3px 5px rgba(17, 80, 43, 0.4), 
+                inset 0 3px 5px rgba(0, 0, 0, 0.3);
+            transform: translateY(6px);
+        }
+
+        .btn-donate-3d.btn-block {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        @keyframes heartBeat3D {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.25); }
+            60% { transform: scale(1); }
+            100% { transform: scale(1); }
         }
 
         .btn-success {
@@ -144,7 +207,7 @@
         .small-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            text-align: left;
+            text-align: center;
             color: var(--secondary);
         }
 
@@ -542,8 +605,9 @@
     <header class="hero">
         <h1 data-aos="zoom-in" data-aos-duration="1000">Light Our Village <br> Bulb Donation Campaign</h1>
         <p data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">Together, we can make our village brighter and safer. Your contribution will help us install bulbs on electric posts across the village, improving visibility and creating a safer environment for everyone.</p>
-        <button class="btn btn-primary" data-aos="fade-up" data-aos-delay="400" onclick="openModal('donateModal')">
-            <i class="fas fa-heart"></i> Donate Now
+        
+        <button class="btn-donate-3d" data-aos="fade-up" data-aos-delay="400" onclick="openModal('donateModal')">
+            <i class="fas fa-heart"></i> <span>Donate Now</span>
         </button>
     </header>
 
@@ -574,11 +638,13 @@
                 </div>
             </div>
 
-            <h2 class="small-title">Recent Contributors</h2>
+            <!-- Changed title here as requested -->
+            <h2 class="small-title">All Contributor List</h2>
             <div class="table-responsive">
                 <table id="contributorsTable">
                     <thead>
                         <tr>
+                            <th>Sl No</th>
                             <th>Name</th>
                             <th>Mobile Number</th>
                             <th>Amount</th>
@@ -664,8 +730,8 @@
                     <div class="error-message" id="amountError">Amount must be greater than ₹0.</div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block" id="proceedBtn">
-                    Proceed to Donate <i class="fas fa-arrow-right"></i>
+                <button type="submit" class="btn-donate-3d btn-block" id="proceedBtn">
+                    <span>Proceed to Donate</span> <i class="fas fa-arrow-right"></i>
                 </button>
             </form>
         </div>
@@ -697,7 +763,7 @@
             </div>
             <div class="status-buttons">
                 <button class="btn btn-outline" onclick="closeModal('failModal')">Close</button>
-                <button class="btn btn-primary" onclick="retryDonation()">Try Again</button>
+                <button class="btn-donate-3d" onclick="retryDonation()"><span>Try Again</span></button>
             </div>
         </div>
     </div>
@@ -725,9 +791,6 @@
         if (firebaseConfig.apiKey && firebaseConfig.databaseURL) {
             firebase.initializeApp(firebaseConfig);
             useFirebase = true;
-            console.log("Firebase initialized");
-        } else {
-            console.log("Firebase credentials not found. Falling back to LocalStorage for Demo purposes.");
         }
 
         const RAZORPAY_KEY = "rzp_test_YOUR_KEY_HERE"; 
@@ -749,7 +812,7 @@
             document.getElementById('donationForm').reset();
             document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
             document.getElementById('proceedBtn').disabled = false;
-            document.getElementById('proceedBtn').innerHTML = 'Proceed to Donate <i class="fas fa-arrow-right"></i>';
+            document.getElementById('proceedBtn').innerHTML = '<span>Proceed to Donate</span> <i class="fas fa-arrow-right"></i>';
         }
 
         function retryDonation() {
@@ -787,7 +850,7 @@
 
             const proceedBtn = document.getElementById('proceedBtn');
             proceedBtn.disabled = true;
-            proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
 
             initiateRazorpay(name, phone, amount);
         }
@@ -830,7 +893,7 @@
             rzp.open();
 
             document.getElementById('proceedBtn').disabled = false;
-            document.getElementById('proceedBtn').innerHTML = 'Proceed to Donate <i class="fas fa-arrow-right"></i>';
+            document.getElementById('proceedBtn').innerHTML = '<span>Proceed to Donate</span> <i class="fas fa-arrow-right"></i>';
         }
 
         function handlePaymentSuccess(name, phone, amount, paymentId) {
@@ -883,25 +946,25 @@
 
             let totalCol = 0;
             const tableBody = document.getElementById('contributorsBody');
+            
             tableBody.innerHTML = '';
 
-            if (donations.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Be the first to contribute to our village!</td></tr>';
-            } else {
-                donations.forEach(donor => {
-                    if (donor.status === "Success") {
-                        totalCol += donor.amount;
-                        
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td data-label="Name"><strong>${donor.name}</strong></td>
-                            <td data-label="Mobile Number">${donor.phone}</td>
-                            <td data-label="Amount" style="color:var(--primary); font-weight:600;">₹${donor.amount.toLocaleString('en-IN')}</td>
-                        `;
-                        tableBody.appendChild(tr);
-                    }
-                });
-            }
+            let slNo = 1;
+            donations.forEach(donor => {
+                if (donor.status === "Success") {
+                    totalCol += donor.amount;
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-label="Sl No"><strong>${slNo}</strong></td>
+                        <td data-label="Name"><strong>${donor.name}</strong></td>
+                        <td data-label="Mobile Number">${donor.phone}</td>
+                        <td data-label="Amount" style="color:var(--primary); font-weight:600;">₹${donor.amount.toLocaleString('en-IN')}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                    slNo++;
+                }
+            });
 
             animateValue("totalCollectionAmount", currentDisplayedTotal, totalCol, 1000, true);
             animateValue("totalContributorsCount", currentDisplayedCount, donations.length, 1000, false);
