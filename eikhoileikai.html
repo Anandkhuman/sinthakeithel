@@ -677,11 +677,12 @@
                 <table id="contributorsTable">
                     <thead>
                         <tr>
+                            <!-- Reordered headers -->
                             <th>Sl No</th>
                             <th>Name</th>
-                            <th>Mobile Number</th>
-                            <th>Date & Time</th>
+                            <th>Mobile</th>
                             <th>Amount</th>
+                            <th>Date & Time</th>
                         </tr>
                     </thead>
                     <tbody id="contributorsBody">
@@ -1005,12 +1006,13 @@
                     const dateTimeStr = `${formattedDate}, ${formattedTime}`;
                     
                     const tr = document.createElement('tr');
+                    // Reordered dynamic row mapping
                     tr.innerHTML = `
                         <td data-label="Sl No"><strong>${slNo}</strong></td>
                         <td data-label="Name"><strong>${donor.name}</strong></td>
-                        <td data-label="Mobile Number">${donor.phone}</td>
-                        <td data-label="Date & Time" style="color:var(--text-muted);">${dateTimeStr}</td>
+                        <td data-label="Mobile">${donor.phone}</td>
                         <td data-label="Amount" style="color:var(--primary); font-weight:600;">₹${donor.amount.toLocaleString('en-IN')}</td>
+                        <td data-label="Date & Time" style="color:var(--text-muted);">${dateTimeStr}</td>
                     `;
                     tableBody.appendChild(tr);
                     slNo++;
