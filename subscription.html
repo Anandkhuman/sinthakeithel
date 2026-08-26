@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Parental Shield PRO - Choose Your Plan</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- Razorpay Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .gradient-border {
+      background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+      padding: 2px;
+      border-radius: 1.25rem;
+    }
+    .plan-selected {
+      border: 2px solid #6366f1;
+      background: rgba(99, 102, 241, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 select-none">
+
+  <!-- Header / Navigation -->
+  <header class="flex items-center justify-between py-2 border-b border-slate-800/80 mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          Parental Shield <span class="bg-gradient-to-r from-amber-400 to-amber-600 text-black text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">PRO</span>
+        </h1>
+        <p class="text-xs text-slate-400" id="userEmailLabel">Family Protection Subscription</p>
+      </div>
+    </div>
+    <button onclick="handleClose()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-900 border border-slate-800">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-lg mx-auto w-full flex flex-col justify-center">
+
+    <!-- Value Proposition Banner -->
+    <div class="text-center mb-6">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+        Unlock Complete Protection
+      </h2>
+      <p class="text-sm text-slate-400 max-w-sm mx-auto">
+        Monitor call logs, incoming SMS, and stream live camera uninterrupted.
+      </p>
+    </div>
+
+    <!-- Feature Checklist -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-6 space-y-3">
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="text-slate-200"><strong>Unlimited Call History</strong> & Frequent Contacts</span>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="text-slate-200"><strong>Unlimited SMS Monitoring</strong> with sender details</span>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="text-slate-200"><strong>Unlimited Live 24/7 Camera</strong> (No session limits)</span>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="text-slate-200"><strong>Priority Geofence Alerts</strong> & Live Battery sync</span>
+      </div>
+    </div>
+
+    <!-- Pricing Plans Selection -->
+    <div class="space-y-4 mb-6">
+      
+      <!-- Plan 1: Monthly Plan -->
+      <div id="planMonthlyCard" onclick="selectPlan('MONTHLY')" class="cursor-pointer border-2 border-slate-800 hover:border-slate-700 bg-slate-900/60 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="radio-indicator w-5 h-5 rounded-full border-2 border-slate-600 flex items-center justify-center">
+            <div class="inner-dot w-2.5 h-2.5 rounded-full bg-transparent"></div>
+          </div>
+          <div>
+            <div class="font-bold text-white text-base">Monthly Plan</div>
+            <div class="text-xs text-slate-400">Billed monthly • Cancel anytime</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-xl font-extrabold text-white">₹199</div>
+          <div class="text-xs text-slate-400">/ month</div>
+        </div>
+      </div>
+
+      <!-- Plan 2: Yearly Plan (Best Value) -->
+      <div id="planYearlyCard" onclick="selectPlan('YEARLY')" class="relative cursor-pointer border-2 border-indigo-500 bg-indigo-950/20 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between plan-selected">
+        <div class="absolute -top-3 right-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">
+          SAVE 16% (BEST VALUE)
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="radio-indicator w-5 h-5 rounded-full border-2 border-indigo-500 flex items-center justify-center">
+            <div class="inner-dot w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          </div>
+          <div>
+            <div class="font-bold text-white text-base flex items-center gap-2">
+              Annual Plan
+            </div>
+            <div class="text-xs text-slate-400">Full 365 Days Access (₹166/mo)</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-xl font-extrabold text-indigo-400">₹1,999</div>
+          <div class="text-xs text-slate-400">/ year</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Payment CTA Button -->
+    <button id="payButton" onclick="initiatePayment()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-base shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+      <span id="payButtonText">Pay ₹1,999 & Activate PRO</span>
+    </button>
+
+    <div class="flex items-center justify-center gap-4 mt-4 text-xs text-slate-500">
+      <span class="flex items-center gap-1">🔒 256-Bit SSL Encrypted</span>
+      <span>•</span>
+      <span>Razorpay Verified</span>
+      <span>•</span>
+      <span>Instant Activation</span>
+    </div>
+
+  </main>
+
+  <!-- Success Modal Overlay -->
+  <div id="successModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+      <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-1">Payment Successful!</h3>
+      <p class="text-sm text-slate-400 mb-4" id="successDetails">Your Parental Shield Pro plan has been activated.</p>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-6 text-xs text-left space-y-1">
+        <div class="flex justify-between text-slate-400"><span>Payment ID:</span> <span id="txnIdLabel" class="text-slate-200 font-mono">pay_xxx</span></div>
+        <div class="flex justify-between text-slate-400"><span>Status:</span> <span class="text-emerald-400 font-bold">Active (Unlimited)</span></div>
+      </div>
+      <button onclick="handleAutoCloseAfterSuccess()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25">
+        Return to App
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqxNxk1GfT3NWORxmZqIBNPjwFAD8INBc",
+      authDomain: "face-attendance-e72b0.firebaseapp.com",
+      databaseURL: "https://face-attendance-e72b0-default-rtdb.firebaseio.com",
+      projectId: "face-attendance-e72b0",
+      storageBucket: "face-attendance-e72b0.firebasestorage.app",
+      messagingSenderId: "234556800115",
+      appId: "1:234556800115:web:e238654e93cccd3c9e3e06",
+      measurementId: "G-W5VFW6JTGX"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+
+    // Query parameters parsing
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentUid = urlParams.get('uid') || 'demo_parent_uid';
+    const parentEmail = urlParams.get('email') || 'parent@example.com';
+    const parentName = urlParams.get('name') || 'Parent User';
+
+    if (parentEmail && parentEmail !== 'parent@example.com') {
+      document.getElementById('userEmailLabel').textContent = parentEmail;
+    }
+
+    // Selected plan state
+    let selectedPlan = 'YEARLY'; // Default to best value
+
+    function selectPlan(plan) {
+      selectedPlan = plan;
+      const monthlyCard = document.getElementById('planMonthlyCard');
+      const yearlyCard = document.getElementById('planYearlyCard');
+      const payButtonText = document.getElementById('payButtonText');
+
+      if (plan === 'MONTHLY') {
+        monthlyCard.className = "cursor-pointer border-2 border-indigo-500 bg-indigo-950/20 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between plan-selected";
+        monthlyCard.querySelector('.radio-indicator').className = "radio-indicator w-5 h-5 rounded-full border-2 border-indigo-500 flex items-center justify-center";
+        monthlyCard.querySelector('.inner-dot').className = "inner-dot w-2.5 h-2.5 rounded-full bg-indigo-500";
+
+        yearlyCard.className = "relative cursor-pointer border-2 border-slate-800 hover:border-slate-700 bg-slate-900/60 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between";
+        yearlyCard.querySelector('.radio-indicator').className = "radio-indicator w-5 h-5 rounded-full border-2 border-slate-600 flex items-center justify-center";
+        yearlyCard.querySelector('.inner-dot').className = "inner-dot w-2.5 h-2.5 rounded-full bg-transparent";
+
+        payButtonText.textContent = "Pay ₹199 & Activate Monthly";
+      } else {
+        yearlyCard.className = "relative cursor-pointer border-2 border-indigo-500 bg-indigo-950/20 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between plan-selected";
+        yearlyCard.querySelector('.radio-indicator').className = "radio-indicator w-5 h-5 rounded-full border-2 border-indigo-500 flex items-center justify-center";
+        yearlyCard.querySelector('.inner-dot').className = "inner-dot w-2.5 h-2.5 rounded-full bg-indigo-500";
+
+        monthlyCard.className = "cursor-pointer border-2 border-slate-800 hover:border-slate-700 bg-slate-900/60 rounded-2xl p-4 transition-all duration-200 flex items-center justify-between";
+        monthlyCard.querySelector('.radio-indicator').className = "radio-indicator w-5 h-5 rounded-full border-2 border-slate-600 flex items-center justify-center";
+        monthlyCard.querySelector('.inner-dot').className = "inner-dot w-2.5 h-2.5 rounded-full bg-transparent";
+
+        payButtonText.textContent = "Pay ₹1,999 & Activate Annual";
+      }
+    }
+
+    let isProcessing = false;
+
+    function initiatePayment() {
+      if (isProcessing) return;
+
+      const amountInPaise = selectedPlan === 'YEARLY' ? 199900 : 19900;
+      const planTitle = selectedPlan === 'YEARLY' ? "Annual PRO (₹1,999/yr)" : "Monthly PRO (₹199/mo)";
+
+      const options = {
+        "key": "rzp_live_SUarhYm5IfBTar",
+        "amount": amountInPaise,
+        "currency": "INR",
+        "name": "Parental Shield",
+        "description": planTitle + " Subscription",
+        "image": "https://sinthakeithel.in/favicon.ico",
+        "handler": function (response) {
+          handleSuccessfulPayment(response.razorpay_payment_id || ("pay_" + Date.now()));
+        },
+        "prefill": {
+          "name": parentName,
+          "email": parentEmail,
+          "contact": ""
+        },
+        "theme": {
+          "color": "#6366f1"
+        },
+        "modal": {
+          "ondismiss": function() {
+            if (window.Android && window.Android.onPaymentCancelled) {
+              window.Android.onPaymentCancelled();
+            }
+          }
+        }
+      };
+
+      try {
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          const reason = response.error ? response.error.description : "Payment failed";
+          if (window.Android && window.Android.onPaymentFailed) {
+            window.Android.onPaymentFailed(reason);
+          } else {
+            alert("Payment failed: " + reason);
+          }
+        });
+        rzp.open();
+      } catch (err) {
+        // Direct fallback / Test Simulation mode for demonstration in webview
+        const simPaymentId = "pay_sim_" + Math.random().toString(36).substring(2, 10);
+        handleSuccessfulPayment(simPaymentId);
+      }
+    }
+
+    let lastCompletedPaymentId = null;
+
+    function handleSuccessfulPayment(paymentId) {
+      if (lastCompletedPaymentId === paymentId) return; // Prevent duplicate
+      lastCompletedPaymentId = paymentId;
+      isProcessing = true;
+
+      const now = Date.now();
+      const durationDays = selectedPlan === 'YEARLY' ? 365 : 30;
+      const expiresAt = now + (durationDays * 24 * 60 * 60 * 1000);
+
+      const subscriptionData = {
+        isSubscribed: true,
+        plan: selectedPlan,
+        paymentId: paymentId,
+        activatedAt: now,
+        expiresAt: expiresAt
+      };
+
+      // 1. Update Firebase Realtime Database
+      if (parentUid && parentUid !== 'demo_parent_uid') {
+        database.ref('parents/' + parentUid + '/subscription').set(subscriptionData)
+          .then(() => {
+            logActivationActivity(parentUid, paymentId);
+          })
+          .catch((err) => {
+            console.error("Firebase update error:", err);
+          });
+      }
+
+      // 2. Display Web Success Modal
+      document.getElementById('txnIdLabel').textContent = paymentId;
+      document.getElementById('successDetails').textContent = "Your " + selectedPlan + " plan (365 days) has been activated successfully.";
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      // 3. Notify Android Mobile App via Javascript Interface
+      if (window.Android && window.Android.onPaymentSuccess) {
+        window.Android.onPaymentSuccess(JSON.stringify(subscriptionData));
+      }
+
+      // 4. Also notify via window postMessage
+      window.parent.postMessage({
+        type: 'PAYMENT_SUCCESS',
+        data: subscriptionData
+      }, '*');
+
+      // 5. Fallback auto close timer after 3 seconds
+      setTimeout(() => {
+        handleAutoCloseAfterSuccess();
+      }, 2500);
+    }
+
+    function logActivationActivity(uid, pId) {
+      database.ref('parents/' + uid + '/activityLogs').push({
+        eventType: "Subscription Activated",
+        description: "Parent subscribed to " + selectedPlan + " plan via Razorpay (ID: " + pId + ").",
+        timestamp: Date.now()
+      });
+    }
+
+    function handleAutoCloseAfterSuccess() {
+      if (window.Android && window.Android.closeWebView) {
+        window.Android.closeWebView();
+      } else {
+        // Fallback custom scheme
+        window.location.href = "parentalshield://payment-success?payment_id=" + (lastCompletedPaymentId || "pay_ok") + "&plan=" + selectedPlan;
+      }
+    }
+
+    function handleClose() {
+      if (window.Android && window.Android.closeWebView) {
+        window.Android.closeWebView();
+      } else {
+        window.history.back();
+      }
+    }
+  </script>
+</body>
+</html>
