@@ -784,24 +784,24 @@ body {
       measurementId: "G-H3GRHB177F"
     },
     "dangboytambola.in": {
-  apiKey: "AIzaSyBHirTmBB9IdgfQ9JKbSbnISXOdEXyRPjk",
-  authDomain: "eramdamtambola.firebaseapp.com",
-  databaseURL: "https://eramdamtambola-default-rtdb.firebaseio.com",
-  projectId: "eramdamtambola",
-  storageBucket: "eramdamtambola.firebasestorage.app",
-  messagingSenderId: "229285760705",
-  appId: "1:229285760705:web:ac5052bbf1f18f1e05ce40",
-  measurementId: "G-0E1XGMWBN2"
-},
+      apiKey: "AIzaSyBHirTmBB9IdgfQ9JKbSbnISXOdEXyRPjk",
+      authDomain: "eramdamtambola.firebaseapp.com",
+      databaseURL: "https://eramdamtambola-default-rtdb.firebaseio.com",
+      projectId: "eramdamtambola",
+      storageBucket: "eramdamtambola.firebasestorage.app",
+      messagingSenderId: "229285760705",
+      appId: "1:229285760705:web:ac5052bbf1f18f1e05ce40",
+      measurementId: "G-0E1XGMWBN2"
+    },
     "yaiphaminarasi-ngasi.in": {
-  apiKey: "AIzaSyAyJPmgZMgSIBdiHve70f25sSEipIxG9AY",
-  authDomain: "yaiphminarasibumper.firebaseapp.com",
-  databaseURL: "https://yaiphminarasibumper-default-rtdb.firebaseio.com",
-  projectId: "yaiphminarasibumper",
-  storageBucket: "yaiphminarasibumper.firebasestorage.app",
-  messagingSenderId: "445424982228",
-  appId: "1:445424982228:web:946276d1c99b5d9b038341"
-},
+      apiKey: "AIzaSyAyJPmgZMgSIBdiHve70f25sSEipIxG9AY",
+      authDomain: "yaiphminarasibumper.firebaseapp.com",
+      databaseURL: "https://yaiphminarasibumper-default-rtdb.firebaseio.com",
+      projectId: "yaiphminarasibumper",
+      storageBucket: "yaiphminarasibumper.firebasestorage.app",
+      messagingSenderId: "445424982228",
+      appId: "1:445424982228:web:946276d1c99b5d9b038341"
+    },
     "gangpartytambola.in": {
       apiKey: "AIzaSyAvtxo-P6vrV6M9bdgLfpcrRfwsjeF5TxA",
       authDomain: "gangpartytambola.firebaseapp.com",
@@ -824,16 +824,17 @@ body {
     },
     "pothaphamhousie.in": {
       apiKey: "AIzaSyClv6ptbETrpdTNskbcXcnI9JOKMr84VaI",
-  authDomain: "pothapham-8551d.firebaseapp.com",
-  databaseURL: "https://pothapham-8551d-default-rtdb.firebaseio.com",
-  projectId: "pothapham-8551d",
-  storageBucket: "pothapham-8551d.firebasestorage.app",
-  messagingSenderId: "921558227914",
-  appId: "1:921558227914:web:c9f24f1cef8a43daee8d33"
+      authDomain: "pothapham-8551d.firebaseapp.com",
+      databaseURL: "https://pothapham-8551d-default-rtdb.firebaseio.com",
+      projectId: "pothapham-8551d",
+      storageBucket: "pothapham-8551d.firebasestorage.app",
+      messagingSenderId: "921558227914",
+      appId: "1:921558227914:web:c9f24f1cef8a43daee8d33"
     },
-   "gentlemanhousie.in": {
+    "gentlemanhousie.in": {
       apiKey: "AIzaSyBkXUpeK_wPwarE3ALh1t9ZF7KDc_ncBIE",
       authDomain: "gentlemanhousie.firebaseapp.com",
+      databaseURL: "https://gentlemanhousie-default-rtdb.firebaseio.com", /* <-- Missing Database URL Fixed Here */
       projectId: "gentlemanhousie",
       storageBucket: "gentlemanhousie.firebasestorage.app",
       messagingSenderId: "489313335381",
@@ -849,7 +850,7 @@ body {
       dbs[domainName] = getDatabase(app);
       auths[domainName] = getAuth(app); 
     } catch (e) {
-        // Errors are ignored for duplicate initializations
+        console.error(`Firebase Initialization Error for ${domainName}:`, e);
     }
   }
   
