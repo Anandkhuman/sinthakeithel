@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tambola Domains & Registration</title>
 
-<!-- Font Awesome for Icons -->
+<!-- Font Awesome for Icons (Trash icon) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Razorpay & jsPDF CDNs -->
@@ -13,121 +13,398 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-/* Global Styles & Compact Layout */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Inter', system-ui, sans-serif; }
-body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px 0 80px 0; overflow-x: hidden; }
+/* Global Styles & Compact Layout (Slidey Decrease) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+}
 
-/* Bottom Nav */
-.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 32, 39, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(0, 255, 204, 0.3); display: flex; justify-content: space-around; padding: 10px 0; z-index: 999; }
-.nav-item { text-align: center; font-size: 0.8rem; color: #aaa; cursor: pointer; flex: 1; padding: 5px 0; transition: all 0.3s ease; user-select: none; }
-.nav-item.active { color: #00ffcc; font-weight: bold; }
-.nav-item i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  padding: 15px 0 80px 0; /* Extra bottom padding for Nav Bar */
+  overflow-x: hidden;
+}
 
-/* Pages */
-.page-wrapper { width: 100%; display: flex; justify-content: center; flex: 1; }
-.page-section { display: none; width: 95%; max-width: 1000px; animation: slideIn 0.3s ease; }
-.page-section.active { display: block; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+/* ================= BOTTOM NAVIGATION BAR ================= */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(15, 32, 39, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 255, 204, 0.3);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  z-index: 999;
+}
 
-/* Info Boxes */
-.info-box { background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); margin-bottom: 20px; }
-.info-box h2 { color: #00ffcc; margin-bottom: 12px; font-size: 1.5rem; text-align: center; }
-.info-box p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px; color: #e0e0e0; }
+.nav-item {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #aaa;
+  cursor: pointer;
+  flex: 1;
+  padding: 5px 0;
+  transition: all 0.3s ease;
+  user-select: none;
+}
 
-/* Slider */
-.purchased-domain-info { display: none; background: rgba(0, 255, 204, 0.1); border: 1px solid #00ffcc; border-radius: 12px; max-width: 1000px; width: 95%; margin: 0 auto 15px auto; box-shadow: 0 5px 20px rgba(0, 255, 204, 0.15); overflow: hidden; position: relative; }
-.slider-track { display: flex; transition: transform 0.5s ease-in-out; width: 100%; }
-.domain-slide { width: 100%; flex-shrink: 0; padding: 12px 15px; text-align: center; }
-.domain-slide h3 { margin-bottom: 5px; color: #fff; font-size: 1rem; font-weight: 500; }
-.domain-slide .domain-name { font-size: 1.15rem; font-weight: bold; color: #ffd166; margin-bottom: 5px; }
-.domain-slide .countdown-timer { font-size: 0.9rem; color: #eee; margin-bottom: 10px; }
-.domain-slide .countdown-timer strong { color: #00ffcc; }
-.action-buttons { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.btn-sm { padding: 6px 12px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.2s; color: #003; }
-.btn-sm:hover { transform: scale(1.05); }
-.btn-renew { background: linear-gradient(135deg, #ff8008, #ffc837); }
-.btn-view { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; }
-.btn-download { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
-.slider-dots { display: flex; justify-content: center; gap: 5px; padding-bottom: 8px; }
-.dot { height: 6px; width: 6px; background: #fff; border-radius: 50%; opacity: 0.3; transition: 0.3s; }
-.dot.active { opacity: 1; background: #00ffcc; transform: scale(1.2); }
+.nav-item.active {
+  color: #00ffcc;
+  font-weight: bold;
+}
 
-/* Offers Section */
-.offers-container { width: 100%; }
-.offers-header { text-align: center; margin-bottom: 20px; }
-.offers-header h1 { font-size: 1.6rem; }
-.offers-header p { margin-top: 5px; font-size: 0.9rem; opacity: 0.85; }
-.cards { display: grid; grid-template-columns: 1fr; gap: 15px; }
-@media (min-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-.card { background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border-radius: 14px; padding: 18px; box-shadow: 0 8px 25px rgba(0,0,0,0.25); }
-.card h2 { font-size: 1.25rem; margin-bottom: 8px; }
-.price { font-size: 1.3rem; font-weight: bold; color: #00ffcc; margin: 10px 0; }
-.card ul { list-style: none; margin-bottom: 12px; font-size: 0.9rem; }
-.card ul li { margin-bottom: 6px; padding-left: 20px; position: relative; }
-.card ul li::before { content: "✓"; position: absolute; left: 0; color: #00ffcc; }
-.card select, .card input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 8px; border: none; font-size: 0.9rem; outline: none; background: white; color: black; }
-.btn-primary { margin-top: 12px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; background: linear-gradient(135deg, #00ffcc, #00c6ff); color: #003; transition: transform 0.2s; }
-.btn-primary:hover { transform: scale(1.03); }
-.btn-danger { margin-top: 12px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #fff; transition: transform 0.2s; }
-.credentials-box { display: none; margin-top: 12px; background: rgba(0, 255, 204, 0.2); border: 1px solid #00ffcc; border-radius: 8px; padding: 12px; color: #fff; }
-.credentials-box h3 { color: #00ffcc; margin-bottom: 8px; font-size: 1rem; }
-.credentials-box p { margin-bottom: 4px; font-size: 0.85rem; }
-.credentials-box strong { color: #ffd166; }
+.nav-item i {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 3px;
+}
 
-/* Registration Form */
-.form-container { display: none; width: 100%; max-width: 550px; padding: 20px; border-radius: 18px; background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); margin: auto; }
-.form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.back-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-.form-container h1 { text-align: center; font-size: 1.4rem; }
-.form-container input, .form-container select { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; background: rgba(255,255,255,0.15); color: white; outline: none; }
+/* ================= PAGES (SWIPEABLE CONTAINERS) ================= */
+.page-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.page-section {
+  display: none;
+  width: 95%;
+  max-width: 1000px;
+  animation: slideIn 0.3s ease;
+}
+
+.page-section.active {
+  display: block;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Info Pages (Contact, Privacy, Refund) Styles */
+.info-box {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  margin-bottom: 20px;
+}
+.info-box h2 {
+  color: #00ffcc;
+  margin-bottom: 12px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+.info-box p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  color: #e0e0e0;
+}
+
+/* ================= SECTION 1: OFFERS PAGE ================= */
+.offers-container {
+  width: 100%;
+}
+
+.offers-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.offers-header h1 {
+  font-size: 1.6rem;
+}
+
+.offers-header p {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #00ffcc;
+  margin: 10px 0;
+}
+
+.card ul {
+  list-style: none;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.card ul li {
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.card ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #00ffcc;
+}
+
+.card input[type="email"], .card input[type="password"], .card input[type="number"] {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  outline: none;
+  background: white;
+  color: black;
+}
+
+.btn-primary {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00ffcc, #00c6ff);
+  color: #003;
+  transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+}
+
+.btn-danger {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #fff;
+  transition: transform 0.2s;
+}
+
+.btn-danger:hover {
+  transform: scale(1.03);
+}
+
+.message {
+  display: none;
+  margin-top: 20px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* ================= SECTION 2: FORM PAGE ================= */
+.form-container {
+  display: none; /* Initially Hidden */
+  width: 100%;
+  max-width: 550px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+  margin: auto;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.back-btn:hover { background: rgba(255,255,255,0.3); }
+
+.form-container h1 {
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.form-container input[type="text"], .form-container input[type="email"], .form-container input[type="tel"], .form-container select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  outline: none;
+  font-size: 0.9rem;
+}
+
 .form-container select { background: rgba(255,255,255,0.9); color: black; }
+.form-container input::placeholder { color: #ddd; }
+
+/* Domain Wrap & Preview */
 .domain-wrap { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
-.preview { display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 8px; font-weight: bold; color: #00ffcc; min-width: 110px; font-size: 0.85rem; }
+.preview {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 8px;
+  font-weight: bold; color: #00ffcc; min-width: 110px; font-size: 0.85rem;
+}
 .info-text { font-size: 0.8rem; color: #ffd166; margin: 4px 0 8px 4px; }
-.suggestions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.suggestion-chip { background: rgba(0, 255, 204, 0.15); color: #00ffcc; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 1px solid #00ffcc; }
-.btn-pay { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 8px; background: linear-gradient(90deg, #00c6ff, #0072ff); color: white; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
-/* Modals */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
-.modal-content { background: #1a2a33; padding: 25px; border-radius: 14px; width: 90%; max-width: 380px; text-align: center; }
-.modal-content h3 { color: #00ffcc; margin-bottom: 15px; font-size: 1.3rem; }
-.modal-content input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 6px; border: none; background: rgba(255,255,255,0.1); color: white; }
-.password-wrap { position: relative; width: 100%; }
-.password-wrap span { position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 1.1rem; }
-.btn-submit-modal { width: 100%; padding: 12px; background: #00ffcc; color: #003; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.btn-pay {
+  width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 8px;
+  background: linear-gradient(90deg, #00c6ff, #0072ff); color: white;
+  font-size: 1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;
+}
+.btn-pay:hover { transform: scale(1.05); }
 
-/* Super Admin */
+/* Policy Agreement Checkbox & Scrollable Section */
+.policy-agreement {
+    background: rgba(255, 75, 43, 0.05);
+    border: 1px solid rgba(255, 75, 43, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+.scrollable-policy {
+    max-height: 120px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.scrollable-policy::-webkit-scrollbar {
+    width: 5px;
+}
+.scrollable-policy::-webkit-scrollbar-thumb {
+    background: #ff4b2b;
+    border-radius: 3px;
+}
+.scrollable-policy p {
+    font-size: 0.8rem;
+    color: #e0e0e0;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.scrollable-policy p.highlight-policy {
+    color: #ff4b2b;
+    font-weight: bold;
+}
+.policy-agreement label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+}
+.policy-agreement input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin: 0;
+    accent-color: #ff4b2b;
+}
+
+/* Super Admin Dashboard Styles */
 .sa-setting-group { margin-bottom: 15px; }
 .sa-setting-group label { display: block; font-size: 0.85rem; color: #ffd166; margin-bottom: 5px; text-align: left;}
-.sa-domain-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00ffcc; text-align: left; }
-.sa-domain-card h4 { color: #00ffcc; margin-bottom: 8px; font-size: 1.1rem;}
-.sa-domain-card p { font-size: 0.85rem; color: #eee; margin-bottom: 5px; }
-.sa-domain-card .sa-timer { color: #ff416c; font-weight: bold; font-size: 0.9rem; margin-top: 10px; display: block; }
-.sa-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-.sa-stat-card { background: rgba(0, 255, 204, 0.1); border: 1px solid rgba(0, 255, 204, 0.3); padding: 15px; border-radius: 8px; text-align: center; }
-.sa-stat-card h3 { font-size: 0.85rem; color: #eee; margin-bottom: 5px; }
-.sa-stat-card p { font-size: 1.3rem; color: #00ffcc; font-weight: bold; }
+
+/* Dashboard Stats Grid */
+.sa-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.sa-stat-card {
+    background: rgba(0, 255, 204, 0.1);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+.sa-stat-card h3 {
+    font-size: 0.85rem;
+    color: #eee;
+    margin-bottom: 5px;
+}
+.sa-stat-card p {
+    font-size: 1.3rem;
+    color: #00ffcc;
+    font-weight: bold;
+}
 </style>
 </head>
-<body>
 
-<!-- TOP SLIDER -->
-<div id="purchasedDomainInfo" class="purchased-domain-info">
-  <div class="slider-track" id="sliderTrack"></div>
-  <div class="slider-dots" id="sliderDots"></div>
-</div>
+<body>
 
 <div class="page-wrapper" id="swipeContainer">
 
-  <!-- PAGE 1: HOME -->
+  <!-- ================= PAGE 1: HOME (OFFERS & FORM) ================= -->
   <div id="page-home" class="page-section active">
       <div class="offers-container" id="offersSection">
         <div class="offers-header">
           <h1>Online Tambola Domain Available</h1>
           <p>Select your domain and start your Tambola business</p>
         </div>
+
         <section class="cards">
+          <!-- New Domain / Custom Domain -->
           <div class="card">
             <h2>New Custom Domain</h2>
             <div class="price" id="customDomainPriceDisplay">₹4,000 / month</div>
@@ -136,83 +413,107 @@ body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #f
               <li>Custom domain name (.in)</li>
               <li>Premium branding</li>
             </ul>
-            <button class="btn-primary" onclick="showForm()">Select Plan & Register</button>
-          </div>
-          <div class="card">
-            <h2>Ready-Made Domain List</h2>
-            <div class="price" id="dynamicPriceDisplay">Select Days for Price</div>
-            <ul id="pricingListUI">
-              <li>1 to 15 Days = ₹--/day</li>
-              <li>16 to 29 Days = ₹--/day</li>
-              <li>1 Month (30 Days) = ₹-- fixed</li>
-              <li>Create Your Own Admin Details</li>
-            </ul>
-            <select id="domainSelect">
-              <option value="">Loading Domains...</option>
-            </select>
-            <input type="number" id="validityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateDynamicPrice()">
-            <input type="email" id="buyerEmail" placeholder="Enter Your Email Address">
-            <button class="btn-primary" onclick="payForReadyDomain()">Pay & Create Admin</button>
-            <div id="credentialsBox" class="credentials-box"></div>
+            <button class="btn-primary" onclick="showForm()">
+              Select Plan & Register
+            </button>
           </div>
         </section>
+
+        <div class="message" id="messageBox"></div>
       </div>
 
-      <!-- FORM -->
+      <!-- REGISTRATION FORM -->
       <div class="form-container" id="formSection">
         <div class="form-header">
           <button class="back-btn" onclick="hideForm()">Back</button>
           <h1>🚀 Sintha Developer</h1>
           <div style="width: 60px;"></div>
         </div>
-        <input id="name" placeholder="Your Name">
-        <input id="title" placeholder="Website Title" oninput="generateSuggestions()">
+
+        <input type="text" id="name" placeholder="Your Name">
+
         <p class="info-text">👉 Note: We only support and register <strong>.in</strong> domains.</p>
+        
         <div class="domain-wrap">
-          <input id="domain" placeholder="Enter base domain name" oninput="updatePreview()">
+          <input type="text" id="domain" placeholder="Enter base domain name" oninput="updatePreview()">
           <div class="preview" id="preview">yourname.in</div>
         </div>
-        <div id="domainSuggestions" class="suggestions-list"></div>
+
         <input id="email" type="email" placeholder="Email">
         <input id="mobile" type="tel" placeholder="Mobile Number">
-        <input id="address" placeholder="Address">
+        <input type="text" id="address" placeholder="Address">
+
         <select id="plan">
           <option value="monthly" id="optMonthly">Monthly ₹4000</option>
           <option value="yearly" id="optYearly">Yearly ₹32000</option>
         </select>
+
+        <!-- REFUND POLICY AGREEMENT SECTION (SCROLLABLE) -->
+        <div class="policy-agreement">
+           <div class="scrollable-policy">
+              <p class="highlight-policy">
+                  IMPORTANT - Demo Verification: Before buying a website, please check the demo website. If you do not like it, please cancel before making the payment. Once registration and payment are done, we will not issue a refund under any circumstances.
+              </p>
+              <p><strong>1. Digital Goods:</strong> Domains and custom platform setups are digital services. Once provisioned, they are non-refundable.</p>
+              <p><strong>2. Setup Failures:</strong> In the rare event of a setup failure after successful payment, a 100% refund will be processed within 5-7 working days if we cannot fulfill the order.</p>
+              <p><strong>3. Cancellation:</strong> You can choose not to renew after your validity expires. However, mid-term cancellations do not qualify for partial refunds.</p>
+           </div>
+           <label>
+             <input type="checkbox" id="agreeRefund">
+             I have read and agree to the Refund Policy
+           </label>
+        </div>
+
         <button class="btn-pay" onclick="payNow()">Pay Now</button>
       </div>
   </div>
 
-  <!-- PAGE 2: CONTACT -->
+  <!-- ================= PAGE 2: CONTACT US ================= -->
   <div id="page-contact" class="page-section">
       <div class="info-box">
           <h2>Contact Us</h2>
-          <p>Email: contact@sinthateam.in</p>
-          <p>Anand Khuman: +91 9366193440</p>
+          <p>We are here to help! If you have any questions, concerns, or need support with your Tambola domain setup, reach out to us.</p>
+          <p><strong>Email:</strong> contact@sinthateam.in</p>
+          <p><strong>Phone / WhatsApp:</strong><br>
+             Anand Khuman: +91 9366193440<br>
+             Pari Thokchom: +91 8415934211<br>
+             Sadananda Mangang: +91 6009020876
+          </p>
+          <p><strong>Address:</strong> Heirok, Thoubal District, Manipur, India.</p>
           <button class="btn-primary" style="margin-top: 15px;" onclick="window.location.href='https://wa.me/919366193440'">Chat on WhatsApp</button>
       </div>
   </div>
 
-  <!-- PAGE 3: PRIVACY -->
+  <!-- ================= PAGE 3: PRIVACY POLICY ================= -->
   <div id="page-privacy" class="page-section">
       <div class="info-box">
           <h2>Privacy Policy</h2>
-          <p>Your privacy is important to us. We securely process payments and do not sell data.</p>
+          <p>Your privacy is important to us. This Privacy Policy outlines how Sintha Developer collects, uses, and protects your information.</p>
+          <p><strong>1. Information Collection:</strong> We collect your name, email, phone number, and transaction details securely to process domain registrations.</p>
+          <p><strong>2. Data Usage:</strong> We use your data solely for account setup, billing, and providing customer support.</p>
+          <p><strong>3. Third-Party Sharing:</strong> We do not sell or share your personal data with third parties. Payments are securely processed via Razorpay.</p>
+          <p><strong>4. Security:</strong> We implement strict security measures to ensure your data remains safe.</p>
       </div>
   </div>
 
-  <!-- PAGE 4: REFUND -->
+  <!-- ================= PAGE 4: REFUND POLICY ================= -->
   <div id="page-refund" class="page-section">
       <div class="info-box">
           <h2>Refund Policy</h2>
-          <p style="color: #ff4b2b; font-weight: bold; border-left: 4px solid #ff4b2b; padding-left: 10px; background: rgba(255, 75, 43, 0.1); padding: 10px;">
-              <strong>IMPORTANT:</strong> Check demo before buying. No refund once paid.
+          <p>Please read our terms regarding refunds carefully before making a purchase.</p>
+          
+          <!-- HIGHTLIGHTED DEMO VERIFICATION POINT -->
+          <p style="color: #ff4b2b; font-weight: bold; border-left: 4px solid #ff4b2b; padding-left: 10px; margin-bottom: 15px; background: rgba(255, 75, 43, 0.1); padding: 10px; border-radius: 5px;">
+              <strong>IMPORTANT - Demo Verification:</strong> Before buying a website, please check the demo website. If you do not like it, please cancel before making the payment. Once registration and payment are done, we will not issue a refund under any circumstances.
           </p>
+          
+          <p><strong>1. Digital Goods:</strong> Domains and custom platform setups are digital services. Once provisioned, they are non-refundable.</p>
+          <p><strong>2. Setup Failures:</strong> In the rare event of a setup failure after successful payment, a 100% refund will be processed within 5-7 working days if we cannot fulfill the order.</p>
+          <p><strong>3. Cancellation:</strong> You can choose not to renew after your validity expires. However, mid-term cancellations do not qualify for partial refunds.</p>
       </div>
   </div>
 
-  <!-- PAGE 5: ADMIN -->
+  <!-- ================= PAGE 5: SUPER ADMIN ================= -->
   <div id="page-superadmin" class="page-section">
     <div id="sa-auth-section">
         <div class="card">
@@ -222,33 +523,50 @@ body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #f
             <button class="btn-primary" onclick="loginSuperAdmin()">Login</button>
         </div>
     </div>
+
     <div id="sa-dashboard-section" style="display:none;">
+        
+        <!-- SALES DASHBOARD & DISTRIBUTION AREA -->
         <div class="info-box">
             <h2>Sales Dashboard</h2>
             <div class="sa-stats-grid">
-                <div class="sa-stat-card"><h3>Today</h3><p id="saToday">₹0</p></div>
-                <div class="sa-stat-card"><h3>Weekly</h3><p id="saWeekly">₹0</p></div>
-                <div class="sa-stat-card"><h3>Monthly</h3><p id="saMonthly">₹0</p></div>
-                <div class="sa-stat-card"><h3>Pending</h3><p id="saPending" style="color:#ffd166;">₹0</p></div>
+                <div class="sa-stat-card">
+                    <h3>Today</h3>
+                    <p id="saToday">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Weekly</h3>
+                    <p id="saWeekly">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Monthly</h3>
+                    <p id="saMonthly">₹0</p>
+                </div>
+                <div class="sa-stat-card">
+                    <h3>Total Pending</h3>
+                    <p id="saPending" style="color:#ffd166;">₹0</p>
+                </div>
             </div>
-            <button class="btn-primary" onclick="distributeFunds()" style="background: linear-gradient(135deg, #11998e, #38ef7d);">Distribute Amount</button>
-            <div id="distributionResult" class="sa-domain-card" style="display:none; position:relative; background: rgba(0, 255, 204, 0.1); margin-top:10px;">
-                <i class="fas fa-trash" style="position:absolute; top:15px; right:15px; cursor:pointer; color:#ff416c;" onclick="closeDistribution()"></i>
-                <h3 style="color:#00ffcc; margin-bottom:10px;">Distribution Info</h3>
+            
+            <button class="btn-primary" onclick="distributeFunds()" style="background: linear-gradient(135deg, #11998e, #38ef7d); margin-bottom: 10px;">Distribute Amount</button>
+            
+            <div id="distributionResult" style="display:none; position:relative; background: rgba(0, 255, 204, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00ffcc; text-align: left;">
+                <i class="fas fa-trash" style="position:absolute; top:15px; right:15px; cursor:pointer; color:#ff416c; font-size:1.2rem;" onclick="closeDistribution()"></i>
+                <h3 style="color:#00ffcc; margin-bottom:10px; font-size:1.1rem;">Distribution Info</h3>
                 <div id="distList"></div>
             </div>
         </div>
-        <div class="info-box">
-            <h2>Sold Domains</h2>
-            <div id="saSoldDomainsList"><p style="text-align:center; color:#ccc;">Loading domains...</p></div>
-        </div>
+
         <div class="card" style="margin-bottom: 20px;">
             <h2>Pricing Management</h2>
-            <input type="number" id="saPriceTier1" placeholder="1 to 15 Days">
-            <input type="number" id="saPriceTier2" placeholder="16 to 29 Days">
-            <input type="number" id="saPriceTier3" placeholder="30 Days">
-            <input type="number" id="saCustomPriceMonthly" placeholder="Custom Monthly">
-            <input type="number" id="saCustomPriceYearly" placeholder="Custom Yearly">
+            <div class="sa-setting-group">
+                <label>Custom Domain: Monthly Price</label>
+                <input type="number" id="saCustomPriceMonthly">
+            </div>
+            <div class="sa-setting-group">
+                <label>Custom Domain: Yearly Price</label>
+                <input type="number" id="saCustomPriceYearly">
+            </div>
             <button class="btn-primary" onclick="savePricingSettings()">Save Pricing</button>
             <button class="btn-danger" onclick="logoutSuperAdmin()">Logout</button>
         </div>
@@ -257,698 +575,473 @@ body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #f
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- ================= BOTTOM NAVIGATION MENU ================= -->
 <div class="bottom-nav">
-  <div class="nav-item active" id="nav-home" onclick="switchPage('page-home')"><i>🏠</i> Home</div>
-  <div class="nav-item" id="nav-contact" onclick="switchPage('page-contact')"><i>📞</i> Contact</div>
-  <div class="nav-item" id="nav-privacy" onclick="switchPage('page-privacy')"><i>🔒</i> Privacy</div>
-  <div class="nav-item" id="nav-refund" onclick="switchPage('page-refund')"><i>💸</i> Refund</div>
-  <div class="nav-item" id="nav-superadmin" onclick="switchPage('page-superadmin')"><i>👑</i> Admin</div>
-</div>
-
-<!-- ADMIN CREATION MODAL -->
-<div class="modal-overlay" id="adminPopup">
-  <div class="modal-content">
-    <h3>Create Admin Account</h3>
-    <p style="font-size: 0.8rem; margin-bottom:12px; color:#ddd;">Payment Successful! Create your admin credentials.</p>
-    <input type="text" id="adminName" placeholder="Full Name">
-    <input type="tel" id="adminPhone" placeholder="Mobile Number">
-    <input type="email" id="adminEmailInput" placeholder="Admin Email">
-    <div class="password-wrap">
-      <input type="password" id="adminPassword" placeholder="Admin Password (min. 6 char)">
-      <span id="eyeIcon" onclick="togglePassword()">👁️</span>
-    </div>
-    <button class="btn-submit-modal" onclick="saveAdminToFirebase()">Submit & Finish</button>
-    <p id="adminErrorMsg" style="color:#ff416c; font-size:0.8rem; margin-top:8px; display:none;"></p>
+  <div class="nav-item active" id="nav-home" onclick="switchPage('page-home')">
+      <i>🏠</i> Home
+  </div>
+  <div class="nav-item" id="nav-contact" onclick="switchPage('page-contact')">
+      <i>📞</i> Contact
+  </div>
+  <div class="nav-item" id="nav-privacy" onclick="switchPage('page-privacy')">
+      <i>🔒</i> Privacy
+  </div>
+  <div class="nav-item" id="nav-refund" onclick="switchPage('page-refund')">
+      <i>💸</i> Refund
+  </div>
+  <div class="nav-item" id="nav-superadmin" onclick="switchPage('page-superadmin')">
+      <i>👑</i> Admin
   </div>
 </div>
 
-<!-- RENEW DOMAIN MODAL -->
-<div class="modal-overlay" id="renewPopup">
-  <div class="modal-content">
-    <h3>Renew Domain</h3>
-    <p id="renewDomainNameDisplay" style="color: #ffd166; font-size: 1.1rem; margin-bottom: 10px;"></p>
-    <div class="price" id="renewPriceDisplay" style="font-size: 1.1rem; margin-bottom: 12px; color: #00ffcc;">Select Days for Price</div>
-    <input type="number" id="renewValidityDays" min="1" max="30" placeholder="Enter Validity (1 to 30 Days)" oninput="calculateRenewPrice()">
-    <input type="email" id="renewUserEmail" placeholder="Enter Your Email Address">
-    <button class="btn-submit-modal" onclick="payForRenewal()">Pay & Renew</button>
-    <button class="btn-submit-modal" style="background: rgba(255,255,255,0.2); color: white; margin-top: 8px;" onclick="closeRenewPopup()">Cancel</button>
-  </div>
-</div>
 
-<!-- ================= JAVASCRIPT FIREBASE MODULES ================= -->
+<!-- ================= JAVASCRIPT & FIREBASE ================= -->
 <script type="module">
+  // Import Firebase modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, set, get, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  const allDomainScripts = {
-    "manipurhousietambola.in": {
+  // Central Firebase Configuration (For Pricing & Super Admin Dashboard)
+  const firebaseConfig = {
       apiKey: "AIzaSyDrfrgYYY69ufupGKbktPDY0jtKKVOzR-0",
       authDomain: "manipurhousie-45674.firebaseapp.com",
       databaseURL: "https://manipurhousie-45674-default-rtdb.firebaseio.com",
       projectId: "manipurhousie-45674",
       storageBucket: "manipurhousie-45674.appspot.com",
       messagingSenderId: "887925712516",
-      appId: "1:887925712516:web:b03d27f5759dd5719c84d1"
-    },
-    "dangboytambola.in": {
-      apiKey: "AIzaSyBHirTmBB9IdgfQ9JKbSbnISXOdEXyRPjk",
-      authDomain: "eramdamtambola.firebaseapp.com",
-      databaseURL: "https://eramdamtambola-default-rtdb.firebaseio.com",
-      projectId: "eramdamtambola",
-      storageBucket: "eramdamtambola.firebasestorage.app",
-      messagingSenderId: "229285760705",
-      appId: "1:229285760705:web:ac5052bbf1f18f1e05ce40"
-    },
-    "yaiphaminarasi-ngasi.in": {
-      apiKey: "AIzaSyAyJPmgZMgSIBdiHve70f25sSEipIxG9AY",
-      authDomain: "yaiphminarasibumper.firebaseapp.com",
-      databaseURL: "https://yaiphminarasibumper-default-rtdb.firebaseio.com",
-      projectId: "yaiphminarasibumper",
-      storageBucket: "yaiphminarasibumper.firebasestorage.app",
-      messagingSenderId: "445424982228",
-      appId: "1:445424982228:web:946276d1c99b5d9b038341"
-    },
-    "gangpartytambola.in": {
-      apiKey: "AIzaSyAvtxo-P6vrV6M9bdgLfpcrRfwsjeF5TxA",
-      authDomain: "gangpartytambola.firebaseapp.com",
-      databaseURL: "https://gangpartytambola-default-rtdb.firebaseio.com",
-      projectId: "gangpartytambola",
-      storageBucket: "gangpartytambola.appspot.com",
-      messagingSenderId: "927866790189",
-      appId: "1:927866790189:web:8f5437030b5ed0918db3a4"
-    },
-    "dailyhousie.in": {
-      apiKey: "AIzaSyBDhmUhwqj_aYXg10DPFvRJI89p0PvxtmA",
-      authDomain: "daily-housie.firebaseapp.com",
-      databaseURL: "https://daily-housie-default-rtdb.firebaseio.com",
-      projectId: "daily-housie",
-      storageBucket: "daily-housie.appspot.com",
-      messagingSenderId: "336383808677",
-      appId: "1:336383808677:web:787e0710d5800152e9a94c"
-    },
-    "pothaphamhousie.in": {
-      apiKey: "AIzaSyClv6ptbETrpdTNskbcXcnI9JOKMr84VaI",
-      authDomain: "pothapham-8551d.firebaseapp.com",
-      databaseURL: "https://pothapham-8551d-default-rtdb.firebaseio.com",
-      projectId: "pothapham-8551d",
-      storageBucket: "pothapham-8551d.firebasestorage.app",
-      messagingSenderId: "921558227914",
-      appId: "1:921558227914:web:c9f24f1cef8a43daee8d33"
-    },
-    "gentlemanhousie.in": {
-      apiKey: "AIzaSyBkXUpeK_wPwarE3ALh1t9ZF7KDc_ncBIE",
-      authDomain: "gentlemanhousie.firebaseapp.com",
-      databaseURL: "https://gentlemanhousie-default-rtdb.firebaseio.com",
-      projectId: "gentlemanhousie",
-      storageBucket: "gentlemanhousie.firebasestorage.app",
-      messagingSenderId: "489313335381",
-      appId: "1:489313335381:web:a0e7fa582503c12790fcdc"
-    } 
+      appId: "1:887925712516:web:b03d27f5759dd5719c84d1",
+      measurementId: "G-H3GRHB177F"
   };
 
-  const dbs = {};
-  const auths = {}; 
-  for (let domainName in allDomainScripts) {
-    try {
-      const app = initializeApp(allDomainScripts[domainName], domainName);
-      dbs[domainName] = getDatabase(app);
-      auths[domainName] = getAuth(app); 
-    } catch (e) {
-        console.error(`Firebase Init Error for ${domainName}:`, e);
-    }
-  }
-  
-  const centralDB = dbs['manipurhousietambola.in'];
-  const centralAuth = auths['manipurhousietambola.in'];
+  const app = initializeApp(firebaseConfig);
+  const centralDB = getDatabase(app);
+  const centralAuth = getAuth(app);
 
   let isDashboardLoaded = false;
 
-  if (centralAuth) {
-      onAuthStateChanged(centralAuth, async (user) => {
-          if (user) {
-              try {
-                  const roleSnap = await get(ref(centralDB, `superAdmins/${user.uid}`));
-                  if (roleSnap.exists() && roleSnap.val().role === 'superadmin') {
-                      document.getElementById('sa-auth-section').style.display = 'none';
-                      document.getElementById('sa-dashboard-section').style.display = 'block';
-                      if (!isDashboardLoaded) {
-                          loadSuperAdminDashboard();
-                          isDashboardLoaded = true;
-                      }
-                  } else {
-                      await signOut(centralAuth);
-                      document.getElementById('sa-auth-section').style.display = 'block';
-                      document.getElementById('sa-dashboard-section').style.display = 'none';
-                      isDashboardLoaded = false;
+  // Listen to Auth State to automatically log in the Super Admin
+  onAuthStateChanged(centralAuth, async (user) => {
+      if (user) {
+          try {
+              const roleSnap = await get(ref(centralDB, `superAdmins/${user.uid}`));
+              if (roleSnap.exists() && roleSnap.val().role === 'superadmin') {
+                  document.getElementById('sa-auth-section').style.display = 'none';
+                  document.getElementById('sa-dashboard-section').style.display = 'block';
+                  if (!isDashboardLoaded) {
+                      loadSuperAdminDashboard();
+                      isDashboardLoaded = true;
                   }
-              } catch(e) { console.error("Auth check error: ", e); }
-          } else {
-              document.getElementById('sa-auth-section').style.display = 'block';
-              document.getElementById('sa-dashboard-section').style.display = 'none';
-              isDashboardLoaded = false;
+              } else {
+                  await signOut(centralAuth);
+                  document.getElementById('sa-auth-section').style.display = 'block';
+                  document.getElementById('sa-dashboard-section').style.display = 'none';
+                  isDashboardLoaded = false;
+              }
+          } catch(e) {
+              console.error("Auth check error: ", e);
           }
-      });
-  }
+      } else {
+          document.getElementById('sa-auth-section').style.display = 'block';
+          document.getElementById('sa-dashboard-section').style.display = 'none';
+          isDashboardLoaded = false;
+      }
+  });
   
-  window.priceTier1 = 200;
-  window.priceTier2 = 150;
-  window.priceTier3 = 3500;
+  // Custom Prices Variables
   window.customPriceMonthly = 4000;
   window.customPriceYearly = 32000;
   
-  let countdownInterval = null;
-  let sliderInterval = null;
-  let currentSlideIndex = 0;
-  window.renewingDomain = null; 
-  let saCountdownInterval = null;
-
-  function migrateOldData() {
-      let oldDomain = localStorage.getItem('purchasedDomain');
-      let oldExpiry = localStorage.getItem('domainExpiry');
-      let oldInvoice = localStorage.getItem('domainInvoiceData');
-      if(oldDomain && oldExpiry) {
-          let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-          if(!list.find(item => item.domain === oldDomain)) {
-              list.push({ domain: oldDomain, expiry: parseInt(oldExpiry), invoice: oldInvoice ? JSON.parse(oldInvoice) : null });
-              localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
-          }
-          localStorage.removeItem('purchasedDomain');
-          localStorage.removeItem('domainExpiry');
-          localStorage.removeItem('domainInvoiceData');
-      }
-  }
-
-  function startCountdown(activeDomains) {
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(() => {
-          const now = new Date().getTime();
-          let needsRefresh = false;
-          activeDomains.forEach(domainData => {
-              const timerElement = document.getElementById(`timer_${domainData.domain.replace(/\./g, '_')}`);
-              if(!timerElement) return;
-              const distance = domainData.expiry - now;
-              if (distance < 0) {
-                  timerElement.innerHTML = "<strong>Status: Expired</strong>";
-                  let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-                  list = list.filter(item => item.domain !== domainData.domain);
-                  localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
-                  needsRefresh = true;
-              } else {
-                  const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-                  const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                  const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                  const s = Math.floor((distance % (1000 * 60)) / 1000);
-                  timerElement.innerHTML = `Time remaining: <strong>${d}d ${h}h ${m}m ${s}s</strong>`;
-              }
-          });
-          if(needsRefresh) { clearInterval(countdownInterval); window.location.reload(); }
-      }, 1000);
-  }
-
-  function checkAndDisplayPurchasedDomain() {
-      migrateOldData(); 
-      const list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-      const infoBar = document.getElementById('purchasedDomainInfo');
-      const track = document.getElementById('sliderTrack');
-      const now = new Date().getTime();
-      const activeDomains = list.filter(d => d.expiry > now);
-
-      if(activeDomains.length !== list.length) localStorage.setItem('purchasedDomainsList', JSON.stringify(activeDomains));
-
-      if (activeDomains.length > 0) {
-          infoBar.style.display = 'block';
-          track.innerHTML = ''; 
-          activeDomains.forEach((domainObj) => {
-              const slide = document.createElement('div');
-              slide.className = 'domain-slide';
-              const safeId = domainObj.domain.replace(/\./g, '_');
-              slide.innerHTML = `
-                  <h3>Your Active Domain</h3>
-                  <p class="domain-name">${domainObj.domain}</p>
-                  <p class="countdown-timer" id="timer_${safeId}">Time remaining: <strong>-- : -- : -- : --</strong></p>
-                  <div class="action-buttons">
-                      <button class="btn-sm btn-renew" onclick="window.openRenewPopup('${domainObj.domain}')">Renew</button>
-                      <button class="btn-sm btn-view" onclick="window.open('https://${domainObj.domain}', '_blank')">View</button>
-                      <button class="btn-sm btn-download" onclick="window.downloadSpecificInvoice('${domainObj.domain}')">Info</button>
-                  </div>
-              `;
-              track.appendChild(slide);
-          });
-          startCountdown(activeDomains);
-      } else {
-          infoBar.style.display = 'none';
-      }
-  }
-
-  window.downloadSpecificInvoice = function(domainName) {
-      if(!window.jspdf) return alert("System loading, please wait...");
-      const list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-      const domainData = list.find(d => d.domain === domainName);
-      if (domainData && domainData.invoice) {
-          const data = domainData.invoice;
-          window.generateInvoice(data.name, data.domain, data.amount, data.paymentId, data.phone, data.email, data.password, data.isRenewal || false, data.days || "N/A");
-      } else { alert("Invoice details not found."); }
-  };
-
-  function loadAvailableDomains(soldDomains = {}) {
-    const selectBox = document.getElementById("domainSelect");
-    selectBox.innerHTML = '<option value="">Select a Domain</option>';
-    let availableCount = 0;
-    const now = new Date().getTime();
-
-    Object.keys(allDomainScripts).forEach(domain => {
-      const expiryTimestamp = soldDomains[domain.replace(/\./g, '_')];
-      if (!expiryTimestamp || expiryTimestamp < now) {
-          const option = document.createElement("option");
-          option.value = domain;
-          option.text = domain;
-          selectBox.appendChild(option);
-          availableCount++;
-      }
-    });
-
-    if (availableCount === 0) selectBox.innerHTML = '<option value="">No domains available right now</option>';
-  }
-  
   function updatePricingUI() {
-      document.getElementById('pricingListUI').innerHTML = `
-        <li>1 to 15 Days = ₹${window.priceTier1}/day</li>
-        <li>16 to 29 Days = ₹${window.priceTier2}/day</li>
-        <li>1 Month (30 Days) = ₹${window.priceTier3} fixed</li>
-        <li>Create Your Own Admin Details</li>
-      `;
+      // Custom Domain UI
       document.getElementById('customDomainPriceDisplay').innerText = `₹${window.customPriceMonthly} / month`;
       document.getElementById('optMonthly').innerText = `Monthly ₹${window.customPriceMonthly}`;
       document.getElementById('optYearly').innerText = `Yearly ₹${window.customPriceYearly}`;
   }
 
-  // ================= MAIN INITIALIZATION FIX =================
-  // Yaha module defer hone ki problem ko properly handle kiya gaya hai
-  async function initializeAppUI() {
-      checkAndDisplayPurchasedDomain();
-      
-      if(!centralDB) {
-          console.error("Central DB not configured correctly.");
-          loadAvailableDomains();
-          return;
-      }
-
+  window.onload = async () => {
       try {
+        // Fetch custom Pricing Settings from Super Admin
         const pricingRef = ref(centralDB, 'pricingSettings');
         const priceSnap = await get(pricingRef);
         if(priceSnap.exists()) {
             const prices = priceSnap.val();
-            window.priceTier1 = prices.tier1 || 200;
-            window.priceTier2 = prices.tier2 || 150;
-            window.priceTier3 = prices.tier3 || 3500;
             window.customPriceMonthly = prices.customMonthly || 4000;
             window.customPriceYearly = prices.customYearly || 32000;
         }
         updatePricingUI();
 
-        const soldDomainsRef = ref(centralDB, 'soldDomains');
-        const snapshot = await get(soldDomainsRef);
-        const soldDomains = snapshot.val() || {}; 
-
-        const now = new Date().getTime();
-        for (let domain in allDomainScripts) {
-            const expiryTimestamp = soldDomains[domain.replace(/\./g, '_')];
-            if (expiryTimestamp && expiryTimestamp < now) {
-                try {
-                    const targetDb = dbs[domain];
-                    if(targetDb) {
-                        const usersSnap = await get(ref(targetDb, 'users'));
-                        if (usersSnap.exists()) {
-                            const usersData = usersSnap.val();
-                            for (let uid in usersData) {
-                                if (usersData[uid].role === 'admin') await set(ref(targetDb, `users/${uid}/role`), 'expired');
-                            }
-                        }
-                    }
-                } catch(e) { console.error("Access revoke failed", e); }
-            }
-        }
-        loadAvailableDomains(soldDomains);
-      } catch (error) { 
-        console.error("Firebase fetch error:", error); 
-        loadAvailableDomains(); 
+      } catch (error) {
+        console.error("Could not fetch pricing data:", error);
       }
-  }
-
-  // This ensures the init function runs absolutely as soon as the DOM is ready, overriding module delays.
-  if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeAppUI);
-  } else {
-      initializeAppUI();
-  }
-
-  window.calculateDynamicPrice = function() {
-    let days = parseInt(document.getElementById("validityDays").value);
-    let priceDisplay = document.getElementById("dynamicPriceDisplay");
-    let amount = 0;
-    if (!days || days < 1) { priceDisplay.innerText = "Enter valid Days"; return 0; }
-    if (days > 30) { days = 30; document.getElementById("validityDays").value = 30; }
-
-    if (days >= 1 && days <= 15) amount = days * window.priceTier1; 
-    else if (days >= 16 && days <= 29) amount = days * window.priceTier2; 
-    else if (days >= 30) amount = window.priceTier3; 
-
-    priceDisplay.innerText = "Total: ₹" + amount;
-    return amount;
   };
 
-  window.tempPaymentData = null;
+  // ================= SUPER ADMIN LOGIC =================
+  window.loginSuperAdmin = async function() {
+      const email = document.getElementById('saLoginEmail').value.trim();
+      const pass = document.getElementById('saLoginPassword').value.trim();
+      if(!email || !pass) return alert("Enter email and password");
 
-  window.payForReadyDomain = function() {
-    if(typeof Razorpay === 'undefined') return alert("Payment system is loading, please check your internet and try again.");
-    let domain = document.getElementById("domainSelect").value;
-    let days = parseInt(document.getElementById("validityDays").value);
-    let buyerEmail = document.getElementById("buyerEmail").value.trim();
-    let amount = window.calculateDynamicPrice();
+      try {
+          const userCred = await signInWithEmailAndPassword(centralAuth, email, pass);
+          // verify role
+          const roleSnap = await get(ref(centralDB, `superAdmins/${userCred.user.uid}`));
+          if(roleSnap.exists() && roleSnap.val().role === 'superadmin') {
+              document.getElementById('sa-auth-section').style.display = 'none';
+              document.getElementById('sa-dashboard-section').style.display = 'block';
+              if (!isDashboardLoaded) {
+                  loadSuperAdminDashboard();
+                  isDashboardLoaded = true;
+              }
+          } else {
+              await signOut(centralAuth);
+              alert("You are not authorized as a Super Admin.");
+          }
+      } catch(e) {
+          alert("Login Failed: " + e.message);
+      }
+  };
 
-    if (!domain) return alert("Please select a domain.");
-    if (!days || days < 1 || days > 30) return alert("Please enter validity between 1 to 30 days.");
-    if (!buyerEmail) return alert("Please enter your email.");
-    if (amount === 0) return alert("Invalid Amount.");
+  window.logoutSuperAdmin = async function() {
+      await signOut(centralAuth);
+      document.getElementById('sa-dashboard-section').style.display = 'none';
+      document.getElementById('sa-auth-section').style.display = 'block';
+      isDashboardLoaded = false;
+  };
+
+  window.savePricingSettings = async function() {
+      let cM = parseInt(document.getElementById('saCustomPriceMonthly').value);
+      let cY = parseInt(document.getElementById('saCustomPriceYearly').value);
+
+      if(!cM || !cY) return alert("Please fill all prices correctly.");
+      
+      try {
+          await set(ref(centralDB, 'pricingSettings'), { 
+              customMonthly: cM, customYearly: cY 
+          });
+          window.customPriceMonthly = cM; window.customPriceYearly = cY;
+          updatePricingUI();
+          alert("Pricing updated successfully!");
+      } catch(e) {
+          alert("Error saving pricing: " + e.message);
+      }
+  };
+
+  // DISTRIBUTION LOGIC
+  window.distributeFunds = async function() {
+      try {
+          // Get Transactions
+          const txSnap = await get(ref(centralDB, 'transactions'));
+          let pendingAmount = 0;
+          let keysToUpdate = [];
+          
+          if(txSnap.exists()) {
+              const data = txSnap.val();
+              for(let key in data) {
+                  if(!data[key].isDistributed) {
+                      pendingAmount += data[key].amount;
+                      keysToUpdate.push(key);
+                  }
+              }
+          }
+          
+          if(pendingAmount === 0) return alert("No pending amount to distribute.");
+
+          // Get all Super Admins
+          const saSnap = await get(ref(centralDB, 'superAdmins'));
+          if(!saSnap.exists()) return alert("No super admins found in database.");
+          
+          const saData = saSnap.val();
+          const admins = Object.values(saData);
+          const adminCount = admins.length;
+          
+          if(adminCount === 0) return alert("No valid super admins to distribute to.");
+          
+          // Split Amount
+          const splitAmount = (pendingAmount / adminCount).toFixed(2);
+          
+          // Update DB (Mark as distributed)
+          const updates = {};
+          keysToUpdate.forEach(key => {
+              updates[`transactions/${key}/isDistributed`] = true;
+          });
+          await update(ref(centralDB), updates);
+          
+          // Show Results UI
+          const distList = document.getElementById("distList");
+          distList.innerHTML = `<p style="color:#eee; font-size:0.9rem; margin-bottom:10px;">Total Distributed: <strong>₹${pendingAmount}</strong></p>`;
+          
+          admins.forEach(admin => {
+              distList.innerHTML += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,255,204,0.3); padding:8px 0; font-size:0.9rem;">
+                  <span style="color:#fff;">${admin.email}</span>
+                  <span style="color:#38ef7d; font-weight:bold;">₹${splitAmount}</span>
+              </div>`;
+          });
+          
+          document.getElementById("distributionResult").style.display = "block";
+          
+      } catch (e) {
+          alert("Error during distribution: " + e.message);
+      }
+  };
+
+  window.closeDistribution = function() {
+      document.getElementById("distributionResult").style.display = "none";
+  };
+
+  function loadSuperAdminDashboard() {
+      document.getElementById('saCustomPriceMonthly').value = window.customPriceMonthly;
+      document.getElementById('saCustomPriceYearly').value = window.customPriceYearly;
+
+      // Listen for Transactions to update Stats
+      onValue(ref(centralDB, 'transactions'), (snapshot) => {
+          let totalToday = 0, totalWeekly = 0, totalMonthly = 0, totalPending = 0;
+          const now = new Date();
+          
+          // Time calculations
+          const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+          const day = now.getDay() || 7; 
+          const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + 1).getTime();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+          if(snapshot.exists()) {
+              const data = snapshot.val();
+              for(let key in data) {
+                  let tx = data[key];
+                  if(!tx.isDistributed) {
+                      totalPending += tx.amount;
+                      if(tx.date >= startOfDay) totalToday += tx.amount;
+                      if(tx.date >= startOfWeek) totalWeekly += tx.amount;
+                      if(tx.date >= startOfMonth) totalMonthly += tx.amount;
+                  }
+              }
+          }
+          
+          document.getElementById('saToday').innerText = `₹${totalToday}`;
+          document.getElementById('saWeekly').innerText = `₹${totalWeekly}`;
+          document.getElementById('saMonthly').innerText = `₹${totalMonthly}`;
+          document.getElementById('saPending').innerText = `₹${totalPending}`;
+      });
+  }
+
+  // ================= UI & UTILS =================
+  window.showForm = function() {
+    document.getElementById("offersSection").style.display = "none";
+    document.getElementById("formSection").style.display = "block";
+    document.getElementById("messageBox").style.display = "none";
+    // Uncheck policy automatically when form is opened freshly
+    document.getElementById("agreeRefund").checked = false;
+  };
+
+  window.hideForm = function() {
+    document.getElementById("formSection").style.display = "none";
+    document.getElementById("offersSection").style.display = "block";
+  };
+
+  window.updatePreview = function() {
+    let val = document.getElementById("domain").value.trim().toLowerCase();
+    let cleanBase = val.replace(/\..*$/, '').replace(/[^a-z0-9-]/g, '');
+    document.getElementById("preview").innerText = cleanBase ? cleanBase + ".in" : "yourname.in";
+  };
+
+  window.payNow = function() {
+    let name = document.getElementById("name").value.trim();
+    let domainRaw = document.getElementById("domain").value.trim().toLowerCase();
+    let baseDomain = domainRaw.replace(/\..*$/, '').replace(/[^a-z0-9-]/g, '');
+    let domain = baseDomain + ".in";
+    let email = document.getElementById("email").value.trim();
+    let mobile = document.getElementById("mobile").value.trim();
+    let address = document.getElementById("address").value.trim();
+    let planType = document.getElementById("plan").value;
+    
+    // Checkbox Validation
+    let isAgreed = document.getElementById("agreeRefund").checked;
+
+    if(!name || !baseDomain || !email || !mobile){
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (!isAgreed) {
+      alert("You must read and agree to the Refund Policy before making a payment.");
+      return;
+    }
+
+    let amount = planType === 'monthly' ? window.customPriceMonthly : window.customPriceYearly;
 
     var options = {
       key: "rzp_live_SUarhYm5IfBTar",
       amount: amount * 100,
       currency: "INR",
       name: "Sintha Developer",
-      description: `Purchase of ${domain} for ${days} days`,
-      handler: function(response) {
-        window.tempPaymentData = { domain, days, amount, buyerEmail, paymentId: response.razorpay_payment_id };
-        document.getElementById("adminEmailInput").value = buyerEmail;
-        document.getElementById("adminErrorMsg").style.display = "none";
-        document.getElementById("adminPopup").style.display = "flex";
-      },
-      prefill: { email: buyerEmail },
-      theme: { color: "#00ffcc" }
-    };
-    new Razorpay(options).open();
-  };
-
-  window.togglePassword = function() {
-    let pwd = document.getElementById("adminPassword");
-    let icon = document.getElementById("eyeIcon");
-    if (pwd.type === "password") { pwd.type = "text"; icon.innerText = "🙈"; } 
-    else { pwd.type = "password"; icon.innerText = "👁️"; }
-  };
-
-  window.saveAdminToFirebase = async function() {
-    if (!window.tempPaymentData) return alert("Payment Session Error. Contact Support.");
-
-    const name = document.getElementById("adminName").value.trim();
-    let phone = document.getElementById("adminPhone").value.trim();
-    const email = document.getElementById("adminEmailInput").value.trim();
-    const pass = document.getElementById("adminPassword").value.trim();
-    const errorMsg = document.getElementById("adminErrorMsg");
-
-    if (!name || !phone || !email || !pass) { errorMsg.innerText = "All fields required!"; errorMsg.style.display="block"; return; }
-    if (pass.length < 6) { errorMsg.innerText = "Password minimum 6 characters!"; errorMsg.style.display="block"; return; }
-
-    if (!phone.startsWith("+91")) phone = phone.length >= 10 && phone.startsWith("91") ? "+91 " + phone.substring(2) : "+91 " + phone;
-
-    const { domain, days, amount, paymentId } = window.tempPaymentData;
-    const db = dbs[domain];
-    const auth = auths[domain];
-    if (!db || !auth) { alert(`Error: Config missing for ${domain}. Contact support.`); return; }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      const newUserUid = userCredential.user.uid;
-      const expiryTimestamp = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
-      
-      await set(ref(db, 'users/' + newUserUid), { name, email, phone, role: "admin", createdAt: new Date().getTime(), expiryDate: expiryTimestamp, paymentId });
-      
-      const domainKey = domain.replace(/\./g, '_'); 
-      await set(ref(centralDB, 'soldDomains/' + domainKey), expiryTimestamp);
-      await set(ref(centralDB, 'soldDomainsDetails/' + domainKey), { domain, name, email, phone, password: pass, expiryTimestamp });
-      await set(push(ref(centralDB, 'transactions')), { domain, amount, date: new Date().getTime(), type: "purchase", isDistributed: false });
-
-      document.getElementById("adminPopup").style.display = "none";
-      
-      const invoiceData = { name, domain, amount, paymentId, phone, email, password: pass, isRenewal: false, days };
-      let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-      list = list.filter(d => d.domain !== domain); 
-      list.push({ domain, expiry: expiryTimestamp, invoice: invoiceData });
-      localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
-      
-      window.generateInvoice(name, domain, amount, paymentId, phone, email, pass, false, days);
-      window.tempPaymentData = null;
-
-      let credBox = document.getElementById("credentialsBox");
-      credBox.style.display = "block";
-      credBox.innerHTML = `<h3>✅ Created! Redirecting...</h3>`;
-      setTimeout(() => { window.location.reload(); }, 2000);
-
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-          errorMsg.innerHTML = "This email is already registered!<br><b>Please change the email address and Submit again.</b>";
-      } else { errorMsg.innerText = error.message; }
-      errorMsg.style.display = "block";
-    }
-  };
-
-  // ================= RENEW FUNCTIONS =================
-  window.openRenewPopup = function(domainName) {
-    if(domainName) {
-      window.renewingDomain = domainName;
-      document.getElementById("renewDomainNameDisplay").innerText = domainName;
-      document.getElementById("renewPopup").style.display = "flex";
-    }
-  };
-
-  window.closeRenewPopup = function() { document.getElementById("renewPopup").style.display = "none"; window.renewingDomain = null; };
-
-  window.calculateRenewPrice = function() {
-    let days = parseInt(document.getElementById("renewValidityDays").value);
-    let priceDisplay = document.getElementById("renewPriceDisplay");
-    let amount = 0;
-    if (!days || days < 1) { priceDisplay.innerText = "Enter valid Days"; return 0; }
-    if (days > 30) { days = 30; document.getElementById("renewValidityDays").value = 30; }
-
-    if (days >= 1 && days <= 15) amount = days * window.priceTier1; 
-    else if (days >= 16 && days <= 29) amount = days * window.priceTier2; 
-    else if (days >= 30) amount = window.priceTier3; 
-
-    priceDisplay.innerText = "Total: ₹" + amount;
-    return amount;
-  };
-
-  window.payForRenewal = function() {
-    if(typeof Razorpay === 'undefined') return alert("Payment system is loading, please check your internet.");
-    let domain = window.renewingDomain;
-    let days = parseInt(document.getElementById("renewValidityDays").value);
-    let email = document.getElementById("renewUserEmail").value.trim();
-    let amount = window.calculateRenewPrice();
-
-    if (!domain || !days || !email || amount === 0) return alert("Fill all fields correctly.");
-
-    var options = {
-      key: "rzp_live_SUarhYm5IfBTar", amount: amount * 100, currency: "INR", name: "Sintha Developer",
-      description: `Renewal of ${domain} for ${days} days`,
-      handler: async function(response) {
-         await window.processRenewal(domain, days, amount, response.razorpay_payment_id, email);
-      }, prefill: { email: email }
-    };
-    new Razorpay(options).open();
-  };
-
-  window.processRenewal = async function(domain, days, amount, paymentId, email) {
-    const db = dbs[domain];
-    if (!db) return alert(`Error: Database missing for '${domain}'.`);
-
-    try {
-        let list = JSON.parse(localStorage.getItem('purchasedDomainsList') || '[]');
-        let domainIndex = list.findIndex(d => d.domain === domain);
-        let currentExpiry = domainIndex !== -1 ? list[domainIndex].expiry : new Date().getTime();
-        let now = new Date().getTime();
-        let baseTime = currentExpiry > now ? currentExpiry : now;
-        let newExpiryTimestamp = baseTime + (days * 24 * 60 * 60 * 1000);
-
-        const usersSnap = await get(ref(db, 'users'));
-        if (usersSnap.exists()) {
-            let uids = Object.keys(usersSnap.val());
-            if (uids.length > 0) {
-                let userUid = uids[0];
-                await set(ref(db, `users/${userUid}/expiryDate`), newExpiryTimestamp);
-                await set(ref(db, `users/${userUid}/paymentId`), paymentId);
-                await set(ref(db, `users/${userUid}/email`), email);
-                await set(ref(db, `users/${userUid}/role`), "admin");
-            }
-        }
-        
-        const domainKey = domain.replace(/\./g, '_');
-        await set(ref(centralDB, 'soldDomains/' + domainKey), newExpiryTimestamp);
-        await set(ref(centralDB, `soldDomainsDetails/${domainKey}/expiryTimestamp`), newExpiryTimestamp);
-        await set(ref(centralDB, `soldDomainsDetails/${domainKey}/email`), email);
-        await set(push(ref(centralDB, 'transactions')), { domain, amount, date: new Date().getTime(), type: "renewal", isDistributed: false });
-
-        const invoiceData = { name: "Valued Customer", domain, amount, paymentId, phone: "N/A", email, password: null, isRenewal: true, days };
-
-        if(domainIndex !== -1) { list[domainIndex].expiry = newExpiryTimestamp; list[domainIndex].invoice = invoiceData; } 
-        else { list.push({ domain, expiry: newExpiryTimestamp, invoice: invoiceData }); }
-        localStorage.setItem('purchasedDomainsList', JSON.stringify(list));
-
-        document.getElementById("renewPopup").style.display = "none";
-        window.generateInvoice("Valued Customer", domain, amount, paymentId, "N/A", email, null, true, days);
-
-        alert("Domain renewed successfully!");
-        setTimeout(() => { window.location.reload(); }, 1500);
-    } catch (error) { alert(`Failed to renew. Please contact support with Payment ID: ${paymentId}`); }
-  };
-
-  // ================= UI & UTILS =================
-  window.showForm = function() { document.getElementById("offersSection").style.display = "none"; document.getElementById("formSection").style.display = "block"; };
-  window.hideForm = function() { document.getElementById("formSection").style.display = "none"; document.getElementById("offersSection").style.display = "block"; };
-  window.updatePreview = function() { let v = document.getElementById("domain").value.trim().toLowerCase().replace(/\..*$/, '').replace(/[^a-z0-9-]/g, ''); document.getElementById("preview").innerText = v ? v + ".in" : "yourname.in"; };
-  
-  window.generateSuggestions = function() {
-    let b = document.getElementById("title").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    let sc = document.getElementById("domainSuggestions");
-    if (b.length < 2) return sc.innerHTML = "";
-    sc.innerHTML = [b, `play${b}`, `${b}online`].map(x => `<div class="suggestion-chip" onclick="selectSuggestedDomain('${x}')">${x}.in</div>`).join('');
-  };
-  
-  window.selectSuggestedDomain = function(baseName) { document.getElementById("domain").value = baseName; window.updatePreview(); };
-
-  window.payNow = function() {
-    if(typeof Razorpay === 'undefined') return alert("Payment system is loading...");
-    let name = document.getElementById("name").value.trim(), title = document.getElementById("title").value.trim();
-    let baseDomain = document.getElementById("domain").value.trim().toLowerCase().replace(/\..*$/, '').replace(/[^a-z0-9-]/g, '');
-    let domain = baseDomain + ".in", email = document.getElementById("email").value.trim(), mobile = document.getElementById("mobile").value.trim();
-    let planType = document.getElementById("plan").value;
-    let amount = planType === 'monthly' ? window.customPriceMonthly : window.customPriceYearly;
-
-    if(!name || !title || !baseDomain || !email || !mobile) return alert("Fill all required fields");
-
-    new Razorpay({
-      key: "rzp_live_SUarhYm5IfBTar", amount: amount * 100, currency: "INR", name: "Sintha Developer", description: "Custom Domain Order",
-      handler: function(r){
+      description: "Custom Domain Order",
+      handler: async function(response){
         let validityDays = planType === 'monthly' ? "30 Days" : "365 Days";
-        window.generateInvoice(name, domain, amount, r.razorpay_payment_id, mobile, email, null, false, validityDays);
-        window.location.href = "https://wa.me/919366193440?text=" + encodeURIComponent(`New Order:\nName: ${name}\nDomain: ${domain}\nEmail: ${email}\nMobile: ${mobile}\nAmount: ₹${amount}\nPaymentID: ${r.razorpay_payment_id}`);
-      }, prefill: { name, email, contact: mobile }
-    }).open();
+        window.generateInvoice(name, domain, amount, response.razorpay_payment_id, mobile, email, validityDays);
+        
+        // Save Transaction for Admin Sales Dashboard
+        try {
+            const txRef = push(ref(centralDB, 'transactions'));
+            await set(txRef, {
+                domain: domain,
+                amount: amount,
+                date: new Date().getTime(),
+                type: "custom_purchase",
+                isDistributed: false
+            });
+        } catch(e) {
+            console.error("Failed to save transaction to admin panel", e);
+        }
+
+        const msg = `New Order:\nName: ${name}\nDomain: ${domain}\nEmail: ${email}\nMobile: ${mobile}\nAddress: ${address}\nAmount: ₹${amount}\nPaymentID: ${response.razorpay_payment_id}`;
+        window.location.href = "https://wa.me/919366193440?text=" + encodeURIComponent(msg);
+      },
+      prefill: { name: name, email: email, contact: mobile },
+      method: { upi: true, card: true, netbanking: true, wallet: true, emi: true }
+    };
+
+    new Razorpay(options).open();
   };
 
-  window.generateInvoice = function(name, domain, amount, paymentId, phone, email, pass = null, isRenewal = false, days = "N/A") {
-      if(!window.jspdf) return;
-      const { jsPDF } = window.jspdf; const doc = new jsPDF();
-      doc.setFillColor(44, 83, 100); doc.rect(0, 0, 210, 35, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(24); doc.setTextColor(255, 255, 255);
-      doc.text("INVOICE", 14, 23); doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(230, 230, 230);
-      doc.text("Sintha Developer", 196, 15, { align: 'right' }); doc.text("contact@sinthadeveloper.com", 196, 20, { align: 'right' });
-      doc.setTextColor(50, 50, 50); doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.text("BILL TO:", 14, 50);
-      doc.setFont('helvetica', 'normal'); doc.text(name, 14, 57); doc.text(email, 14, 64);
-      doc.text(`Payment ID: ${paymentId}`, 130, 50); doc.text(`Amount: Rs. ${amount}`, 130, 57);
+  window.generateInvoice = function(customerName, domain, amount, paymentId, customerPhone, customerEmail, validityDays = "N/A") {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const invoiceDate = new Date().toLocaleDateString('en-IN');
+      const invoiceId = paymentId.substring(4).toUpperCase();
+      amount = Number(amount);
+
+      doc.setFillColor(44, 83, 100);
+      doc.rect(0, 0, 210, 35, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.setTextColor(255, 255, 255);
+      doc.text("INVOICE", 14, 23);
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(230, 230, 230);
+      doc.text("Sintha Developer", 196, 15, { align: 'right' });
+      doc.text("contact@sinthadeveloper.com", 196, 20, { align: 'right' });
+      doc.text("+91 93661 93440", 196, 25, { align: 'right' });
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text("BILL TO:", 14, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.text(customerName, 14, 57);
+      doc.text(customerEmail, 14, 64);
+      doc.text(customerPhone, 14, 71);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text("Invoice #:", 130, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.text(invoiceId, 155, 50);
       
-      let desc = isRenewal ? `Domain Renewal (${domain})` : (pass ? `Ready Domain (${domain})` : `Custom Domain (${domain})`);
-      doc.text(`Description: ${desc}`, 14, 80); doc.text(`Validity: ${days} Days`, 14, 87);
+      doc.setFont('helvetica', 'bold');
+      doc.text("Date:", 130, 57);
+      doc.setFont('helvetica', 'normal');
+      doc.text(invoiceDate, 155, 57);
       
-      if(pass) { doc.text(`Login: ${email}`, 14, 105); doc.text(`Pass: ${pass}`, 14, 112); }
+      doc.setFont('helvetica', 'bold');
+      doc.text("Payment ID:", 130, 64);
+      doc.setFont('helvetica', 'normal');
+      doc.text(paymentId, 155, 64, { maxWidth: 45 });
+
+      let tableStartY = 90;
+      doc.setFillColor(240, 240, 240);
+      doc.rect(14, tableStartY, 182, 10, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0);
+      doc.text("DESCRIPTION", 18, tableStartY + 7);
+      doc.text("VALIDITY", 130, tableStartY + 7);
+      doc.text("AMOUNT", 180, tableStartY + 7, { align: 'right' });
+
+      let itemDescription = `New Custom Domain Registration (${domain})`;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text(itemDescription, 18, tableStartY + 17, { maxWidth: 100 });
+      
+      let validityStr = validityDays;
+      if (!isNaN(validityDays)) validityStr = `${validityDays} Days`;
+      doc.text(validityStr, 130, tableStartY + 17);
+
+      doc.text(`₹${amount.toFixed(2)}`, 180, tableStartY + 17, { align: 'right' });
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, tableStartY + 25, 196, tableStartY + 25);
+
+      let totalY = tableStartY + 35;
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text("TOTAL", 130, totalY);
+      doc.text(`₹${amount.toFixed(2)}`, 180, totalY, { align: 'right' });
+
+      let footerY = 270;
+      doc.setDrawColor(44, 83, 100);
+      doc.line(14, footerY, 196, footerY);
+      doc.setFontSize(10);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Thank you for your business!", 105, footerY + 8, { align: 'center' });
+      doc.text("This is a computer-generated invoice and does not require a signature.", 105, footerY + 13, { align: 'center' });
+
       doc.save(`${domain}_invoice.pdf`);
   };
 
-  // ================= SUPER ADMIN LOGIC =================
-  window.loginSuperAdmin = async function() {
-      let email = document.getElementById('saLoginEmail').value.trim(), pass = document.getElementById('saLoginPassword').value.trim();
-      if(!email || !pass) return alert("Enter credentials");
-      try { await signInWithEmailAndPassword(centralAuth, email, pass); } catch(e) { alert("Login Failed: " + e.message); }
-  };
-  
-  window.logoutSuperAdmin = async function() { await signOut(centralAuth); };
-  
-  window.savePricingSettings = async function() {
-      let t1 = parseInt(document.getElementById('saPriceTier1').value), t2 = parseInt(document.getElementById('saPriceTier2').value);
-      let t3 = parseInt(document.getElementById('saPriceTier3').value), cM = parseInt(document.getElementById('saCustomPriceMonthly').value), cY = parseInt(document.getElementById('saCustomPriceYearly').value);
-      if(!t1||!t2||!t3||!cM||!cY) return alert("Fill all fields");
-      try { await set(ref(centralDB, 'pricingSettings'), { tier1: t1, tier2: t2, tier3: t3, customMonthly: cM, customYearly: cY }); alert("Updated!"); } catch(e) {}
-  };
-  
-  window.distributeFunds = async function() {
-      try {
-          const txSnap = await get(ref(centralDB, 'transactions'));
-          let pending = 0, keys = [];
-          if(txSnap.exists()) { for(let k in txSnap.val()) { if(!txSnap.val()[k].isDistributed) { pending+=txSnap.val()[k].amount; keys.push(k); } } }
-          if(pending===0) return alert("No pending amount.");
-          const saSnap = await get(ref(centralDB, 'superAdmins'));
-          const admins = saSnap.exists() ? Object.values(saSnap.val()) : [];
-          if(admins.length===0) return;
-          const split = (pending/admins.length).toFixed(2);
-          const updates = {}; keys.forEach(k => updates[`transactions/${k}/isDistributed`] = true);
-          await update(ref(centralDB), updates);
-          let dl = document.getElementById("distList"); dl.innerHTML = `<p style="color:#eee">Total Distributed: <strong>₹${pending}</strong></p>`;
-          admins.forEach(a => dl.innerHTML += `<div style="display:flex;justify-content:space-between;color:#38ef7d;"><span>${a.email}</span><span>₹${split}</span></div>`);
-          document.getElementById("distributionResult").style.display = "block";
-      } catch (e) { alert("Error: " + e.message); }
-  };
-  
-  window.closeDistribution = function() { document.getElementById("distributionResult").style.display = "none"; };
-
-  function loadSuperAdminDashboard() {
-      document.getElementById('saPriceTier1').value = window.priceTier1; document.getElementById('saPriceTier2').value = window.priceTier2;
-      document.getElementById('saPriceTier3').value = window.priceTier3; document.getElementById('saCustomPriceMonthly').value = window.customPriceMonthly;
-      document.getElementById('saCustomPriceYearly').value = window.customPriceYearly;
-      
-      onValue(ref(centralDB, 'transactions'), (s) => {
-          let t=0, w=0, m=0, p=0; const n=new Date();
-          const sd=new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime(), sw=new Date(n.getFullYear(),n.getMonth(),n.getDate()-(n.getDay()||7)+1).getTime(), sm=new Date(n.getFullYear(),n.getMonth(),1).getTime();
-          if(s.exists()) { for(let k in s.val()) { let tx=s.val()[k]; if(!tx.isDistributed){ p+=tx.amount; if(tx.date>=sd) t+=tx.amount; if(tx.date>=sw) w+=tx.amount; if(tx.date>=sm) m+=tx.amount; } } }
-          document.getElementById('saToday').innerText=`₹${t}`; document.getElementById('saWeekly').innerText=`₹${w}`;
-          document.getElementById('saMonthly').innerText=`₹${m}`; document.getElementById('saPending').innerText=`₹${p}`;
-      });
-
-      onValue(ref(centralDB, 'soldDomainsDetails'), (s) => {
-          if(saCountdownInterval) clearInterval(saCountdownInterval);
-          let div = document.getElementById('saSoldDomainsList'); div.innerHTML = "";
-          if(!s.exists()) return div.innerHTML = "<p>No domains sold.</p>";
-          let data = s.val(), timers = [];
-          for(let k in data) {
-              let d = data[k];
-              div.innerHTML += `<div class="sa-domain-card"><h4>${d.domain}</h4><p>Name: ${d.name}</p><p>Email: ${d.email}</p><span class="sa-timer" id="sat_${k}"></span></div>`;
-              timers.push({ id: `sat_${k}`, exp: d.expiryTimestamp });
-          }
-          saCountdownInterval = setInterval(() => {
-              let now = new Date().getTime();
-              timers.forEach(t => {
-                  let el = document.getElementById(t.id);
-                  if(el) { let d=t.exp-now; if(d<0) el.innerText="Expired"; else el.innerText=`Expires in: ${Math.floor(d/86400000)}d`; }
-              });
-          }, 1000);
-      });
-  }
 </script>
 
+<!-- ================= NAVIGATION & SWIPE SCRIPT ================= -->
 <script>
-  // ================= SWIPE LOGIC =================
   const pages = ['page-home', 'page-contact', 'page-privacy', 'page-refund', 'page-superadmin'];
   let currentPageIndex = 0;
+
   window.switchPage = function(pageId) {
       pages.forEach((p, idx) => {
           document.getElementById(p).classList.remove('active');
           document.getElementById('nav-' + p.split('-')[1]).classList.remove('active');
           if (p === pageId) currentPageIndex = idx;
       });
+      
       document.getElementById(pageId).classList.add('active');
       document.getElementById('nav-' + pageId.split('-')[1]).classList.add('active');
-      if(pageId !== 'page-home') { document.getElementById("formSection").style.display = "none"; document.getElementById("offersSection").style.display = "block"; }
+
+      if(pageId !== 'page-home') {
+          document.getElementById("formSection").style.display = "none";
+          document.getElementById("offersSection").style.display = "block";
+      }
   };
 
-  let touchstartX = 0; let touchendX = 0; let touchstartY = 0; let touchendY = 0;
+  let touchstartX = 0;
+  let touchendX = 0;
+  let touchstartY = 0;
+  let touchendY = 0;
+
   function handleSwipe() {
-      const minDistance = 50; const maxVertical = 0.6; 
-      let diffX = touchstartX - touchendX, diffY = touchstartY - touchendY;
-      if (Math.abs(diffX) > minDistance && Math.abs(diffY) < Math.abs(diffX) * maxVertical) {
-          if (diffX > 0) { if (currentPageIndex < pages.length - 1) window.switchPage(pages[currentPageIndex + 1]); } 
-          else { if (currentPageIndex > 0) window.switchPage(pages[currentPageIndex - 1]); }
+      const minSwipeDistance = 50; 
+      const maxVerticalRatio = 0.6; 
+
+      let diffX = touchstartX - touchendX;
+      let diffY = touchstartY - touchendY;
+
+      if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffY) < Math.abs(diffX) * maxVerticalRatio) {
+          if (diffX > 0) {
+              if (currentPageIndex < pages.length - 1) window.switchPage(pages[currentPageIndex + 1]);
+          } else {
+              if (currentPageIndex > 0) window.switchPage(pages[currentPageIndex - 1]);
+          }
       }
   }
-  document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, { passive: true });
-  document.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY; handleSwipe(); }, { passive: true });
+
+  document.addEventListener('touchstart', e => {
+      touchstartX = e.changedTouches[0].screenX;
+      touchstartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+      touchendX = e.changedTouches[0].screenX;
+      touchendY = e.changedTouches[0].screenY;
+      handleSwipe();
+  }, { passive: true });
 </script>
 
 </body>
