@@ -326,7 +326,7 @@
             <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--danger); margin-bottom: 15px;"></i>
             <h2 style="color: var(--danger); font-family: 'Rajdhani', sans-serif; margin-bottom: 10px;">Link Expired or Invalid</h2>
             <p style="color: #94a3b8; font-size: 0.9rem;">The payment request is no longer valid or has already been completed.</p>
-            <button class="pay-btn" style="margin-top: 20px; background: #334155; box-shadow: none;" onclick="window.location.href='index.html'">Go Back</button>
+            <button class="pay-btn" style="margin-top: 20px; background: #334155; box-shadow: none;" id="errorBackBtn">Go Back</button>
         </div>
 
         <!-- Payment Details State -->
@@ -375,7 +375,7 @@
     </div>
 
     <script>
-        // FIREBASE CONFIGURATION (Same as index.html)
+        // FIREBASE CONFIGURATION (Wahi same db use hoga chahe domain koi bhi ho)
         const firebaseConfig = {
             apiKey: "AIzaSyBxtWgmOPaFY1tq1mHHYOC5IRtV_gIIFuQ",
             authDomain: "sinthahousiev5.firebaseapp.com",
@@ -392,10 +392,19 @@
         // RAZORPAY LIVE KEY
         const RAZORPAY_KEY = "rzp_live_SUarhYm5IfBTar";
 
-        // Global Variables
+        // Extracting Data from URL
         let paymentData = null;
         const urlParams = new URLSearchParams(window.location.search);
         const payId = urlParams.get('payId');
+        
+        // Return URL ko decode karna, taaki payment ke baad sahi website par ja sake
+        // Agar returnUrl nahi milta toh default fallback
+        const returnUrl = urlParams.get('returnUrl') ? decodeURIComponent(urlParams.get('returnUrl')) : 'index.html';
+
+        // Setup Error back button dynamic link
+        document.getElementById('errorBackBtn').onclick = () => {
+            window.location.href = returnUrl;
+        };
 
         // GSAP Entry Animation
         gsap.to("#paymentCard", {
@@ -531,15 +540,16 @@
                     timestamp: timestamp
                 });
 
-                // Redirect back to main page after animation completes (3 seconds)
+                // DYNAMIC REDIRECT: Go back to the exact domain we came from with success parameter
                 setTimeout(() => {
-                    window.location.replace(`index.html?payment_success=true`);
+                    const sep = returnUrl.includes('?') ? '&' : '?';
+                    window.location.replace(`${returnUrl}${sep}payment_success=true`);
                 }, 3000);
 
             } catch (error) {
                 console.error("Database update error post-payment: ", error);
                 alert("Payment received but error updating tickets. Please contact Admin with Payment ID: " + paymentId);
-                window.location.replace(`index.html`);
+                window.location.replace(returnUrl);
             }
         }
 
