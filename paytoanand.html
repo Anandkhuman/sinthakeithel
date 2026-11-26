@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .payment-card {
+            background: rgba(25, 21, 58, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00f6ff;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 0 20px rgba(0, 246, 255, 0.3);
+            text-align: center;
+        }
+        .payment-card h2 {
+            color: #00f6ff;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+        .detail-row span:last-child {
+            font-weight: bold;
+            color: #fff200;
+        }
+        .total-row {
+            font-size: 1.4rem;
+            margin-top: 15px;
+            border-bottom: none;
+        }
+        .pay-btn {
+            margin-top: 2rem;
+            width: 100%;
+            background: linear-gradient(45deg, #00f6ff, #00ff88);
+            color: #100c2A;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 246, 255, 0.4);
+            transition: transform 0.2s;
+        }
+        .pay-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-card">
+    <h2>Booking Preview</h2>
+    
+    <div class="detail-row">
+        <span>Name:</span>
+        <span id="preview-name">Loading...</span>
+    </div>
+    <div class="detail-row">
+        <span>Tickets:</span>
+        <span id="preview-tickets" style="word-break: break-all; max-width: 60%; text-align: right;">Loading...</span>
+    </div>
+    <div class="detail-row total-row">
+        <span>Total Amount:</span>
+        <span id="preview-amount">₹ 0</span>
+    </div>
+
+    <button class="pay-btn" id="payNowBtn" onclick="initiatePayment()">Pay Securely</button>
+</div>
+
+<script>
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const name = urlParams.get('name') || 'Guest';
+    const phone = urlParams.get('phone') || '';
+    const agentPhone = urlParams.get('agentPhone') || '';
+    const tickets = urlParams.get('tickets') || '';
+    const amount = urlParams.get('amount') || 0;
+    const baseURL = urlParams.get('baseURL') || window.location.origin + '/index.html';
+
+    // Set UI Details
+    document.getElementById('preview-name').innerText = name;
+    document.getElementById('preview-tickets').innerText = tickets;
+    document.getElementById('preview-amount').innerText = "₹ " + amount;
+
+    function initiatePayment() {
+        if (!amount || amount <= 0) {
+            alert("Invalid amount!");
+            return;
+        }
+
+        var options = {
+            "key": "rzp_live_SUarhYm5IfBTar", 
+            "amount": (parseInt(amount) * 100).toString(), 
+            "currency": "INR",
+            "name": "Sintha Housie",
+            "description": "Tickets: " + tickets,
+            "handler": function (response) {
+                // On Payment Success, redirect to WhatsApp for Approval
+                var paymentId = response.razorpay_payment_id;
+                var approvalLink = baseURL + "?book=" + code;
+                var msg = "Online Payment Successful! ✅\n\n*Payment ID*: " + paymentId + "\n*Name*: " + name + "\n*Tickets*: " + tickets + "\n*Total Paid*: ₹" + amount + "\n\n*Please click this link to approve my booking:*\n" + approvalLink;
+                
+                window.location.href = "https://wa.me/" + agentPhone + "?text=" + encodeURIComponent(msg);
+            },
+            "prefill": {
+                "name": name,
+                "contact": phone
+            },
+            "theme": {
+                "color": "#19153a"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+            alert("Payment Failed! Reason: " + response.error.description);
+        });
+        rzp1.open();
+    }
+</script>
+
+</body>
+</html>
